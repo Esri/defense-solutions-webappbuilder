@@ -1,10 +1,8 @@
-# Coordinate-Tool-Widget
+# Coordinate-Conversion-Widget
 
-The Coordinate Tool is an Esri Prototype Widget for [Web AppBuilder for ArcGIS](http://doc.arcgis.com/en/web-appbuilder/).The Coordinate Tool allows analysts to input coordinates, quickly converting them between several common formats including Universal Transverse Mercator (UTM), Military Grid Reference System (MGRS),
-Degrees, Decimal, Minutes (DDM), Degrees, Minutes, Seconds (DMS), Decimal Degrees (DD), U.S. National Grid (USNG), and Global Area Reference System (GARS).  Analysts also have the ability to interact with the map to dynamically retrieve the current cursor location in any or all of the formats listed above.  They can then use the
-Coordinate Tool to easily copy one or all coordinate formats to disseminate information to others for mission critical response.
+The Coordinate Conversion is an Esri Prototype Widget for [Web AppBuilder for ArcGIS](http://doc.arcgis.com/en/web-appbuilder/).The Coordinate Conversion allows analysts to input coordinates, quickly converting them between several common formats including Universal Transverse Mercator (UTM), Military Grid Reference System (MGRS), Degrees, Decimal, Minutes (DDM), Degrees, Minutes, Seconds (DMS), Decimal Degrees (DD), U.S. National Grid (USNG), and Global Area Reference System (GARS).  Analysts also have the ability to interact with the map to dynamically retrieve the current cursor location in any or all of the formats listed above.  They can then use the Coordinate Conversion to easily copy one or all coordinate formats to disseminate information to others for mission critical response.
 
-![Image of Coordinate Tool Widget][ss]
+![Image of Coordinate Conversion Widget][ss]
 
 ## Features
 
@@ -23,33 +21,33 @@ Coordinate Tool to easily copy one or all coordinate formats to disseminate info
 
 ## Requirements
 
-* Web Appbuilder Version 1.3 December 2015
+* Web Appbuilder Version 1.3
 * [ArcGIS Web Appbuilder for ArcGIS](http://developers.arcgis.com/web-appbuilder/)
 
 ## Instructions
 Deploying Widget
 
 Setting Up Repository for Development
-In order to develop and test widgets you need to deploy the CoordinateTool folder to the stemapp/widgets directory in your Web AppBuilder for ArcGIS installation. If you use Github for windows this can be accomplished using the following steps.
+In order to develop and test widgets you need to deploy the CoordinateConversion folder to the stemapp/widgets directory in your Web AppBuilder for ArcGIS installation. If you use Github for windows this can be accomplished using the following steps.
 
 1. Sync the repository to your local machine.
 2. Open the Repository in Windows Explorer
 3. Close Github for Windows
-4. Cut and paste the entire CoordinateTool folder into the stemapp/widgets folder
+4. Cut and paste the entire CoordinateConversion folder into the stemapp/widgets folder
 5. Launch Github for Windows and choose the option to locate the repository. This will change the location on disk to the new location.
 
 ## Workflow
-The Coordinate Tool is an intuitive and easy to use widget. Below are some quick How-to steps on performing functions of the Coordinate Tool.
+The Coordinate Conversion is an intuitive and easy to use widget. Below are some quick How-to steps on performing functions of the Coordinate Conversion.
 
 Convert Coordinate Formats
 
-1.	Click the Coordinate Tool button.
-2.	The Coordinate Tool window appears.
+1.	Click the Coordinate Conversion button.
+2.	The Coordinate Conversion window appears.
 3.	Enter a coordinate in the Input text box.
 4.	Click the (+) button to add an Output coordinate format.
 5.	By default, the DD format appears in the Output format.
 6.	Using the dropdown, select the desired Output coordinate.
-7.	Repeat until all desired Output coordinate formats have been added to the Coordinate Tool window.
+7.	Repeat until all desired Output coordinate formats have been added to the Coordinate Conversion window.
 8.	The Input coordinate will automatically be converted in the desired Output coordinate formats.
 
 
@@ -62,7 +60,7 @@ Zoom-to Input Coordinate
 
 Map Point Tool
 
-1.	Click the Coordinate Tool button.
+1.	Click the Coordinate Conversion button.
 2.	Click directly on the map using the cursor.
 3.	A blue point marker will be placed on the map at the clicked location.
 4.	The cursor’s coordinate location will automatically be populated in the Input text box.
@@ -73,7 +71,7 @@ Copy Coordinates
 
 1.	Enter a coordinate in the Input text box.
 2.	The Input coordinate will automatically be converted in the desired Output coordinate formats.
-3.	Click the Copy all output coordinates button in the Input section to copy the Input coordinate in addition to      all other Output coordinate formats listed in the Output section.
+3.	Click the Copy all output coordinates button in the Input section to copy the Input coordinate in addition to all other Output coordinate formats listed in the Output section.
 4.	If only a specific coordinate is desired for copying, click the Copy to clipboard button in the same row as the desired coordinate in the Output section.
 
 Remove Coordinate Output Format
@@ -83,7 +81,7 @@ Remove Coordinate Output Format
 
 Coordinate Output Format
 
-The Coordinate Tool allows formatting of notations using a custom format string for each particular coordinate type.
+The Coordinate Conversion allows formatting of notations using a custom format string for each particular coordinate type.
 
 1.	After a Coordinate is added to the Output list, click the Format Output button.
 2.	In the Set Coordinate Format String window, choose the coordinate type to update.
