@@ -1,0 +1,10 @@
+{
+  "feedback": {
+    "linesymbol": {
+      "type": "esriSLS",
+      "style": "esriSLSSolid",
+      "color": [255, 50, 50, 255],
+      "width": 2
+    }
+  }
+}

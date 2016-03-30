@@ -1,0 +1,36 @@
+<div class="tabPanel" data-dojo-attach-point="circleContainer">
+    <div class="controls">
+        <div class="controlGroup">
+            <label>Create Circle From</label>
+            <div class="controlItem">
+                <select style="width: 225px" data-dojo-type="dijit/form/Select" data-dojo-attach-point="creationType">
+                    <option value="Radius">Radius</option>
+                    <option value="Diameter">Diameter</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="controlGroup">
+            <label>Center Point</label>
+            <div class="controlItem">
+                <input class="jimu-input coordInput" data-dojo-attach-point="startPointCoords" placeholder="Enter Coordinates" />
+                <span class="addPointBtn" data-dojo-attach-point="addPointBtn"></span>
+            </div>
+        </div>
+
+        <div class="controlGroup">
+            <label>Radius/Diameter</label>
+            <div class="controlItem">
+                <input class="jimu-input selectInput" data-dojo-attach-point="lengthInput" />
+                <select style="width: 100px" class="controlSpace" data-dojo-type="dijit/form/Select" data-dojo-attach-point="lengthUnitDD">
+                    <option value="feet">Feet</option>
+                    <option value="meters" selected>Meters</option>
+                    <option value="yards">Yards</option>
+                    <option value="kilometers">Kilometers</option>
+                    <option value="miles">Miles</option>
+                    <option value="nautical-miles">Nautical Mile</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>

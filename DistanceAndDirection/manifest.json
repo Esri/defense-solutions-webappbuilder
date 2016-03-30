@@ -1,0 +1,15 @@
+{
+  "name": "GeodesyAndRange",
+  "platform": "HTML",
+  "version": "1.4",
+  "wabVersion": "1.4",
+  "author": "Esri",
+  "description": "Military Analyst Geodesy and Range Widget",
+  "copyright": "",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0",
+  "properties": {
+  	"keepConfigAfterMapSwithched": false,
+    "supportMultiInstance": false,
+    "hasVersionManager": false
+  }
+}

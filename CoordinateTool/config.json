@@ -1,0 +1,7 @@
+{
+    "zoomLevel": 12,
+    "initialCoords": ["DDM", "DMS", "MGRS", "UTM"],
+    "geometryService": {
+        "url": "http://pscltags1.eastus.cloudapp.azure.com/arcgis/rest/services/Utilities/Geometry/GeometryServer"
+    }
+}
