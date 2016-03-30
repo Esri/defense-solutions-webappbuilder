@@ -14,7 +14,7 @@ The Web AppBuilder Widgets for Military Analyst is a set of widgets for use with
 ## Features
 The Widget Repository currently includes:
 
-* [Distance and Direction](./DistanceAndDirection/README.md) | WAB 1.2 
+* [Distance and Direction](./DistanceAndDirection/ReadMe.md) | WAB 1.2 
 * [Coordinate Conversion](./CoordinateConversion/ReadMe.md) | WAB 1.2 
 
 ## Requirements
