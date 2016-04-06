@@ -79,7 +79,7 @@ define([
           'spatialReference': {
             'wkid': 4326
           }
-        })).then(function (r) {
+        })).then(function () {
           console.log('Geometry Engine initialized');
         });
 
@@ -101,13 +101,29 @@ define([
         units: this.lengthUnit
       });
 
-      var screen = esriScreenUtils.toScreenPoint(this.map.extent, this.map.width, this.map.height, pt);
+      var screen = esriScreenUtils.toScreenPoint(
+        this.map.extent,
+        this.map.width,
+        this.map.height,
+        pt
+      );
       screen.x -= 40;
       screen.y += 20;
 
-      var lengthLoc = esriScreenUtils.toMapPoint(this.map.extent, this.map.width, this.map.height, screen);
+      var lengthLoc = esriScreenUtils.toMapPoint(
+        this.map.extent,
+        this.map.width,
+        this.map.height,
+        screen
+      );
 
-      var lblFont = new EsriFont(14, EsriFont.STYLE_NORMAL, EsriFont.VARIANT_NORMAL, EsriFont.WEIGHT_BOLD, 'Arial');
+      var lblFont = new EsriFont(
+        14,
+        EsriFont.STYLE_NORMAL,
+        EsriFont.VARIANT_NORMAL,
+        EsriFont.WEIGHT_BOLD,
+        'Arial'
+      );
 
       var txtLbl = new EsriTextSymbol(lenStr, lblFont, new EsriColor('black'));
 
@@ -161,9 +177,11 @@ define([
 
           // draw length of current line
           if (this.lengthLayer) {
-            esriGeoDUtils.geodesicLength(g, this.lengthUnit).then(dojoLang.hitch(this, function (l) {
-              this.showLength(end, l);
-            }));
+            esriGeoDUtils.geodesicLength(g, this.lengthUnit).then(
+              dojoLang.hitch(this, function (l) {
+                this.showLength(end, l);
+              })
+            );
           }
           break;
         case esriDraw.CIRCLE:
@@ -177,21 +195,23 @@ define([
           });
           pLine = EsriWebMercatorUtils.webMercatorToGeographic(pLine);
 
-          esriGeoDUtils.geodesicLength(pLine, this.lengthUnit).then(dojoLang.hitch(this, function (l) {
-            var circleParams = {
-              center: EsriWebMercatorUtils.webMercatorToGeographic(start),
-              geodesic: true,
-              numberOfPoints: 60,
-              radius: this.convertToMeters(l),
-              radiusUnits: this.getRadiusUnitType()
-            };
-            var g = new EsriCircle(circleParams);
-            _graphic.geometry = dojoLang.mixin(g, {
-              paths:[
-                [[start.x, start.y], [end.x, end.y]]
-              ]});
-            _graphic.setGeometry(_graphic.geometry);
-          }));
+          esriGeoDUtils.geodesicLength(pLine, this.lengthUnit).then(
+            dojoLang.hitch(this, function (l) {
+              var circleParams = {
+                center: EsriWebMercatorUtils.webMercatorToGeographic(start),
+                geodesic: true,
+                numberOfPoints: 60,
+                radius: this.convertToMeters(l),
+                radiusUnits: this.getRadiusUnitType()
+              };
+              var g = new EsriCircle(circleParams);
+              _graphic.geometry = dojoLang.mixin(g, {
+                paths:[
+                  [[start.x, start.y], [end.x, end.y]]
+                ]});
+                _graphic.setGeometry(_graphic.geometry);
+            }
+          ));
           break;
       }
 

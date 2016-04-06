@@ -53,6 +53,9 @@
 .jimu-widget-GeodesyAndRange .controlGroup {
   margin-top: 13px;
 }
+  .jimu-widget-GeodesyAndRange .controlGroup .controlGroupChild{
+    margin-top: 6px;
+  }
 
   .jimu-widget-GeodesyAndRange .controlGroup .splitRight {
     position: absolute;
