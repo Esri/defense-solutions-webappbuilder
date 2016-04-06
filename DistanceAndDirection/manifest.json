@@ -1,15 +1,19 @@
 {
-  "name": "GeodesyAndRange",
+  "name": "DistanceAndDirection",
   "platform": "HTML",
   "version": "1.4",
   "wabVersion": "1.4",
   "author": "Esri",
-  "description": "Military Analyst Geodesy and Range Widget",
+  "description": "Military Analyst Distance and Direction Widget",
   "copyright": "",
   "license": "http://www.apache.org/licenses/LICENSE-2.0",
   "properties": {
   	"keepConfigAfterMapSwithched": false,
     "supportMultiInstance": false,
-    "hasVersionManager": false
+    "hasVersionManager": false,
+    "hasSettingPage": false,
+    "hasSettingUIFile": false,
+    "hasSettingLocale": false,
+    "hasSettingStyle": false
   }
 }
