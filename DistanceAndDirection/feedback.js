@@ -22,7 +22,8 @@ define([
   'dojo/string',
   'dojo/Stateful',
   'esri/Color',
-  'esri/toolbars/draw',
+  /*'esri/toolbars/draw',*/
+  './Draw',
   'esri/geometry/Polyline',
   'esri/geometry/Polygon',
   'esri/geometry/Point',
@@ -83,7 +84,7 @@ define([
           console.log('Geometry Engine initialized');
         });
 
-      this.inherited(arguments);
+      // this.inherited(arguments);
     },
 
     /**

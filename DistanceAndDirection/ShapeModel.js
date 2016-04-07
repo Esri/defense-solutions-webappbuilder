@@ -17,6 +17,8 @@
 /*global define*/
 define([
   'dojo/_base/declare',
+  'dojo/_base/array',
+  'dojo/_base/lang',
   'dojo/string',
   'dojo/number',
   'esri/geometry/geometryEngine',
@@ -25,6 +27,8 @@ define([
   'esri/geometry/Polyline'
 ], function (
   dojoDeclare,
+  dojoArray,
+  dojoLang,
   dojoString,
   dojoNumber,
   esriGeometryEngine,
@@ -47,17 +51,21 @@ define([
      *
      **/
     getAngle: function (inUnits) {
-      var delx = this.endPoint.y - this.startPoint.y;
-      var dely = this.endPoint.x - this.startPoint.x;
+      var angle = null;
+      if (this.angle === undefined) {
+        var delx = this.endPoint.y - this.startPoint.y;
+        var dely = this.endPoint.x - this.startPoint.x;
 
-      var azi = Math.atan2(dely, delx) * 180 / Math.PI;
-      var br = ((azi + 360) % 360);
-
+        var azi = Math.atan2(dely, delx) * 180 / Math.PI;
+        angle = ((azi + 360) % 360);
+      } else {
+        angle = Number(this.angle);
+      }
       if (inUnits === 'mils') {
-        br = br * 17.777777778;
+        angle *= 17.777777778;
       }
 
-      return br.toFixed(2);
+      return angle.toFixed(2);
     },
 
     /**
@@ -90,7 +98,7 @@ define([
      * @param length
      * @returns {*}
      */
-    formatLength: function (length) {
+    formatLength: function (length, withUnit) {
       return dojoNumber.format(length, {
         places: 4
       })
@@ -103,24 +111,41 @@ define([
       dojoDeclare.safeMixin(this, args);
 
       if (this.geometry.type === "polygon") {
-        var pLine = new esriPolyline({
-          paths: [
-            [this.geometry.paths[0][0], this.geometry.paths[0][1]]
-          ],
-          spatialReference: {
-            wkid: this.geometry.spatialReference.wkid
+        if (this.geometry.hasOwnProperty("drawType")) {
+          if (this.geometry.drawType === "ellipse") {
+            var line = new esriPolyline();
+            dojoArray.forEach(this.geometry.geometry.rings, dojoLang.hitch(this, function (ring) {
+              line.paths.push(ring);
+            }));
+            line.spatialReference = this.geometry.spatialReference;
+            line = esriWMUtils.webMercatorToGeographic(line);
+            this.geographicGeometry = line;
+            this.geodesicGeometry = esriGeometryEngine.geodesicDensify(line, 10000);
+            this.wmGeometry = this.geometry;
+            this.angle = this.geometry.angle;
           }
-        });
-        pLine = esriWMUtils.webMercatorToGeographic(pLine);
-        this.geographicGeometry = pLine;
-        this.geodesicGeometry = esriGeometryEngine.geodesicDensify(pLine, 10000);
-        this.wmGeometry = this.geometry;
+        } else {
+          var pLine = new esriPolyline({
+            paths: [
+              [this.geometry.paths[0][0], this.geometry.paths[0][1]]
+            ],
+            spatialReference: {
+              wkid: this.geometry.spatialReference.wkid
+            }
+          });
+          pLine = esriWMUtils.webMercatorToGeographic(pLine);
+          this.geographicGeometry = pLine;
+          this.geodesicGeometry = esriGeometryEngine.geodesicDensify(pLine, 10000);
+          this.wmGeometry = this.geometry;
+        }
       }
       else {
         this.geodesicGeometry = esriGeometryEngine.geodesicDensify(this.geographicGeometry, 10000);
         this.wmGeometry = esriWMUtils.geographicToWebMercator(this.geodesicGeometry);
       }
-      this.startPoint = this.geodesicGeometry.getPoint(0,0);
+      this.startPoint = this.geometry.drawType === "ellipse" ?
+        esriWMUtils.webMercatorToGeographic(this.geometry.center) :
+        this.geodesicGeometry.getPoint(0,0);
       this.endPoint = this.geodesicGeometry.getPoint(0, this.geodesicGeometry.paths[0].length - 1);
 
       this.formattedStartPoint = dojoString.substitute('${xStr}, ${yStr}', {

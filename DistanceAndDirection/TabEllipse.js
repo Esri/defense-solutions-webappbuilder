@@ -19,23 +19,47 @@ define([
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/on',
+    'dojo/topic',
     'dojo/dom-attr',
     'dojo/dom-class',
     'dojo/dom-style',
+    'dojo/string',
+    'dojo/number',
     'dijit/_WidgetBase',
     'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin',
+    'esri/layers/GraphicsLayer',
+    'esri/geometry/geometryEngine',
+    'esri/symbols/SimpleLineSymbol',
+    'esri/symbols/SimpleFillSymbol',
+    'esri/graphic',
+    'esri/units',
+    'esri/geometry/webMercatorUtils',
+    './Feedback',
+    './ShapeModel',
     'dojo/text!./templates/TabEllipse.html'
 ], function (
     dojoDeclare,
     dojoLang,
     dojoOn,
+    dojoTopic,
     dojoDomAttr,
     dojoDomClass,
     dojoDomStyle,
+    dojoString,
+    dojoNumber,
     dijitWidgetBase,
     dijitTemplatedMixin,
     dijitWidgetsInTemplate,
+    EsriGraphicsLayer,
+    esriGeometryEngine,
+    EsriSimpleLineSymbol,
+    EsriSimpleFillSymbol,
+    EsriGraphic,
+    esriUnits,
+    esriWMUtils,
+    DrawFeedBack,
+    ShapeModel,
     templateStr
 ) {
     'use strict';
@@ -47,15 +71,214 @@ define([
          * class constructor
          **/
         constructor: function (args) {
-            dojoDeclare.safeMixin(this, args);
-            //this.uid = args.id || dijitRegistry.getUniqueId('LineTab');
+          dojoDeclare.safeMixin(this, args);
         },
 
         /**
          * dijit post create
          **/
         postCreate: function () {
-          console.log('TabEllipse');
+          this.currentAngleUnit = this.angleUnitDD.get('value');
+          this.currentLengthUnit = this.lengthUnitDD.get('value');
+
+          this._lengthLayer = new EsriGraphicsLayer();
+          this._gl = new EsriGraphicsLayer();
+          this.map.addLayers([this._gl, this._lengthLayer]);
+
+          this._circleSym = new EsriSimpleFillSymbol(this.circlesymbol);
+
+          // add extended toolbar
+          this.dt = new DrawFeedBack(this.map);
+          this.dt.set('lengthLayer', this._lengthLayer);
+
+          this.syncEvents();
+        },
+
+        /**
+         *
+         **/
+        syncEvents: function () {
+          dojoTopic.subscribe('DD_CLEAR_GRAPHICS', dojoLang.hitch(this, this.clearGraphics));
+          dojoTopic.subscribe('DD_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
+          dojoTopic.subscribe('DD_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
+
+          this.own(
+            this.dt.on(
+              'draw-complete',
+              dojoLang.hitch(this, this.feedbackDidComplete)
+          ));
+
+          this.own(dojoOn(
+            this.addPointBtn,
+            'click',
+            dojoLang.hitch(this, this.pointButtonWasClicked)
+          ));
+
+          this.own(this.ellipseType.on(
+            'change',
+            dojoLang.hitch(this, this.ellipseTypeChangeHandler)
+          ))
+
+          this.own(this.angleUnitDD.on(
+            'change',
+            dojoLang.hitch(this, this.angleUnitDDDidChange)
+          ));
+
+          this.own(this.lengthUnitDD.on(
+            'change',
+            dojoLang.hitch(this, this.lengthUnitDDDidChange)
+          ))
+
+        },
+
+        /**
+         * Button click event, activate feedback tool
+         **/
+        pointButtonWasClicked: function () {
+          this.map.disableMapNavigation();
+          this.dt.activate('polyline');
+          dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
+        },
+
+        /**
+         *
+         **/
+        lengthUnitDDDidChange: function () {
+          this.currentLengthUnit = this.lengthUnitDD.get('value');
+          this.dt.set('lengthUnit', this.currentLengthUnit);
+          if (this.currentLine) {
+            this.ellipseTypeChangeHandler();
+            dojoDomAttr.set(
+              this.minorAxisInput,
+              'value',
+              this._getFormattedLength(this.currentLine.geometry.minorAxisLength)
+            );
+          }
+        },
+
+        /**
+         *
+         **/
+        ellipseTypeChangeHandler: function () {
+          var majorAxisLength = this.ellipseType.get('value') === 'full' ?
+            this.currentLine.geometry.majorAxisLength * 2 :
+            this.currentLine.geometry.majorAxisLength
+          dojoDomAttr.set(
+            this.majorAxisInput,
+            'value',
+            this._getFormattedLength(majorAxisLength)
+          );
+        },
+
+        /**
+         *
+         **/
+        angleUnitDDDidChange: function () {
+          this.currentAngleUnit = this.angleUnitDD.get('value');
+
+          if (this.currentLine) {
+            dojoDomAttr.set(
+              this.angleInput,
+              'value',
+              this.currentLine.getAngle(this.currentAngleUnit));
+          }
+        },
+
+        /**
+         *
+         **/
+        feedbackDidComplete: function (results) {
+          this.currentLine = new ShapeModel(results);
+          this.currentLine.graphic = new EsriGraphic(
+            this.currentLine.wmGeometry.geometry,
+            this._circleSym
+          );
+
+          dojoDomAttr.set(
+            this.startPointCoords,
+            'value',
+            this.currentLine.formattedStartPoint
+          );
+
+          this.lengthUnitDDDidChange();
+          this.angleUnitDDDidChange();
+
+          this._gl.add(this.currentLine.graphic);
+          if (this._lengthLayer.graphics.length > 0) {
+            var tg = dojoLang.clone(this._lengthLayer.graphics[0].geometry);
+            var ts = dojoLang.clone(this._lengthLayer.graphics[0].symbol);
+            this._gl.add(new EsriGraphic(tg, ts));
+            this._lengthLayer.clear();
+          }
+
+          this.emit('graphic_created', this.currentLine);
+
+          this.map.enableMapNavigation();
+          this.dt.deactivate();
+          dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
+        },
+
+        /**
+         *
+         **/
+        clearGraphics: function () {
+          if (this._gl) {
+            this._gl.clear();
+            this._lengthLayer.clear();
+            dojoDomAttr.set(this.startPointCoords, 'value', '');
+            dojoDomAttr.set(this.majorAxisInput, 'value', '');
+            dojoDomAttr.set(this.minorAxisInput, 'value', '');
+            dojoDomAttr.set(this.angleInput, 'value', '');
+          }
+        },
+
+        /**
+         *
+         **/
+        setGraphicsHidden: function () {
+          if (this._gl) {
+            this._gl.hide();
+          }
+        },
+
+        /**
+         *
+         **/
+        setGraphicsShown: function () {
+          if (this._gl) {
+            this._gl.show();
+          }
+        },
+
+        _getFormattedLength: function (length) {
+          var convertedLength = length;
+          switch (this.currentLengthUnit) {
+            case "meters":
+              convertedLength = length;
+              break;
+            case "feet":
+              convertedLength = length * 3.28084;
+              break;
+            case "kilometers":
+              convertedLength = length * 1000;
+              break;
+            case "miles":
+              convertedLength = length * 0.00062137121212121;
+              break;
+            case "nautical-miles":
+              convertedLength = length * 0.00053995682073433939625;
+              break;
+            case "yards":
+              convertedLength = length * 1.0936133333333297735;
+              break;
+            case "ussurveyfoot":
+              convertedLength = length * 3.2808333333465;
+              break;
+          }
+          return dojoNumber.format(convertedLength, {
+            places:4
+          });          ;
+
         }
     });
 });

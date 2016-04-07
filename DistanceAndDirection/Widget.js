@@ -47,7 +47,7 @@ define([
 ) {
   'use strict';
   var clz = dojoDeclare([jimuBaseWidget, dijitWidgetsInTemplate], {
-    baseClass: 'jimu-widget-GeodesyAndRange',
+    baseClass: 'jimu-widget-DistanceAndDirection',
 
     /**
      *
@@ -81,6 +81,22 @@ define([
         this.circleTabNode
       );
 
+      this.ellipseTab = new TabEllipse({
+        map: this.map,
+        circlesymbol: this.config.feedback.circlesymbol || {
+          type: 'esriSFS',
+          style: 'esriSFSNull',
+          color: [255,0,0,0],
+          outline: {
+            color: [255, 50, 50, 255],
+            width: 1.25,
+            type: 'esriSLS',
+            style: 'esriSLSSolid'
+          }
+        }},
+        this.ellipseTabNode
+      );
+
       /**
        *
        **/
@@ -100,7 +116,7 @@ define([
           },
           {
             title: 'Ellipse',
-            content: new TabEllipse({}, this.EllipseTabContainer)
+            content: this.ellipseTab
           },
           {
             title: 'Range',
@@ -110,16 +126,16 @@ define([
       }, this.tabContainer);
 
       this.own(dojoOn(this.clearGraphicsButton, 'click', function (){
-        dojoTopic.publish('GR_CLEAR_GRAPHICS');
+        dojoTopic.publish('DD_CLEAR_GRAPHICS');
       }));
     },
 
     onClose: function () {
-      dojoTopic.publish('GR_WIDGET_CLOSE');
+      dojoTopic.publish('DD_WIDGET_CLOSE');
     },
 
     onOpen: function () {
-      dojoTopic.publish('GR_WIDGET_OPEN');
+      dojoTopic.publish('DD_WIDGET_OPEN');
     }
   });
   return clz;

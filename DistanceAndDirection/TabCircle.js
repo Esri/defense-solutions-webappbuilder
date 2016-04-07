@@ -95,9 +95,9 @@ define([
     },
 
     syncEvents: function () {
-      dojoTopic.subscribe('GR_CLEAR_GRAPHICS', dojoLang.hitch(this, this.clearGraphics));
-      dojoTopic.subscribe('GR_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
-      dojoTopic.subscribe('GR_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
+      dojoTopic.subscribe('DD_CLEAR_GRAPHICS', dojoLang.hitch(this, this.clearGraphics));
+      dojoTopic.subscribe('DD_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
+      dojoTopic.subscribe('DD_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
 
       this.own(
         this.dt.on(
