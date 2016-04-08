@@ -190,7 +190,7 @@ define([
         feedbackDidComplete: function (results) {
           this.currentLine = new ShapeModel(results);
           this.currentLine.graphic = new EsriGraphic(
-            this.currentLine.wmGeometry.geometry,
+            this.currentLine.geodesicGeometry,
             this._circleSym
           );
 

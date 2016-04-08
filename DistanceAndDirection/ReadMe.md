@@ -71,6 +71,15 @@ In order to develop and test widgets you need to deploy the DistanceAndDirection
       Note: The ‘Center Point’ and ‘Radius/Diameter’ will update based on parameters from newly created circle.
 	* If desired you can clear all graphics with the clear graphics button
 
+### Create a Circle using the Distance Calculator Interactively
+
+		* Choose the Circle tab on the Distance and Direction Tool
+		* Expand the Distance Calculator section
+		* Enter a Time
+		* Enter a Rate
+		* Start an interactive session by selecting the ‘Map Point’ icon
+		* Click on the map to create a starting (center) point.
+		* A graphic will be displayed using the calculated distance and the clicked point
 
 ### Create Ellipses Interactively
 	* Choose the Ellipse tab on the Distance and Directions Tool

@@ -28,6 +28,7 @@ define([
   'dijit/_WidgetBase',
   'dijit/_TemplatedMixin',
   'dijit/_WidgetsInTemplateMixin',
+  'dijit/TitlePane',
   'esri/layers/GraphicsLayer',
   'esri/geometry/geometryEngine',
   'esri/symbols/SimpleFillSymbol',
@@ -50,6 +51,7 @@ define([
   dijitWidgetBase,
   dijitTemplatedMixin,
   dijitWidgetsInTemplate,
+  dijitTitlePane,
   EsriGraphicsLayer,
   esriGeometryEngine,
   EsriSimpleFillSymbol,
@@ -77,6 +79,8 @@ define([
      * dijit post create
      **/
     postCreate: function () {
+      this.useCalculatedDistance = false;
+
       this.currentLengthUnit = this.lengthUnitDD.get('value');
 
       this._lengthLayer = new EsriGraphicsLayer();
@@ -119,7 +123,101 @@ define([
       this.own(this.creationType.on(
         'change',
         dojoLang.hitch(this, this.creationTypeDidChange)
-      ))
+      ));
+
+      this.own(dojoOn(
+        this.timeInput,
+        'change',
+        dojoLang.hitch(this, this.timeInputDidChange)
+      ));
+
+      this.own(dojoOn(
+        this.distanceInput,
+        'change',
+        dojoLang.hitch(this, this.distanceInputDidChange)
+      ));
+
+      this.own(this.distanceUnitDD.on(
+        'change',
+        dojoLang.hitch(this, this.distanceInputDidChange)
+      ));
+
+      this.own(this.timeUnitDD.on(
+        'change',
+        dojoLang.hitch(this, this.timeInputDidChange)
+      ));
+
+      this.own(dojoOn(
+        this.lengthInput,
+        'change',
+        dojoLang.hitch(
+          this,
+          this.lengthInputDidChange
+        )
+      ));
+    },
+
+    lengthInputDidChange: function () {
+      if (this.lengthInput.value && this.lengthInput.value <= 0){
+        this.useCalculatedDistance = false;
+      }
+    },
+    /**
+     *
+     **/
+    timeInputDidChange: function (evt) {
+      console.log("Time Input Did Change");
+      this.currentTimeInSeconds = this.timeInput.value;
+      this.getCalculatedDistance();
+    },
+
+    /**
+     *
+     **/
+    distanceInputDidChange: function (evt) {
+      console.log("Distance Input DiD Change");
+      this.currentDistanceInMeters = this.distanceInput.value * this.distanceUnitDD.value;
+      this.getCalculatedDistance();
+    },
+
+    /**
+     *
+     **/
+    getCalculatedDistance: function () {
+      if ((this.currentTimeInSeconds && this.currentTimeInSeconds > 0) &&
+        (this.currentDistanceInMeters && this.currentDistanceInMeters > 0)) {
+        this.calculatedRadiusInMeters = this.currentTimeInSeconds * this.currentDistanceInMeters;
+        this.useCalculatedDistance = true;
+        var fr = 0;
+        switch (this.currentLengthUnit){
+          case 'feet':
+            fr = this.calculatedRadiusInMeters * 3.28084;
+            break;
+          case 'meters':
+            fr = this.calculatedRadiusInMeters;
+            break;
+          case 'yards':
+            fr = this.calculatedRadiusInMeters * 1.09361;
+            break;
+          case 'kilometers':
+            fr = this.calculatedRadiusInMeters * 0.001;
+            break;
+          case 'miles':
+            fr = this.calculatedRadiusInMeters * 0.000621371;
+            break;
+          case 'nautical-miles':
+            fr = this.calculatedRadiusInMeters * 0.000539957;
+            break;
+        }
+        dojoDomAttr.set(
+          this.lengthInput,
+          'value',
+          fr
+        );
+      } else {
+        this.calculatedRadiusInMeters = null;
+        this.useCalculatedDistance = true;
+      }
     },
 
     /**
@@ -127,7 +225,12 @@ define([
      **/
     pointButtonWasClicked: function () {
       this.map.disableMapNavigation();
-      this.dt.activate('circle');
+      if (this.lengthInput.value && this.lengthInput.value > 0){
+        this.dt.activate('point');
+      } else {
+        this.dt.activate('circle');
+      }
+
       dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
     },
 
@@ -154,6 +257,8 @@ define([
 
     feedbackDidComplete: function (results) {
 
+      results.calculatedDistance = this.calculatedRadiusInMeters;
+
       this.currentCircle = new ShapeModel(results);
       this.currentCircle.graphic = new EsriGraphic(
         this.currentCircle.wmGeometry,
@@ -166,7 +271,9 @@ define([
         this.currentCircle.formattedStartPoint
       );
 
-      this.lengthUnitDDDidChange();
+      if (!this.useCalculatedDistance) {
+        this.lengthUnitDDDidChange();
+      }
 
       this._gl.add(this.currentCircle.graphic);
       if (this._lengthLayer.graphics.length > 0) {
@@ -189,8 +296,12 @@ define([
       if (this._gl) {
         this._gl.clear();
         this._lengthLayer.clear();
+        this.useCalculatedDistance = false;
+        this.currentCircle = null;
         dojoDomAttr.set(this.startPointCoords, 'value', '');
         dojoDomAttr.set(this.lengthInput, 'value', '');
+        dojoDomAttr.set(this.timeInput, 'value', '');
+        dojoDomAttr.set(this.distanceInput, 'value', '');
       }
     },
 
