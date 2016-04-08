@@ -1,85 +1,89 @@
-.jimu-widget-GeodesyAndRange {
+.jimu-widget-DistanceAndDirection {
 
 }
 
-.jimu-widget-GeodesyAndRange .tabsContainer {
-  border: 1px solid #838383;
+.jimu-widget-DistanceAndDirection .tabsContainer {
+    border: 1px solid #838383;
 }
 
-.jimu-widget-GeodesyAndRange .selectInput {
-  width: 119px;
+.jimu-widget-DistanceAndDirection .selectInput {
+    width: 119px;
 }
 
-.jimu-widget-GeodesyAndRange .coordInput {
-  width: 225px;
-  height: 32px;
+.jimu-widget-DistanceAndDirection .coordInput {
+    width: 225px;
+    height: 32px;
 }
 
-.jimu-widget-GeodesyAndRange .tabPanel {
-  border-bottom: 1px solid #CCC;
-  padding-bottom: 20px;
+.jimu-widget-DistanceAndDirection .tabPanel {
+    border-bottom: 1px solid #CCC;
+    padding-bottom: 20px;
 }
 
-  .jimu-widget-GeodesyAndRange .tabPanel fieldset {
-    border:1px solid #CCC;
+.jimu-widget-DistanceAndDirection .tabPanel fieldset {
+    border: 1px solid #CCC;
     padding: 6px;
     margin-top: 10px;
-  }
+}
 
-  .jimu-widget-GeodesyAndRange .tabPanel fieldset > div{
+.jimu-widget-DistanceAndDirection .tabPanel fieldset > div {
     margin: 3px;
-  }
+}
 
-  .jimu-widget-GeodesyAndRange .tabPanel fieldset > div > label{
+.jimu-widget-DistanceAndDirection .tabPanel fieldset > div > label {
     width: 50px;
     display: inline-block;
-  }
-
-.jimu-widget-GeodesyAndRange .controls {
-  display: table;
-  margin: 0 auto;
 }
 
-.jimu-widget-GeodesyAndRange .buttonContainer {
-  width: 100%;
-  text-align: center;
-  margin-top: 20px;
+.jimu-widget-DistanceAndDirection .controls {
+    display: table;
+    margin: 0 auto;
 }
 
-.jimu-widget-GeodesyAndRange .controlItem {
-  display: flex;
+.jimu-widget-DistanceAndDirection .buttonContainer {
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
 }
 
-.jimu-widget-GeodesyAndRange .controlGroup {
-  margin-top: 13px;
+.jimu-widget-DistanceAndDirection .controlItem {
+    display: flex;
 }
 
-  .jimu-widget-GeodesyAndRange .controlGroup .splitRight {
+.jimu-widget-DistanceAndDirection .controlGroup {
+    margin-top: 13px;
+}
+
+.jimu-widget-DistanceAndDirection .controlGroup .controlGroupChild{
+    margin-top: 6px;
+}
+
+.jimu-widget-DistanceAndDirection .controlGroup .splitRight {
     position: absolute;
     right: 25px;
-  }
-
-  .jimu-widget-GeodesyAndRange .controlGroup > label{
-    width: 100px;
-  }
-
-.jimu-widget-GeodesyAndRange .controlSpace {
-  margin-left: 6px;
 }
 
-  .jimu-widget-GeodesyAndRange .addPointBtn {
+.jimu-widget-DistanceAndDirection .controlGroup > label {
+    width: 100px;
+}
+
+.jimu-widget-DistanceAndDirection .controlSpace {
+    margin-left: 6px;
+}
+
+.jimu-widget-DistanceAndDirection .addPointBtn {
     background: url(../images/draw_point.png) no-repeat;
     width: 32px;
     height: 32px;
     background-repeat: no-repeat;
     background-position: center center;
 
-  }
+}
 
-    .jimu-widget-GeodesyAndRange .addPointBtn:hover {
-      background-color:#c0c0c0;
-    }
+.jimu-widget-DistanceAndDirection .addPointBtn:hover {
+    background-color: #c0c0c0;
+}
 
-    .jimu-widget-GeodesyAndRange .addPointBtn.jimu-state-active {
-      background-color:#c0c0c0;
-    }
+.jimu-widget-DistanceAndDirection .addPointBtn.jimu-state-active {
+    background-color: #c0c0c0;
+}

@@ -17,20 +17,28 @@
 /*global define*/
 define([
   'dojo/_base/declare',
+  'dojo/_base/array',
+  'dojo/_base/lang',
   'dojo/string',
   'dojo/number',
   'esri/geometry/geometryEngine',
   'esri/geometry/webMercatorUtils',
   'esri/geometry/Point',
-  'esri/geometry/Polyline'
+  'esri/geometry/Polyline',
+  'esri/geometry/Circle',
+  'esri/units'
 ], function (
   dojoDeclare,
+  dojoArray,
+  dojoLang,
   dojoString,
   dojoNumber,
   esriGeometryEngine,
   esriWMUtils,
   esriPoint,
-  esriPolyline
+  esriPolyline,
+  esriCircle,
+  esriUnit
 ) {
   return dojoDeclare(null, {
 
@@ -47,17 +55,21 @@ define([
      *
      **/
     getAngle: function (inUnits) {
-      var delx = this.endPoint.y - this.startPoint.y;
-      var dely = this.endPoint.x - this.startPoint.x;
+      var angle = null;
+      if (this.angle === undefined) {
+        var delx = this.endPoint.y - this.startPoint.y;
+        var dely = this.endPoint.x - this.startPoint.x;
 
-      var azi = Math.atan2(dely, delx) * 180 / Math.PI;
-      var br = ((azi + 360) % 360);
-
+        var azi = Math.atan2(dely, delx) * 180 / Math.PI;
+        angle = ((azi + 360) % 360);
+      } else {
+        angle = Number(this.angle);
+      }
       if (inUnits === 'mils') {
-        br = br * 17.777777778;
+        angle *= 17.777777778;
       }
 
-      return br.toFixed(2);
+      return angle.toFixed(2);
     },
 
     /**
@@ -90,7 +102,7 @@ define([
      * @param length
      * @returns {*}
      */
-    formatLength: function (length) {
+    formatLength: function (length, withUnit) {
       return dojoNumber.format(length, {
         places: 4
       })
@@ -103,39 +115,92 @@ define([
       dojoDeclare.safeMixin(this, args);
 
       if (this.geometry.type === "polygon") {
-        var pLine = new esriPolyline({
-          paths: [
-            [this.geometry.paths[0][0], this.geometry.paths[0][1]]
-          ],
-          spatialReference: {
-            wkid: this.geometry.spatialReference.wkid
+        if (this.geometry.hasOwnProperty("drawType")) {
+          if (this.geometry.drawType === "ellipse") {
+            var line = new esriPolyline();
+            dojoArray.forEach(this.geometry.geometry.rings, dojoLang.hitch(this, function (ring) {
+              line.paths.push(ring);
+            }));
+            line.spatialReference = this.geometry.spatialReference;
+            line = esriWMUtils.webMercatorToGeographic(line);
+            this.geographicGeometry = line;
+            this.geodesicGeometry = esriGeometryEngine.geodesicDensify(this.geometry.geometry, 1000);
+            this.wmGeometry = this.geometry.geometry;
+            this.angle = this.geometry.angle;
+
+            this.startPoint = esriWMUtils.webMercatorToGeographic(this.geometry.center);
+
+            this.formattedStartPoint = dojoString.substitute('${xStr}, ${yStr}', {
+              xStr: dojoNumber.format(this.startPoint.y, {places:4}),
+              yStr: dojoNumber.format(this.startPoint.x, {places:4})
+            });
           }
+        } else {
+          var pLine = new esriPolyline({
+            paths: [
+              [this.geometry.paths[0][0], this.geometry.paths[0][1]]
+            ],
+            spatialReference: {
+              wkid: this.geometry.spatialReference.wkid
+            }
+          });
+          pLine = esriWMUtils.webMercatorToGeographic(pLine);
+          this.geographicGeometry = pLine;
+          this.geodesicGeometry = esriGeometryEngine.geodesicDensify(pLine, 10000);
+          this.wmGeometry = this.geometry;
+          this.startPoint = this.geodesicGeometry.getPoint(0,0);
+          this.endPoint = this.geodesicGeometry.getPoint(
+            0,
+            this.geodesicGeometry.paths[0].length - 1);
+
+          this.formattedStartPoint = dojoString.substitute('${xStr}, ${yStr}', {
+            xStr: dojoNumber.format(this.startPoint.y, {places:4}),
+            yStr: dojoNumber.format(this.startPoint.x, {places:4})
+          });
+
+          this.formattedEndPoint = dojoString.substitute('${xStr}, ${yStr}', {
+            xStr: dojoNumber.format(this.endPoint.y, {places:4}),
+            yStr: dojoNumber.format(this.endPoint.x, {places:4})
+          });
+        }
+      } else if (this.geometry.type === "point") {
+        this.geodesicGeometry = esriGeometryEngine.geodesicBuffer(
+          this.geometry,
+          this.calculatedDistance,
+          'meters'
+        );
+
+        if (this.geodesicGeometry.spatialReference.wkid !== 102100 &&
+          this.geodesicGeometry.spatialReference.wkid !== 3857) {
+          this.wmGeometry = esriWMUtils.geographicToWebMercator(this.geodesicGeometry);
+        } else {
+          this.wgsGeometry = esriWMUtils.webMercatorToGeographic(this.geodesicGeometry);
+          this.wmGeometry = this.geodesicGeometry;
+        }
+
+        this.formattedStartPoint = dojoString.substitute("${xStr}, ${yStr}", {
+          xStr: dojoNumber.format(this.wgsGeometry.getCentroid().y, {places:4}),
+          yStr: dojoNumber.format(this.wgsGeometry.getCentroid().x, {places:4})
         });
-        pLine = esriWMUtils.webMercatorToGeographic(pLine);
-        this.geographicGeometry = pLine;
-        this.geodesicGeometry = esriGeometryEngine.geodesicDensify(pLine, 10000);
-        this.wmGeometry = this.geometry;
-      }
-      else {
+      } else {
         this.geodesicGeometry = esriGeometryEngine.geodesicDensify(this.geographicGeometry, 10000);
         this.wmGeometry = esriWMUtils.geographicToWebMercator(this.geodesicGeometry);
+
+        this.startPoint = this.geodesicGeometry.getPoint(0,0);
+        this.endPoint = this.geodesicGeometry.getPoint(
+          0,
+          this.geodesicGeometry.paths[0].length - 1);
+
+        this.formattedStartPoint = dojoString.substitute('${xStr}, ${yStr}', {
+          xStr: dojoNumber.format(this.startPoint.y, {places:4}),
+          yStr: dojoNumber.format(this.startPoint.x, {places:4})
+        });
+
+        this.formattedEndPoint = dojoString.substitute('${xStr}, ${yStr}', {
+          xStr: dojoNumber.format(this.endPoint.y, {places:4}),
+          yStr: dojoNumber.format(this.endPoint.x, {places:4})
+        });
       }
-      this.startPoint = this.geodesicGeometry.getPoint(0,0);
-      this.endPoint = this.geodesicGeometry.getPoint(0, this.geodesicGeometry.paths[0].length - 1);
-
-      this.formattedStartPoint = dojoString.substitute('${xStr}, ${yStr}', {
-        xStr: dojoNumber.format(this.startPoint.y, {places:4}),
-        yStr: dojoNumber.format(this.startPoint.x, {places:4})
-      });
-
-      this.formattedEndPoint = dojoString.substitute('${xStr}, ${yStr}', {
-        xStr: dojoNumber.format(this.endPoint.y, {places:4}),
-        yStr: dojoNumber.format(this.endPoint.x, {places:4})
-      });
-
-      //this.formattedLength =
-
-      //this.degreeangle = dojoNumber.format(this.getAngle(), {places:2});
     }
   });
 });
