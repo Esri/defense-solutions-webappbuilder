@@ -73,7 +73,7 @@ In order to develop and test widgets you need to deploy the GeodesyAndRange fold
 
 ### Create a Circle using the Distance Calculator Interactively
 
-		* Choose the Circles tab on the Distance and Direction Tool
+		* Choose the Circle tab on the Distance and Direction Tool
 		* Expand the Distance Calculator section
 		* Enter a Time
 		* Enter a Rate
