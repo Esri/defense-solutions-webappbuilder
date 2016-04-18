@@ -167,7 +167,7 @@ define([
      **/
     timeInputDidChange: function (evt) {
       console.log("Time Input Did Change");
-      this.currentTimeInSeconds = this.timeInput.value;
+      this.currentTimeInSeconds = this.timeInput.value  * this.timeUnitDD.value;
       this.getCalculatedDistance();
     },
 
@@ -175,8 +175,14 @@ define([
      *
      **/
     distanceInputDidChange: function (evt) {
-      console.log("Distance Input DiD Change");
-      this.currentDistanceInMeters = this.distanceInput.value * this.distanceUnitDD.value;
+
+      var currentRateInMetersPerSecond = (this.distanceInput.value *
+        this.distanceUnitDD.value.split(';')[0]) / this.distanceUnitDD.value.split(';')[1];
+      console.log(dojoString.substitute("Rate in Meters Per Second = ${crmps}", {
+          crmps: currentRateInMetersPerSecond
+        })
+      );
+      this.currentDistanceInMeters = currentRateInMetersPerSecond;
       this.getCalculatedDistance();
     },
 
