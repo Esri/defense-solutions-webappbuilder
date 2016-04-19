@@ -104,6 +104,7 @@ define([
     syncEvents: function () {
 
       this.distCalcControl.watch("open", dojoLang.hitch(this, this.distCalcDidExpand));
+      
       dojoTopic.subscribe('DD_CLEAR_GRAPHICS', dojoLang.hitch(this, this.clearGraphics));
       dojoTopic.subscribe('DD_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
       dojoTopic.subscribe('DD_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
