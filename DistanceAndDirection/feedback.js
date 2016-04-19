@@ -36,8 +36,7 @@ define([
   'esri/symbols/TextSymbol',
   'esri/symbols/Font',
   'esri/geometry/webMercatorUtils',
-  'esri/units',
-  './Ellipse'
+  'esri/units'
 ], function (
   dojoDeclare,
   dojoLang,
@@ -60,8 +59,7 @@ define([
   EsriTextSymbol,
   EsriFont,
   EsriWebMercatorUtils,
-  EsriUnits,
-  Ellipse
+  EsriUnits
   ) {
   return dojoDeclare([esriDraw, dojoStateful], {
 
