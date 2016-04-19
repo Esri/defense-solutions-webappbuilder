@@ -1,5 +1,5 @@
 # military-tools-webappbuilder
-The Web AppBuilder Widgets for Military Analyst is a set of widgets for use with the Web AppBuilder for ArcGIS. These widgets address specialized workflows for Military Analyst users. Additionally, these widgets are created and managed by the Esri Solutions teams. 
+The Web AppBuilder Widgets for Military Tools for ArcGIS is a set of widgets for use with the Web AppBuilder for ArcGIS. These widgets address specialized workflows for defense users. Additionally, these widgets are created and managed by the Esri Solutions teams. 
 
 ## Sections
 
