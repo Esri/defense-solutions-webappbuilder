@@ -34,7 +34,7 @@
         </div>
 
         <div class="controlGroup">
-            <div data-dojo-attach-point='distCalcControl' data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Distance Calculator', open: false">
+            <div data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Distance Calculator', open: false">
                 <div class="controlGroupChild">
                     <label>Time<label>
                         <div class="controlItem">
@@ -51,16 +51,12 @@
                         <div class="controlItem">
                             <input class="jimu-input selectInput" data-dojo-attach-point="distanceInput" />
                             <select style="width: 100px" class="controlSpace" data-dojo-type="dijit/form/Select" data-dojo-attach-point="distanceUnitDD">
-                                <option value="0.3048;1">Feet / second</option>
-                                <option value="0.3048;3600">Feet / hour</option>
-                                <option value="1000;1">Kilometers / second</option>
-                                <option value="1000;3600">Kilometers / hour</option>
-                                <option value="1;1" selected="selected">Meters / second</option>
-                                <option value="1;3600">Meters / hour</option>
-                                <option value="1609.34;1">Miles / second</option>
-                                <option value="1609.34;3600">Miles / hour</option>
-                                <option value="1852;1">Nautical Miles / second</option>
-                                <option value="1852;3600">Nautical Miles / hour</option>
+                                <option value="0.3048">Feet</option>
+                                <option value="1000">Kilometers</option>
+                                <option value="1" selected="selected">Meters</option>
+                                <option value="1609.34">Miles</option>
+                                <option value="0.9144">Yards</option>
+                                <option value="1852">Nautical Miles</option>
                             </select>
                         </div>
                 </div>

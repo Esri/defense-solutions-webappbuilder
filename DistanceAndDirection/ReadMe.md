@@ -66,20 +66,20 @@ In order to develop and test widgets you need to deploy the DistanceAndDirection
 	* Choose the Circle tab on the Distance and Direction Widget
 	* Choose the type of circle you will create from in the ‘Create Circle From’ drop down list.
 	* Start an interactive session by selecting the ‘Map Point’ icon
-	* Click on the map to create a starting (center) point. Drag the tool to create a radius for the circle.  
+	* Click on the map to create a starting (center) point. Drag the widget to create a radius for the circle.  
 	* A graphic will then be displayed on the map showing the circle you created
       Note: The ‘Center Point’ and ‘Radius/Diameter’ will update based on parameters from newly created circle.
 	* If desired you can clear all graphics with the clear graphics button
 
 ### Create a Circle using the Distance Calculator Interactively
 
-		* Choose the Circle tab on the Distance and Direction Widget
-		* Expand the Distance Calculator section
-		* Enter a Time
-		* Enter a Rate
-		* Start an interactive session by selecting the ‘Map Point’ icon
-		* Click on the map to create a starting (center) point.
-		* A graphic will be displayed using the calculated distance and the clicked point
+	* Choose the Circle tab on the Distance and Direction Widget
+	* Expand the Distance Calculator section
+	* Enter a Time
+	* Enter a Rate
+	* Start an interactive session by selecting the ‘Map Point’ icon
+	* Click on the map to create a starting (center) point.
+	* A graphic will be displayed using the calculated distance and the clicked point
 
 ### Create Ellipses Interactively
 	* Choose the Ellipse tab on the Distance and Directions Widget

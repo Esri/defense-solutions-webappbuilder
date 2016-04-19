@@ -146,12 +146,12 @@ define([
         lengthUnitDDDidChange: function () {
           this.currentLengthUnit = this.lengthUnitDD.get('value');
           this.dt.set('lengthUnit', this.currentLengthUnit);
-          if (this.currentLine) {
+          if (this.currentEllipse) {
             this.ellipseTypeChangeHandler();
             dojoDomAttr.set(
               this.minorAxisInput,
               'value',
-              this._getFormattedLength(this.currentLine.geometry.minorAxisLength)
+              this._getFormattedLength(this.currentEllipse.geometry.minorAxisLength)
             );
           }
         },
@@ -161,8 +161,8 @@ define([
          **/
         ellipseTypeChangeHandler: function () {
           var majorAxisLength = this.ellipseType.get('value') === 'full' ?
-            this.currentLine.geometry.majorAxisLength * 2 :
-            this.currentLine.geometry.majorAxisLength
+            this.currentEllipse.geometry.majorAxisLength * 2 :
+            this.currentEllipse.geometry.majorAxisLength
           dojoDomAttr.set(
             this.majorAxisInput,
             'value',
@@ -176,11 +176,11 @@ define([
         angleUnitDDDidChange: function () {
           this.currentAngleUnit = this.angleUnitDD.get('value');
 
-          if (this.currentLine) {
+          if (this.currentEllipse) {
             dojoDomAttr.set(
               this.angleInput,
               'value',
-              this.currentLine.getAngle(this.currentAngleUnit));
+              this.currentEllipse.getAngle(this.currentAngleUnit));
           }
         },
 
@@ -188,22 +188,23 @@ define([
          *
          **/
         feedbackDidComplete: function (results) {
-          this.currentLine = new ShapeModel(results);
-          this.currentLine.graphic = new EsriGraphic(
-            this.currentLine.geodesicGeometry,
+          this.currentEllipse = new ShapeModel(results);
+          this.currentEllipse.graphic = new EsriGraphic(
+            this.currentEllipse.wmGeometry,
             this._circleSym
           );
 
           dojoDomAttr.set(
             this.startPointCoords,
             'value',
-            this.currentLine.formattedStartPoint
+            this.currentEllipse.formattedStartPoint
           );
 
           this.lengthUnitDDDidChange();
           this.angleUnitDDDidChange();
 
-          this._gl.add(this.currentLine.graphic);
+          this._gl.add(this.currentEllipse.graphic);
+          ///this.map.setExtent(this.currentEllipse.graphic.geometry.getExtent());
           if (this._lengthLayer.graphics.length > 0) {
             var tg = dojoLang.clone(this._lengthLayer.graphics[0].geometry);
             var ts = dojoLang.clone(this._lengthLayer.graphics[0].symbol);
@@ -211,7 +212,7 @@ define([
             this._lengthLayer.clear();
           }
 
-          this.emit('graphic_created', this.currentLine);
+          this.emit('graphic_created', this.currentEllipse);
 
           this.map.enableMapNavigation();
           this.dt.deactivate();
