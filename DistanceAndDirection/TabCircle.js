@@ -72,7 +72,6 @@ define([
      **/
     constructor: function (args) {
       dojoDeclare.safeMixin(this, args);
-      //this.uid = args.id || dijitRegistry.getUniqueId('LineTab');
     },
 
     /**
@@ -93,12 +92,18 @@ define([
 
       // add extended toolbar
       this.dt = new DrawFeedBack(this.map);
+
       this.dt.set('lengthLayer', this._lengthLayer);
 
       this.syncEvents();
     },
 
+    /**
+     * Start up event listeners
+     **/
     syncEvents: function () {
+
+      this.distCalcControl.watch("open", dojoLang.hitch(this, this.distCalcDidExpand));
       dojoTopic.subscribe('DD_CLEAR_GRAPHICS', dojoLang.hitch(this, this.clearGraphics));
       dojoTopic.subscribe('DD_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
       dojoTopic.subscribe('DD_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
@@ -157,26 +162,47 @@ define([
       ));
     },
 
+    /**
+     *
+     **/
+    distCalcDidExpand: function () {
+      if (this.distCalcControl.get('open')) {
+        this.lengthInput.disabled = 'disabled';
+      } else {
+        this.lengthInput.disabled = false;
+      }
+    },
+
+    /**
+     *
+     **/
     lengthInputDidChange: function () {
       if (this.lengthInput.value && this.lengthInput.value <= 0){
         this.useCalculatedDistance = false;
       }
     },
+
     /**
      *
      **/
-    timeInputDidChange: function (evt) {
+    timeInputDidChange: function () {
       console.log("Time Input Did Change");
-      this.currentTimeInSeconds = this.timeInput.value;
+      this.currentTimeInSeconds = this.timeInput.value  * this.timeUnitDD.value;
       this.getCalculatedDistance();
     },
 
     /**
      *
      **/
-    distanceInputDidChange: function (evt) {
-      console.log("Distance Input DiD Change");
-      this.currentDistanceInMeters = this.distanceInput.value * this.distanceUnitDD.value;
+    distanceInputDidChange: function () {
+
+      var currentRateInMetersPerSecond = (this.distanceInput.value *
+        this.distanceUnitDD.value.split(';')[0]) / this.distanceUnitDD.value.split(';')[1];
+      console.log(dojoString.substitute("Rate in Meters Per Second = ${crmps}", {
+          crmps: currentRateInMetersPerSecond
+        })
+      );
+      this.currentDistanceInMeters = currentRateInMetersPerSecond;
       this.getCalculatedDistance();
     },
 
@@ -242,7 +268,8 @@ define([
       this.dt.set('lengthUnit', this.currentLengthUnit);
       if (this.currentCircle) {
         var currentLength = this.currentCircle.getLength(this.currentLengthUnit);
-        var length = this.creationType.get('value') === "Radius" ? currentLength : currentLength * 2;
+        var length = this.creationType.get('value') === 'Radius' ?
+          currentLength : currentLength * 2;
         dojoDomAttr.set(
           this.lengthInput,
           'value',
@@ -251,15 +278,22 @@ define([
       }
     },
 
+    /**
+     *
+     **/
     creationTypeDidChange: function() {
       this.lengthUnitDDDidChange();
     },
 
+    /**
+     *
+     **/
     feedbackDidComplete: function (results) {
 
       results.calculatedDistance = this.calculatedRadiusInMeters;
 
       this.currentCircle = new ShapeModel(results);
+
       this.currentCircle.graphic = new EsriGraphic(
         this.currentCircle.wmGeometry,
         this._circleSym
@@ -276,6 +310,7 @@ define([
       }
 
       this._gl.add(this.currentCircle.graphic);
+
       if (this._lengthLayer.graphics.length > 0) {
         var tg = dojoLang.clone(this._lengthLayer.graphics[0].geometry);
         var ts = dojoLang.clone(this._lengthLayer.graphics[0].symbol);
@@ -286,16 +321,23 @@ define([
       this.emit('graphic_created', this.currentCircle);
 
       this.map.enableMapNavigation();
+
       this.dt.deactivate();
 
       dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
 
     },
 
+    /**
+     * Remove graphics and reset values
+     **/
     clearGraphics: function () {
       if (this._gl) {
+        // graphic layers
         this._gl.clear();
         this._lengthLayer.clear();
+
+        // ui controls
         this.useCalculatedDistance = false;
         this.currentCircle = null;
         dojoDomAttr.set(this.startPointCoords, 'value', '');
@@ -305,12 +347,18 @@ define([
       }
     },
 
+    /**
+     *
+     **/
     setGraphicsHidden: function () {
       if (this._gl) {
         this._gl.hide();
       }
     },
 
+    /**
+     *
+     **/
     setGraphicsShown: function () {
       if (this._gl) {
         this._gl.show();
