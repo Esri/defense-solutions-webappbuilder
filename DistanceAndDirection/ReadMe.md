@@ -42,7 +42,7 @@ In order to develop and test widgets you need to deploy the DistanceAndDirection
 ## Workflows
 
 ### Create Lines Interactively
-	* Choose the Lines tab on the Distance and Directions Tool
+	* Choose the Lines tab on the Distance and Directions Widget
 	* Choose the type of line that is needed to be created
 	* Start an interactive session by selecting the arrow icon
 	* Enter a starting and ending point on the map by clicking on the map
@@ -73,7 +73,7 @@ In order to develop and test widgets you need to deploy the DistanceAndDirection
 
 ### Create a Circle using the Distance Calculator Interactively
 
-		* Choose the Circle tab on the Distance and Direction Tool
+		* Choose the Circle tab on the Distance and Direction Widget
 		* Expand the Distance Calculator section
 		* Enter a Time
 		* Enter a Rate
@@ -82,7 +82,7 @@ In order to develop and test widgets you need to deploy the DistanceAndDirection
 		* A graphic will be displayed using the calculated distance and the clicked point
 
 ### Create Ellipses Interactively
-	* Choose the Ellipse tab on the Distance and Directions Tool
+	* Choose the Ellipse tab on the Distance and Directions Widget
 	* Start an interactive session by selecting the arrow icon next to the “Center Point” text box
 	* Choose the location where you want the ellipse to be started from
 	* Drag the cursor to the location where the major axis will end
@@ -91,7 +91,7 @@ In order to develop and test widgets you need to deploy the DistanceAndDirection
 	* Graphic(s) will then be displayed on the map showing the Ellipse you created based on the values of the parameters that were set
 
 ### Create Range Rings Interactively
-	* Choose the Range Rings tab on the Distance and Directions Tool
+	* Choose the Range Rings tab on the Distance and Directions Widget
 	* Start an interactive session by selecting the arrow icon next to the “Center Point” text box
 	* Choose the location of the Range Rings center by selecting the desired location on the map
 	* Fill in the associated parameters for “Number of Rings”, “Ring Interval”, “Distance Units”, and “Number of Radials”
@@ -99,7 +99,7 @@ In order to develop and test widgets you need to deploy the DistanceAndDirection
 	* Graphic(s) will then be displayed on the map showing the Range Rings you created based on the values of the parameters that were set
 
 ### Create Range Rings Manually
-	* Choose the Range Rings tab on the Distance and Directions Tool
+	* Choose the Range Rings tab on the Distance and Directions Widget
 	* Fill in the associated parameters for “Number of Rings”, “Ring Interval”, “Distance Units”, and “Number of Radials”
 	* Input the coordinates for the Range Rings center in the “Center Point” text box and select the Enter key on the keyboard
 	* Graphic(s) will then be displayed on the map showing the Range Rings you created based on the values of the parameters that were set
