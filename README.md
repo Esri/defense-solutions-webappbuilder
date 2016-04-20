@@ -72,7 +72,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 A copy of the license is available in the repository's
-[license.txt](license.txt) file.
+[license.txt](LICENSE.txt) file.
 
 [](Esri Tags: ArcGISSolutions ArcGIS Defense and Intelligence Military Environment Planning Analysis Emergency Management Local-Government Local Government State-Government State Government Utilities ArcGISSolutions)
 [](Esri Language: Javascript)
