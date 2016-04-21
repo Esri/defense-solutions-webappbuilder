@@ -92,9 +92,7 @@ define([
           lineSymbol: {
             type: "esriSLS",
             style: "esriSLSSolid",
-            color: this.lineColorPicker.get("color"), /*Object.keys(this.lineColorPicker.get("color")).map(lang.hitch(this, function (key) {
-              return this.lineColorPicker.get("color")[key]
-            })), */
+            color: this.lineColorPicker.get("color"), 
             width: this.lineSize.get("value"),            
           },
           circleSymbol: {
@@ -102,9 +100,7 @@ define([
             style: "esriSFSNull",
             color: [255,0,0,0],
             outline: {
-              color: this.circleColorPicker.get("color"), /*Object.keys(this.circleColorPicker.get("color")).map(lang.hitch(this, function (key) {
-                return this.circleColorPicker.get("color")[key]
-              })),*/
+              color: this.circleColorPicker.get("color"), 
               width: this.circleSize.get("value"),
               type: "esriSLS",
               style: "esriSLSSolid"
@@ -115,9 +111,7 @@ define([
             style: "esriSFSNull",
             color: [255,0,0,0],
             outline: {
-              color: this.ellipseColorPicker.get("color"), /* Object.keys(this.ellipseColorPicker.get("color")).map(lang.hitch(this, function (key) {
-                return this.ellipseColorPicker.get("color")[key]
-              })),*/
+              color: this.ellipseColorPicker.get("color"), 
               width: this.ellipseSize.get("value"),
               type: "esriSLS",
               style: "esriSLSSolid"
@@ -128,9 +122,7 @@ define([
             style: "esriSFSNull",
             color: [255,0,0,0],
             outline: {
-              color: this.rangeRingColorPicker.get("color"), /*Object.keys(this.rangeRingColorPicker.get("color")).map(lang.hitch(this, function (key) {
-                return this.rangeRingColorPicker.get("color")[key]
-              })),*/
+              color: this.rangeRingColorPicker.get("color"), 
               width: this.rangeRingSize.get("value"),
               type: "esriSLS",
               style: "esriSLSSolid"
