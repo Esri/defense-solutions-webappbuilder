@@ -11,9 +11,9 @@
   	"keepConfigAfterMapSwithched": false,
     "supportMultiInstance": false,
     "hasVersionManager": false,
-    "hasSettingPage": false,
-    "hasSettingUIFile": false,
-    "hasSettingLocale": false,
-    "hasSettingStyle": false
+    "hasSettingPage": true,
+    "hasSettingUIFile": true,
+    "hasSettingLocale": true,
+    "hasSettingStyle": true
   }
 }

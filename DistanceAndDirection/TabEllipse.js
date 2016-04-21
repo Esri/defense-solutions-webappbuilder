@@ -85,10 +85,11 @@ define([
           this._gl = new EsriGraphicsLayer();
           this.map.addLayers([this._gl, this._lengthLayer]);
 
-          this._circleSym = new EsriSimpleFillSymbol(this.circlesymbol);
+          this._ellipseSym = new EsriSimpleFillSymbol(this.ellipseSymbol);
 
           // add extended toolbar
           this.dt = new DrawFeedBack(this.map);
+          this.dt.setLineSymbol(this._ellipseSym);
           this.dt.set('lengthLayer', this._lengthLayer);
 
           this.syncEvents();
@@ -191,7 +192,7 @@ define([
           this.currentEllipse = new ShapeModel(results);
           this.currentEllipse.graphic = new EsriGraphic(
             this.currentEllipse.wmGeometry,
-            this._circleSym
+            this._ellipseSym
           );
 
           dojoDomAttr.set(
