@@ -56,7 +56,7 @@ define([
 
       this.lineTab = new TabLine({
         map: this.map,
-        linesymbol: this.config.feedback.linesymbol || {
+        lineSymbol: this.config.feedback.lineSymbol || {
           type: 'esriSLS',
           style: 'esriSLSSolid',
           color: [255, 50, 50, 255],
@@ -67,7 +67,7 @@ define([
 
       this.circleTab = new TabCircle({
         map: this.map,
-        circlesymbol: this.config.feedback.circlesymbol || {
+        circleSymbol: this.config.feedback.circleSymbol || {
           type: 'esriSFS',
           style: 'esriSFSNull',
           color: [255,0,0,0],
@@ -83,7 +83,7 @@ define([
 
       this.ellipseTab = new TabEllipse({
         map: this.map,
-        circlesymbol: this.config.feedback.circlesymbol || {
+        ellipseSymbol: this.config.feedback.ellipseSymbol || {
           type: 'esriSFS',
           style: 'esriSFSNull',
           color: [255,0,0,0],

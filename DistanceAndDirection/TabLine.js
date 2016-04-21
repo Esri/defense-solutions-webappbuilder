@@ -85,12 +85,13 @@ define([
 
           this._gl = new EsriGraphicsLayer();
 
-          this._lineSym = new EsriSimpleLineSymbol(this.linesymbol);
+          this._lineSym = new EsriSimpleLineSymbol(this.lineSymbol);
 
           this.map.addLayers([this._gl, this._lengthLayer]);
 
           // add extended toolbar
           this.dt = new DrawFeedBack(this.map);
+          this.dt.setLineSymbol(this._lineSym);
           this.dt.set('lengthLayer', this._lengthLayer);
 
           this.syncEvents();

@@ -86,13 +86,13 @@ define([
 
       this._gl = new EsriGraphicsLayer();
 
-      this._circleSym = new EsriSimpleFillSymbol(this.circlesymbol);
+      this._circleSym = new EsriSimpleFillSymbol(this.circleSymbol);
 
       this.map.addLayers([this._gl, this._lengthLayer]);
 
       // add extended toolbar
       this.dt = new DrawFeedBack(this.map);
-
+      this.dt.setFillSymbol(this._circleSym);
       this.dt.set('lengthLayer', this._lengthLayer);
 
       this.syncEvents();
