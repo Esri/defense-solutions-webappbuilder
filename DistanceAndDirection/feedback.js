@@ -80,14 +80,14 @@ define([
       // force loading of the geometryEngine
       // prevents lag in feedback when used in mousedrag
       esriGeoDUtils.isSimple(new EsriPoint({
-          'x': -122.65,
-          'y': 45.53,
-          'spatialReference': {
-            'wkid': 4326
-          }
-        })).then(function () {
-          console.log('Geometry Engine initialized');
-        });
+        'x': -122.65,
+        'y': 45.53,
+        'spatialReference': {
+          'wkid': 4326
+        }
+      })).then(function () {
+        console.log('Geometry Engine initialized');
+      });
 
       // this.inherited(arguments);
     },
@@ -97,11 +97,11 @@ define([
      * http://ekenes.github.io/esri-js-samples/ge-length/
      **/
     showLength: function (pt, result) {
-      if (!this.lengthLayer) {return;}
+      if (!this.lengthLayer) { return; }
 
       this.lengthLayer.clear();
 
-      var length = dojoNumber.format(result, {places:2});
+      var length = dojoNumber.format(result, { places: 2 });
       var lenStr = dojoString.substitute('${len} ${units}', {
         len: length,
         units: this.lengthUnit
@@ -149,7 +149,7 @@ define([
     _onMouseDragHandler: function (evt) {
       // Pressing escape while drawing causing errors for certain draw tools
       // -- Issue #1381
-      if(!this._graphic && !this._points.length){
+      if (!this._graphic && !this._points.length) {
         return;
       }
 
@@ -169,15 +169,16 @@ define([
       var start = this._points[0],
         end = snappingPoint || evt.mapPoint,
         _graphic = this._graphic;
-      switch(this._geometryType){
+      switch (this._geometryType) {
         case esriDraw.LINE:
           var g = dojoLang.mixin(_graphic.geometry, {
-            paths:[
+            paths: [
               [[start.x, start.y], [end.x, end.y]]
-            ]});
+            ]
+          });
 
           // get geodesic length of user drawn line
-          esriGeoDUtils.geodesicDensify(g, 10000).then(function(r) {
+          esriGeoDUtils.geodesicDensify(g, 10000).then(function (r) {
             _graphic.setGeometry(r);
           });
 
@@ -203,20 +204,21 @@ define([
 
           esriGeoDUtils.geodesicLength(pLine, this.lengthUnit).then(
             dojoLang.hitch(this, function (l) {
-                var circleParams = {
-                  center: EsriWebMercatorUtils.webMercatorToGeographic(start),
-                  geodesic: true,
-                  numberOfPoints: 60,
-                  radius: this.convertToMeters(l),
-                  radiusUnits: this.getRadiusUnitType()
-                };
-                var g = new EsriCircle(circleParams);
-                _graphic.geometry = dojoLang.mixin(g, {
-                  paths:[
-                    [[start.x, start.y], [end.x, end.y]]
-                  ]});
-                _graphic.setGeometry(_graphic.geometry);
-              }
+              var circleParams = {
+                center: EsriWebMercatorUtils.webMercatorToGeographic(start),
+                geodesic: true,
+                numberOfPoints: 60,
+                radius: this.convertToMeters(l),
+                radiusUnits: this.getRadiusUnitType()
+              };
+              var g = new EsriCircle(circleParams);
+              _graphic.geometry = dojoLang.mixin(g, {
+                paths: [
+                  [[start.x, start.y], [end.x, end.y]]
+                ]
+              });
+              _graphic.setGeometry(_graphic.geometry);
+            }
             ));
           break;
       }
@@ -240,10 +242,10 @@ define([
 
       this._points.push(start.offset(0, 0));
       switch (this._geometryType) {
-        case esriDraw.POINT:          
+        case esriDraw.POINT:
           this._drawEnd(start.offset(0, 0));
-          this._setTooltipMessage(0);          
-          break;        
+          this._setTooltipMessage(0);
+          break;
         case esriDraw.POLYLINE:
           if (this._points.length === 3) {
             this._onDblClickHandler();
@@ -293,23 +295,23 @@ define([
         map = this.map,
         spatialReference = map.spatialReference;
 
-      if (dojoHas("esri-touch")) {
+      if (dojoHas("esri-touch") && evt) {
         _pts.push(evt.mapPoint);
       }
 
-      var currentVertex = _pts[_pts.length-1];
-      var previousVertex = _pts[_pts.length-2];
+      var currentVertex = _pts[_pts.length - 1];
+      var previousVertex = _pts[_pts.length - 2];
 
-      if(currentVertex && previousVertex && currentVertex.x ===
-        previousVertex.x && currentVertex.y === previousVertex.y){
+      if (currentVertex && previousVertex && currentVertex.x ===
+        previousVertex.x && currentVertex.y === previousVertex.y) {
         _pts = _pts.slice(0, _pts.length - 1);
-      }else{
+      } else {
         _pts = _pts.slice(0, _pts.length);
       }
 
       switch (this._geometryType) {
         case esriDraw.POLYLINE:
-          if (! this._graphic || _pts.length < 2) {
+          if (!this._graphic || _pts.length < 2) {
             connect.disconnect(this._onMouseMoveHandler_connect);
             this._clear();
             this._onClickHandler(evt);
@@ -318,16 +320,16 @@ define([
 
           geometry = new EsriPolygon(spatialReference);
 
-          var majorAxisGeom = new EsriPolyLine({ paths:[[[_pts[0].x, _pts[0].y], [_pts[1].x, _pts[1].y]]], spatialReference:spatialReference });
-          var minorAxisGeom = new EsriPolyLine({ paths:[[[_pts[0].x, _pts[0].y], [_pts[2].x, _pts[2].y]]], spatialReference:spatialReference });
+          var majorAxisGeom = new EsriPolyLine({ paths: [[[_pts[0].x, _pts[0].y], [_pts[1].x, _pts[1].y]]], spatialReference: spatialReference });
+          var minorAxisGeom = new EsriPolyLine({ paths: [[[_pts[0].x, _pts[0].y], [_pts[2].x, _pts[2].y]]], spatialReference: spatialReference });
           var majorAxisLength = esriGeometryEngine.geodesicLength(majorAxisGeom, 9001);
           var minorAxisLength = esriGeometryEngine.geodesicLength(minorAxisGeom, 9001);
 
-          var lineLength = function(x, y, x0, y0){
+          var lineLength = function (x, y, x0, y0) {
             return Math.sqrt((x -= x0) * x + (y -= y0) * y);
           };
 
-          var computeAngle = function (pointA, pointB){
+          var computeAngle = function (pointA, pointB) {
             var deltaX = pointB.y - pointA.y;
             var deltaY = pointB.x - pointA.x;
             var azi = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
@@ -342,7 +344,7 @@ define([
               return (180 - angle) + 270;
             }
             if (180 <= angle && angle < 270) {
-              return (angle - 180) + 270;
+              return (270 - angle) + 180;
             }
             if (270 <= angle && angle < 360) {
               return 180 - (angle - 270);
@@ -385,7 +387,7 @@ define([
       this._drawEnd(geometry);
     },
 
-    _onMouseMoveHandler: function(evt) {
+    _onMouseMoveHandler: function (evt) {
       var snappingPoint;
       if (this.map.snappingManager) {
         snappingPoint = this.map.snappingManager._snappingPoint;
@@ -404,7 +406,7 @@ define([
 
           if (this._points.length === 2) {
             var majorAxisGeom = new EsriPolyLine({
-              paths:[
+              paths: [
                 [[this._points[0].x, this._points[0].y], [this._points[1].x, this._points[1].y]]
               ],
               spatialReference: this.map.spatialReference
