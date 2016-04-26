@@ -1,4 +1,4 @@
-# geodesy-and-range-widget
+# distance-and-direction-widget
 
 This widget provides the ability to create geodesic features such as lines, circles, ellipses and range rings.
 
