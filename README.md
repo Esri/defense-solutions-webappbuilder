@@ -14,16 +14,16 @@ The Web AppBuilder Widgets for Military Tools for ArcGIS is a set of widgets for
 ## Features
 The Widget Repository currently includes:
 
-* [Distance and Direction](./DistanceAndDirection/ReadMe.md) | WAB 1.2 
-* [Coordinate Conversion](./CoordinateConversion/ReadMe.md) | WAB 1.2 
+* [Distance and Direction](./DistanceAndDirection/ReadMe.md)
+* [Coordinate Conversion](./CoordinateConversion/ReadMe.md) 
 
 ## Requirements
-Requires Web AppBuilder for ArcGIS version 1.2
+Requires Web AppBuilder for ArcGIS version 1.2 and above. 
 
 ## Instructions
 Deploying Widgets.
 
-To use the widgets with you should copy any of the widgets to the stemapp/widget directory. This is located in %webappbuilder_install%/client directory.
+To use the widgets with you should copy any of the widgets to the stemapp/widget directory. This is located in %webappbuilder_install%/client/stemapp/widget directory.
 
 For more resources on developing modifying widgets please visit
 [Web AppBuilder for ArcGIS Documentation](http://doc.arcgis.com/en/web-appbuilder/)
@@ -34,7 +34,11 @@ For more resources on developing modifying widgets please visit
 
 ## Resources
 
-* Learn more about Esri's Solutions [Focused Maps and Apps for Your Organization](http://solutions.arcgis.com/).
+* [Web AppBuilder API](https://developers.arcgis.com/web-appbuilder/api-reference/css-framework.htm)
+* [ArcGIS API for JavaScript](https://developers.arcgis.com/javascript/)
+* [ArcGIS Blog](http://blogs.esri.com/esri/arcgis/)
+* [ArcGIS Solutions Website](http://solutions.arcgis.com/military/)
+* ![Twitter](https://g.twimg.com/twitter-bird-16x16.png)[@EsriDefense](http://twitter.com/EsriDefense)
 
 ## Issues
 
@@ -74,5 +78,5 @@ limitations under the License.
 A copy of the license is available in the repository's
 [license.txt](LICENSE.txt) file.
 
-[](Esri Tags: ArcGISSolutions ArcGIS Defense and Intelligence Military Environment Planning Analysis Emergency Management Local-Government Local Government State-Government State Government Utilities ArcGISSolutions)
+[](Esri Tags: Military Analyst ArcGIS Defense and Intelligence Military ArcGISSolutions)
 [](Esri Language: Javascript)

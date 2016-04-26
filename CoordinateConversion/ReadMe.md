@@ -1,6 +1,6 @@
 # Coordinate-Conversion-Widget
 
-The Coordinate Conversion is an Esri Prototype Widget for [Web AppBuilder for ArcGIS](http://doc.arcgis.com/en/web-appbuilder/).The Coordinate Conversion allows analysts to input coordinates, quickly converting them between several common formats including Universal Transverse Mercator (UTM), Military Grid Reference System (MGRS), Degrees, Decimal, Minutes (DDM), Degrees, Minutes, Seconds (DMS), Decimal Degrees (DD), U.S. National Grid (USNG), and Global Area Reference System (GARS).  Analysts also have the ability to interact with the map to dynamically retrieve the current cursor location in any or all of the formats listed above.  They can then use the Coordinate Conversion to easily copy one or all coordinate formats to disseminate information to others for mission critical response.
+The Coordinate Conversion is an Esri Widget for [Web AppBuilder for ArcGIS](http://doc.arcgis.com/en/web-appbuilder/).The Coordinate Conversion allows analysts to input coordinates, quickly converting them between several common formats including Universal Transverse Mercator (UTM), Military Grid Reference System (MGRS), Degrees, Decimal, Minutes (DDM), Degrees, Minutes, Seconds (DMS), Decimal Degrees (DD), U.S. National Grid (USNG), and Global Area Reference System (GARS).  Analysts also have the ability to interact with the map to dynamically retrieve the current cursor location in any or all of the formats listed above.  They can then use the Coordinate Conversion to easily copy one or all coordinate formats to disseminate information to others for mission critical response.
 
 ![Image of Coordinate Conversion Widget][ss]
 
@@ -21,7 +21,7 @@ The Coordinate Conversion is an Esri Prototype Widget for [Web AppBuilder for Ar
 
 ## Requirements
 
-* Web Appbuilder Version 1.3
+* Web Appbuilder Version 1.2 and above.
 * [ArcGIS Web Appbuilder for ArcGIS](http://developers.arcgis.com/web-appbuilder/)
 
 ## Instructions
