@@ -15,7 +15,12 @@ The Web AppBuilder Widgets for Military Tools for ArcGIS is a set of widgets for
 The Widget Repository currently includes:
 
 * [Distance and Direction](./DistanceAndDirection/ReadMe.md)
+
+![Image of Distance and Direction][ss_dd]
+
 * [Coordinate Conversion](./CoordinateConversion/ReadMe.md) 
+
+![Image of Coordinate Conversion][ss_cc]
 
 ## Requirements
 Requires Web AppBuilder for ArcGIS version 1.2 and above. 
@@ -78,5 +83,7 @@ limitations under the License.
 A copy of the license is available in the repository's
 [license.txt](LICENSE.txt) file.
 
+[ss_dd]: /DistanceAndDirection/images/screenshot.png
+[ss_cc]: /CoordinateConversion/images/screenshot.png
 [](Esri Tags: Military Analyst ArcGIS Defense and Intelligence Military ArcGISSolutions)
 [](Esri Language: Javascript)
