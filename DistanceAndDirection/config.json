@@ -1,0 +1,43 @@
+{
+  "feedback": {
+    "lineSymbol": {
+      "type": "esriSLS",
+      "style": "esriSLSSolid",
+      "color": [255, 50, 50, 255],
+      "width": 1.25
+    },
+    "circleSymbol": {
+      "type": "esriSFS",
+      "style": "esriSFSNull",
+      "color": [255,0,0,0],
+      "outline": {
+        "color": [255, 50, 50, 255],
+        "width": 1.25,
+        "type": "esriSLS",
+        "style": "esriSLSSolid"
+      }
+    },
+    "ellipseSymbol": {
+      "type": "esriSFS",
+      "style": "esriSFSNull",
+      "color": [255,0,0,0],
+      "outline": {
+        "color": [255, 50, 50, 255],
+        "width": 1.25,
+        "type": "esriSLS",
+        "style": "esriSLSSolid"
+      }
+    },
+    "rangeRingSymbol": {
+      "type": "esriSFS",
+      "style": "esriSFSNull",
+      "color": [255,0,0,0],
+      "outline": {
+        "color": [255, 50, 50, 255],
+        "width": 1.25,
+        "type": "esriSLS",
+        "style": "esriSLSSolid"
+      }
+    }
+  }
+}

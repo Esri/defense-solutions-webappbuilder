@@ -1,0 +1,63 @@
+<div class="tabPanel" data-dojo-attach-point="ellipseContainer">
+  <div class="controls">
+    <div class="controlGroup">
+      <label>Ellipse Type</label>
+      <div class="controlItem">
+        <select style="width: 225px" data-dojo-type="dijit/form/Select" data-dojo-attach-point="ellipseType">
+          <option value="semi">Semi</option>
+          <option value="full">Full</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="controlGroup">
+      <label>Center Point</label>
+      <div class="controlItem">
+        <input class="jimu-input coordInput" placeholder="Enter Coordinates" data-dojo-attach-point="startPointCoords" />
+        <div class="addPointBtn" data-dojo-attach-point="addPointBtn"></div>
+      </div>
+    </div>
+
+    <fieldset>
+      <legend>Axis</legend>
+        <div class="controlGroup">
+          <label>Major</label>
+          <div class="controlItem">
+            <input class="jimu-input coordInput" data-dojo-attach-point="majorAxisInput"></input>
+          </div>
+        </div>
+
+        <div class="controlGroup">
+          <label>Minor</label>
+          <div class="controlItem">
+            <input class="jimu-input coordInput" data-dojo-attach-point="minorAxisInput"></input>
+          </div>
+        </div>
+
+        <div class="controlGroup">
+          <label>Unit</label>
+          <div class="controlItem">
+            <select style="width: 225px" data-dojo-type="dijit/form/Select" data-dojo-attach-point="lengthUnitDD">
+              <option value="feet">Feet</option>
+              <option value="meters">Meters</option>
+              <option value="kilometers">Kilometers</option>
+              <option value="miles">Miles</option>
+              <option value="nauticalmiles">Nautical Mile</option>
+              <option value="ussurveyfoot">US Survey Foot</option>
+            </select>
+          </div>
+        </div>
+    </fieldset>
+
+    <div class="controlGroup">
+      <label>Orientation Angle</label>
+      <div class="controlItem">
+        <input class="jimu-input selectInput" data-dojo-attach-point="angleInput" />
+        <select style="width: 100px" class="controlSpace" data-dojo-type="dijit/form/Select" data-dojo-attach-point="angleUnitDD">
+          <option value="degrees">Degrees</option>
+          <option value="mils">Mils</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
