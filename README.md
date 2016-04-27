@@ -9,6 +9,8 @@ The Web AppBuilder Widgets for Military Tools for ArcGIS is a set of widgets for
 * [Resources](#resources)
 * [Issues](#issues)
 * [Contributing](#contributing)
+* [Repository Points of Contact](#repository-points-of-contact)
+* [Branching and Releases](#branching-and-releases)
 * [Licensing](#licensing)
 
 ## Features
@@ -52,6 +54,19 @@ For more resources on developing modifying widgets please visit
 ## Contributing
 
 Please see our [guidelines for contributing](http://github.com/Esri/solutions-webappbuilder-widgets/blob/master/CONTRIBUTING.md).
+
+## Repository Points of Contact
+
+#### Repository Owner: [Kevin](https://github.com/kgonzago)
+
+* Merge Pull Requests
+* Creates Releases and Tags
+* Manages Milestones
+* Manages and Assigns Issues
+
+#### Secondary: [Lyle](https://github.com/topowright)
+
+* Backup when the Owner is away
 
 ## Branching and Releases
 
