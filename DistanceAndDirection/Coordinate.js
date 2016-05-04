@@ -1,0 +1,124 @@
+define([
+  'dojo/_base/declare',
+  'dojo/_base/lang',
+  'dojo/Stateful',
+  'dojo/topic',
+  'esri/geometry/Point',
+  'esri/SpatialReference',
+  './util'
+], function (
+  dojoDeclare,
+  dojoLang,
+  dojoStateful,
+  dojoTopic,
+  EsriPoint,
+  EsriSpatialReference,
+  CoordinateUtilities
+) {
+
+  var mo = dojoDeclare([dojoStateful], {
+
+    inputString: null,
+    _inputStringSetter: function (value) {
+      this.inputString = value;
+      this.getInputType();
+    },
+
+    formatString: null,
+    _formatStringSetter: function (value) {
+      this.formatString = value;
+      this.getFormattedValue();
+    },
+
+    inputType: 'UNKNOWN',
+
+    formatType: 'DMS',
+
+    outputString: null,
+
+    coordinateEsriGeometry: null,
+    _coordinateEsriGeometrySetter: function (value) {
+      this.coordinateEsriGeometry = value;
+      this.getFormattedValue();
+    },
+
+    hasError: false,
+
+    /**
+     *
+     **/
+    constructor: function (args) {
+      dojoDeclare.safeMixin(this, args);
+      this.util = new CoordinateUtilities({
+        'appConfig': {
+          'coordinateconversion': {
+            'geometryService': {
+              'url': 'http://pscltags1.eastus.cloudapp.azure.com/arcgis/rest/services/Utilities/Geometry/GeometryServer'
+            }
+        }
+        }
+      });
+    },
+
+    /**
+     *
+     **/
+    getInputType: function () {
+
+      var tc = this.util.getCoordinateType(this.inputString);
+      if (tc && tc[tc.length-1]){
+        this.hasError = false;
+        this.inputType = tc[tc.length-1].name;
+        this.util.getXYNotation(this.inputString, this.inputType).then(
+          dojoLang.hitch(this, function (r) {
+            if (!r || r.length === 0){
+              this.hasError = true;
+              this.message = 'Invalid Coordinate 1';
+            } else {
+              this.coordinateEsriGeometry = new EsriPoint(
+                r[0][0],
+                r[0][1],
+                new EsriSpatialReference({
+                  wkid: 4326
+                })
+              );
+              this.isManual = true;
+              this.hasError = false;
+              this.message = '';
+            }
+
+          }),
+          dojoLang.hitch(this, function (r) {
+            this.hasError=true;
+            this.inputType = 'UNKNOWN';
+            this.message = 'Invalid Coordinate 2';
+            dojoTopic.publish('COORDINATE_INPUT_TYPE_CHANGE', this);
+          })
+        );
+      } else {
+        this.hasError = true;
+        this.inputType = 'UNKNOWN';
+        this.message = 'Invalid Coordinate 3';
+        dojoTopic.publish('COORDINATE_INPUT_TYPE_CHANGE', this);
+      }
+    },
+
+    /**
+     *
+     **/
+    getFormattedValue: function () {
+      if (!this.coordinateEsriGeometry) {
+        return;
+      }
+      this.util.getCoordValues({
+        x: this.coordinateEsriGeometry.x,
+        y: this.coordinateEsriGeometry.y
+      }, this.formatType, 4).then(dojoLang.hitch(this, function (r) {
+        this.outputString = r[0];
+        dojoTopic.publish('COORDINATE_INPUT_TYPE_CHANGE', this);
+      }));
+    }
+  });
+
+  return mo;
+});

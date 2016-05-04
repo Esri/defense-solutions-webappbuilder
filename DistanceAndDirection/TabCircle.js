@@ -29,14 +29,20 @@ define([
   'dijit/_TemplatedMixin',
   'dijit/_WidgetsInTemplateMixin',
   'dijit/TitlePane',
+  'dijit/TooltipDialog',
+  'dijit/popup',
   'esri/layers/GraphicsLayer',
+  'esri/graphicsUtils',
   'esri/geometry/geometryEngine',
   'esri/symbols/SimpleFillSymbol',
   'esri/graphic',
   'esri/units',
   'esri/geometry/webMercatorUtils',
+  'esri/geometry/Circle',
   './Feedback',
   './ShapeModel',
+  './CoordinateInput',
+  './EditOutputCoordinate',
   'dojo/text!./templates/TabCircle.html'
 ], function (
   dojoDeclare,
@@ -52,14 +58,20 @@ define([
   dijitTemplatedMixin,
   dijitWidgetsInTemplate,
   dijitTitlePane,
+  DijitTooltipDialog,
+  DijitPopup,
   EsriGraphicsLayer,
+  esriGraphicsUtils,
   esriGeometryEngine,
   EsriSimpleFillSymbol,
   EsriGraphic,
   esriUnits,
   esriWMUtils,
+  EsriCircle,
   DrawFeedBack,
   ShapeModel,
+  CoordInput,
+  EditOutputCoordinate,
   templateStr
   ) {
   'use strict';
@@ -95,6 +107,14 @@ define([
       this.dt.setFillSymbol(this._circleSym);
       this.dt.set('lengthLayer', this._lengthLayer);
 
+      this.coordTool = new CoordInput({}, this.startPointCoords);
+      this.coordTool.inputCoordinate.formatType = 'DD';
+
+      this.coordinateFormat = new DijitTooltipDialog({
+        content: new EditOutputCoordinate(),
+        style: 'width: 400px'
+      });
+
       this.syncEvents();
     },
 
@@ -103,11 +123,12 @@ define([
      **/
     syncEvents: function () {
 
-      this.distCalcControl.watch("open", dojoLang.hitch(this, this.distCalcDidExpand));
-      
+      this.distCalcControl.watch('open', dojoLang.hitch(this, this.distCalcDidExpand));
+
       dojoTopic.subscribe('DD_CLEAR_GRAPHICS', dojoLang.hitch(this, this.clearGraphics));
       dojoTopic.subscribe('DD_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
       dojoTopic.subscribe('DD_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
+      dojoTopic.subscribe('COORDINATE_INPUT_TYPE_CHANGE', dojoLang.hitch(this, this.setGraphic));
 
       this.own(
         this.dt.on(
@@ -116,9 +137,20 @@ define([
         ));
 
       this.own(dojoOn(
+        this.coordinateFormatButton,
+        'click',
+        dojoLang.hitch(this, this.coordinateFormatButtonWasClicked)
+      ));
+
+      this.own(dojoOn(
         this.addPointBtn,
         'click',
         dojoLang.hitch(this, this.pointButtonWasClicked)
+      ));
+
+      this.own(this.coordTool.on(
+        'blur',
+        dojoLang.hitch(this, this.coordToolDidLoseFocus)
       ));
 
       this.own(this.lengthUnitDD.on(
@@ -161,6 +193,47 @@ define([
           this.lengthInputDidChange
         )
       ));
+
+      this.own(dojoOn(
+        this.coordinateFormat.content.applyButton,
+        'click',
+        dojoLang.hitch(this, function () {
+          var fv = this.coordinateFormat.content.frmtSelect.get('value');
+          console.log(fv);
+          DijitPopup.close(this.coordinateFormat);
+        }
+      )));
+
+      this.own(dojoOn(
+        this.coordinateFormat.content.cancelButton,
+        'click',
+        dojoLang.hitch(this, function () {
+          DijitPopup.close(this.coordinateFormat);
+        }
+      )));
+    },
+
+    /**
+     *
+     **/
+    coordToolDidLoseFocus: function () {
+      //this.coordTool.validate();
+      this.coordTool.inputCoordinate.isManual = true;
+      this.coordTool.set('validateOnInput', true);
+      if (this.coordTool.isValid){
+        //this.setGraphic(true);
+      }
+
+    },
+
+    /**
+     *
+     **/
+    coordinateFormatButtonWasClicked: function () {
+      DijitPopup.open({
+        popup: this.coordinateFormat,
+        around: this.coordinateFormatButton
+      });
     },
 
     /**
@@ -181,13 +254,16 @@ define([
       if (this.lengthInput.value && this.lengthInput.value <= 0){
         this.useCalculatedDistance = false;
       }
+
+      if (this.coordTool.inputCoordinate) {
+        this.setGraphic();
+      }
     },
 
     /**
      *
      **/
     timeInputDidChange: function () {
-      console.log("Time Input Did Change");
       this.currentTimeInSeconds = this.timeInput.value  * this.timeUnitDD.value;
       this.getCalculatedDistance();
     },
@@ -197,12 +273,11 @@ define([
      **/
     distanceInputDidChange: function () {
 
-      var currentRateInMetersPerSecond = (this.distanceInput.value *
-        this.distanceUnitDD.value.split(';')[0]) / this.distanceUnitDD.value.split(';')[1];
-      console.log(dojoString.substitute("Rate in Meters Per Second = ${crmps}", {
-          crmps: currentRateInMetersPerSecond
-        })
-      );
+      var currentRateInMetersPerSecond = (
+        this.distanceInput.value *
+        this.distanceUnitDD.value.split(';')[0]
+      ) / this.distanceUnitDD.value.split(';')[1];
+
       this.currentDistanceInMeters = currentRateInMetersPerSecond;
       this.getCalculatedDistance();
     },
@@ -245,6 +320,7 @@ define([
         this.calculatedRadiusInMeters = null;
         this.useCalculatedDistance = true;
       }
+      this.setGraphic();
     },
 
     /**
@@ -252,7 +328,7 @@ define([
      **/
     pointButtonWasClicked: function () {
       this.map.disableMapNavigation();
-      if (this.lengthInput.value && this.lengthInput.value > 0){
+      if (this.distCalcControl.get('open')) {
         this.dt.activate('point');
       } else {
         this.dt.activate('circle');
@@ -284,31 +360,59 @@ define([
      **/
     creationTypeDidChange: function() {
       this.lengthUnitDDDidChange();
+      this.radiusDiameterLabel.innerHTML = this.creationType.get('value');
     },
 
     /**
      *
      **/
     feedbackDidComplete: function (results) {
+      var centerPoint = results.geometry.center;
+      if (!centerPoint) {
+        centerPoint = esriWMUtils.webMercatorToGeographic(results.geometry);
+      } else {
+        dojoDomAttr.set(this.lengthInput, 'value', results.geometry.radius);
+        //this.calculatedRadiusInMeters = results.geometry.radius;
+      }
+      this.coordTool.inputCoordinate.isManual = false;
+      this.coordTool.inputCoordinate.set('coordinateEsriGeometry', centerPoint);
+    },
 
-      results.calculatedDistance = this.calculatedRadiusInMeters;
+    /**
+     *
+     **/
+    setGraphic: function (isManual) {
+      var results = {};
+      this.map.enableMapNavigation();
+      this.dt.deactivate();
+      dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
 
+      if (!this.coordTool.inputCoordinate.isManual) {
+        this.coordTool.set('validateOnInput', false);
+        this.coordTool.set('value', this.coordTool.inputCoordinate.outputString);
+      }
+
+      if (!this.lengthInput.value || this.lengthInput.value <= 0) {return;}
+
+      /*if (this.calculatedRadiusInMeters && this.calculatedRadiusInMeters > 0) {
+        results.calculatedDistance = this.calculatedRadiusInMeters;
+      } else {*/
+        if (this.creationType.get('value') === 'Radius') {
+          results.calculatedDistance = parseInt(this.lengthInput.value, 10);
+        } else {
+          results.calculatedDistance = parseInt(this.lengthInput.value, 10) * 2;
+        }
+
+      /*}*/
+
+      //this.currentCircle = new ShapeModel(results);
+      results.geometry = this.coordTool.inputCoordinate.coordinateEsriGeometry;
       this.currentCircle = new ShapeModel(results);
 
       this.currentCircle.graphic = new EsriGraphic(
         this.currentCircle.wmGeometry,
         this._circleSym
       );
-
-      dojoDomAttr.set(
-        this.startPointCoords,
-        'value',
-        this.currentCircle.formattedStartPoint
-      );
-
-      if (!this.useCalculatedDistance) {
-        this.lengthUnitDDDidChange();
-      }
 
       this._gl.add(this.currentCircle.graphic);
 
@@ -319,14 +423,12 @@ define([
         this._lengthLayer.clear();
       }
 
+      if (this.coordTool.inputCoordinate.isManual) {
+        this.map.setExtent(this.currentCircle.wmGeometry.getExtent().expand(3));
+      }
+
       this.emit('graphic_created', this.currentCircle);
-
-      this.map.enableMapNavigation();
-
-      this.dt.deactivate();
-
-      dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
-
+      this.clearUI(true);
     },
 
     /**
@@ -339,13 +441,22 @@ define([
         this._lengthLayer.clear();
 
         // ui controls
-        this.useCalculatedDistance = false;
-        this.currentCircle = null;
-        dojoDomAttr.set(this.startPointCoords, 'value', '');
-        dojoDomAttr.set(this.lengthInput, 'value', '');
-        dojoDomAttr.set(this.timeInput, 'value', '');
-        dojoDomAttr.set(this.distanceInput, 'value', '');
+        this.clearUI(false);
       }
+    },
+
+    clearUI: function (keepCoords) {
+      this.useCalculatedDistance = false;
+      this.currentCircle = null;
+      if (!keepCoords){
+        this.coordTool.clear();
+      }
+
+      dojoDomClass.remove(this.addPointBtn, 'jimu-state-active');
+      dojoDomAttr.set(this.startPointCoords, 'value', '');
+      dojoDomAttr.set(this.lengthInput, 'value', '');
+      dojoDomAttr.set(this.timeInput, 'value', '');
+      dojoDomAttr.set(this.distanceInput, 'value', '');
     },
 
     /**

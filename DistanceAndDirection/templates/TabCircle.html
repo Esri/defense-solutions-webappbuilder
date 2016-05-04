@@ -4,7 +4,7 @@
             <label>Create Circle From</label>
             <div class="controlItem">
                 <select style="width: 225px" data-dojo-type="dijit/form/Select" data-dojo-attach-point="creationType">
-                    <option value="Radius">Radius</option>
+                    <option value="Radius" selected="selected">Radius</option>
                     <option value="Diameter">Diameter</option>
                 </select>
             </div>
@@ -14,12 +14,13 @@
             <label>Center Point</label>
             <div class="controlItem">
                 <input class="jimu-input coordInput" data-dojo-attach-point="startPointCoords" placeholder="Enter Coordinates" />
+                <span class="frmtBtn" data-dojo-attach-point="coordinateFormatButton"></span>
                 <span class="addPointBtn" data-dojo-attach-point="addPointBtn"></span>
             </div>
         </div>
 
         <div class="controlGroup">
-            <label>Radius/Diameter</label>
+            <label data-dojo-attach-point="radiusDiameterLabel">Radius</label>
             <div class="controlItem">
                 <input class="jimu-input selectInput" data-dojo-attach-point="lengthInput" />
                 <select style="width: 100px" class="controlSpace" data-dojo-type="dijit/form/Select" data-dojo-attach-point="lengthUnitDD">
