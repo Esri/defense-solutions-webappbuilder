@@ -131,6 +131,7 @@ define([
                 params.strings.push(a);
                 break;
             case 'MGRS':
+            case 'USNG':
                 params.conversionMode = 'mgrsNewStyle';
                 params.strings.push(fromStr);
                 break;
@@ -171,7 +172,7 @@ define([
                     pattern: /^\d{1,2}[c-hj-np-xC-HJ-NP-X][-,;:\s]*[a-hj-np-zA-HJ-NP-Z]{1}[a-hj-np-zA-HJ-NP-Z]{1}[-,;:\s]*\d{0,10}/
                 }, {
                     name: 'USNG',
-                    pattern: /\d{2}[S,s,N,n]*\s[A-Za-z]*\s\d*/
+                    pattern: /^\d{1,2}[c-hj-np-xC-HJ-NP-X][-,;:\s]*[a-hj-np-zA-HJ-NP-Z]{1}[a-hj-np-zA-HJ-NP-Z]{1}[-,;:\s]*\d{0,10}[\s]?\d{0,10}/
                 }, {
                     name: 'UTM',
                     pattern: /^\d{1,3}[NnSs]{1}([\s-]\d*\.?\d*[mM]?){2}/

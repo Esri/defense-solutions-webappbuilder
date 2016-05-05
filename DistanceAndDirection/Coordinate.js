@@ -75,7 +75,7 @@ define([
         this.inputType = tc[tc.length-1].name;
         this.util.getXYNotation(this.inputString, this.inputType).then(
           dojoLang.hitch(this, function (r) {
-            if (!r || r.length === 0){
+            if (r.length <= 0){
               this.hasError = true;
               this.message = 'Invalid Coordinate 1';
             } else {
@@ -119,8 +119,7 @@ define([
         y: this.coordinateEsriGeometry.y
       }, this.formatType, 4).then(dojoLang.hitch(this, function (r) {
         this.outputString = this.getCoordUI(r);
-        console.log('Output String :' + this.outputString);
-        dojoTopic.publish('COORDINATE_INPUT_TYPE_CHANGE', this);
+        dojoTopic.publish('COORDINATE_INPUT_FORMAT_CHANGE', this);
       }));
     },
 

@@ -130,6 +130,7 @@ define([
       dojoTopic.subscribe('DD_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
       dojoTopic.subscribe('COORDINATE_INPUT_TYPE_CHANGE', dojoLang.hitch(this, this.setGraphic));
       dojoTopic.subscribe('COORDINATE_INPUT_FORMAT_CHANGE', dojoLang.hitch(this, function () {
+        console.log('TabCircle: Coordinate_Input_Format_Change', this.coordTool.inputCoordinate.outputString);
         this.coordTool.inputCoordinate.validateOnInput = false;
         this.coordTool.set('value', this.coordTool.inputCoordinate.outputString);
       }));
@@ -237,6 +238,7 @@ define([
      *
      **/
     coordinateFormatButtonWasClicked: function () {
+      this.coordinateFormat.content.set('ct', this.coordTool.inputCoordinate.inputType);
       DijitPopup.open({
         popup: this.coordinateFormat,
         around: this.coordinateFormatButton
@@ -408,7 +410,7 @@ define([
         if (this.creationType.get('value') === 'Radius') {
           results.calculatedDistance = parseInt(this.lengthInput.value, 10);
         } else {
-          results.calculatedDistance = parseInt(this.lengthInput.value, 10) * 2;
+          results.calculatedDistance = parseInt(this.lengthInput.value, 10) / 2;
         }
 
       /*}*/
