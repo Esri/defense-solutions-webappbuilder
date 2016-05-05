@@ -323,11 +323,12 @@ define([
           'value',
           fr
         );
+        this.setGraphic();
       } else {
         this.calculatedRadiusInMeters = null;
         this.useCalculatedDistance = true;
       }
-      this.setGraphic();
+
     },
 
     /**
