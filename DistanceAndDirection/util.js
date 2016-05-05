@@ -148,7 +148,7 @@ define([
         },
 
         /**
-         *
+         * Figure out what type of coordinate this string rep
          **/
         getCoordinateType: function (fromInput) {
 

@@ -129,6 +129,10 @@ define([
       dojoTopic.subscribe('DD_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
       dojoTopic.subscribe('DD_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
       dojoTopic.subscribe('COORDINATE_INPUT_TYPE_CHANGE', dojoLang.hitch(this, this.setGraphic));
+      dojoTopic.subscribe('COORDINATE_INPUT_FORMAT_CHANGE', dojoLang.hitch(this, function () {
+        this.coordTool.inputCoordinate.validateOnInput = false;
+        this.coordTool.set('value', this.coordTool.inputCoordinate.outputString);
+      }));
 
       this.own(
         this.dt.on(
@@ -198,8 +202,15 @@ define([
         this.coordinateFormat.content.applyButton,
         'click',
         dojoLang.hitch(this, function () {
+          var fs = this.coordinateFormat.content.formats[this.coordinateFormat.content.ct];
+          var cfs = fs.defaultFormat;
           var fv = this.coordinateFormat.content.frmtSelect.get('value');
-          console.log(fv);
+          if (fs.useCustom) {
+            cfs = fs.customFormat;
+          }
+          this.coordTool.inputCoordinate.set('formatString', cfs);
+          this.coordTool.inputCoordinate.set('formatType', fv);
+
           DijitPopup.close(this.coordinateFormat);
         }
       )));
@@ -217,13 +228,9 @@ define([
      *
      **/
     coordToolDidLoseFocus: function () {
-      //this.coordTool.validate();
       this.coordTool.inputCoordinate.isManual = true;
       this.coordTool.set('validateOnInput', true);
-      if (this.coordTool.isValid){
-        //this.setGraphic(true);
-      }
-
+      this.coordTool.isValid();
     },
 
     /**
@@ -445,6 +452,9 @@ define([
       }
     },
 
+    /**
+     * reset ui controls
+     **/
     clearUI: function (keepCoords) {
       this.useCalculatedDistance = false;
       this.currentCircle = null;

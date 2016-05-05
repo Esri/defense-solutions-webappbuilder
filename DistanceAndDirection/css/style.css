@@ -105,3 +105,21 @@
 .jimu-widget-DistanceAndDirection .addPointBtn.jimu-state-active {
     background-color: #c0c0c0;
 }
+
+/**
+ * Coordinate Format Dialog
+ **/
+
+
+.btnContainer {
+    text-align: right;
+    margin-top: 6px;
+}
+
+.settingsContainer {
+    margin-top: 6px;
+}
+
+.controlContainer {
+    margin-top: 6px;
+}
