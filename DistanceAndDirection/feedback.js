@@ -17,7 +17,7 @@
 define([
   'dojo/_base/declare',
   'dojo/_base/lang',
-  "dojo/_base/connect",
+  'dojo/_base/connect',
   'dojo/has',
   'dojo/number',
   'dojo/string',
@@ -218,6 +218,7 @@ define([
                 ]
               });
               _graphic.setGeometry(_graphic.geometry);
+              this.showLength(end, l);
             }
             ));
           break;
