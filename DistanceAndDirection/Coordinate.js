@@ -44,6 +44,7 @@ define([
     _coordinateEsriGeometrySetter: function (value) {
       this.coordinateEsriGeometry = value;
       this.getFormattedValue();
+      dojoTopic.publish('COORDINATE_INPUT_TYPE_CHANGE', this);
     },
 
     hasError: false,
