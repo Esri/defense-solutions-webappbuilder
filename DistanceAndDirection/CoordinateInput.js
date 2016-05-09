@@ -18,14 +18,13 @@ define([
 
     invalidMessage: 'Blah Blah Blah',
 
-
-    validateOnInput: false,
+    validateOnInput: true,
     _validateOnInputSetter: function (value) {
         this.validateOnInput = (value === 'true');
     },
 
     clear: function () {
-      this.set('validateOnInput', false);
+      this.set('validateOnInput', true);
       this.set('value', '');
       this.inputCoordinate.coordinateEsriGeometry = null;
     },
@@ -52,7 +51,7 @@ define([
       this.set('promptMessage', this.inputCoordinate.message);
 
       //this.displayMessage();
-      return !this.inputCoordinate.hasError;
+      return this.inputCoordinate.gettInputTypeSync();
     }
   });
 

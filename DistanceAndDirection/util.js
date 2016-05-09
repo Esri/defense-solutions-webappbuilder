@@ -427,6 +427,34 @@ define([
 
             r.formatResult = s;
             return r;
+        },
+
+        /**
+         *
+         **/
+        convertMetersToUnits: function (inMeters, fromUnit) {
+          var convLength = 0;
+          switch (fromUnit.toLowerCase()) {
+            case 'meters':
+              convLength = inMeters;
+              break;
+            case 'feet':
+              convLength = inMeters * 3.28084;
+              break;
+            case 'kilometers':
+              convLength = inMeters * 0.001;
+              break;
+            case 'miles':
+              convLength = inMeters * 0.000621371;
+              break;
+            case 'nautical-miles':
+              convLength = inMeters * 0.000539957;
+              break;
+            case 'yards':
+              convLength = inMeters * 1.09361;
+              break;
+          }
+          return convLength;
         }
     });
 });
