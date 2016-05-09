@@ -339,6 +339,7 @@ define([
      **/
     pointButtonWasClicked: function () {
       this.map.disableMapNavigation();
+      this.dt.set('isDiameter', this.creationType.get('value') === 'Diameter');
       if (this.distCalcControl.get('open')) {
         this.dt.activate('point');
       } else {
@@ -383,9 +384,9 @@ define([
         centerPoint = esriWMUtils.webMercatorToGeographic(results.geometry);
       } else {
         dojoDomAttr.set(this.lengthInput, 'value', results.geometry.radius);
-        //this.calculatedRadiusInMeters = results.geometry.radius;
       }
       this.coordTool.inputCoordinate.isManual = false;
+      this.coordTool.inputCoordinate.hasError = false;
       this.coordTool.inputCoordinate.set('coordinateEsriGeometry', centerPoint);
     },
 
@@ -398,28 +399,27 @@ define([
       this.dt.deactivate();
       dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
 
+      if (this.coordTool.inputCoordinate.hasError) {
+        return;
+      }
+
       if (!this.coordTool.inputCoordinate.isManual) {
         this.coordTool.set('validateOnInput', false);
+
         this.coordTool.set('value', this.coordTool.inputCoordinate.outputString);
       }
 
       if (!this.lengthInput.value || this.lengthInput.value <= 0) {return;}
 
-      /*if (this.calculatedRadiusInMeters && this.calculatedRadiusInMeters > 0) {
-        results.calculatedDistance = this.calculatedRadiusInMeters;
-      } else {*/
-      if (this.creationType.get('value') === 'Radius') {
-        results.calculatedDistance = parseInt(this.lengthInput.value, 10);
+      if (this.coordTool.inputCoordinate.isManual && this.creationType.get('value') === 'Diameter') {
+        results.calculatedDistance = parseInt(this.lengthInput.value*2, 10);
       } else {
-        results.calculatedDistance = parseInt(this.lengthInput.value, 10) / 2;
+        results.calculatedDistance = parseInt(this.lengthInput.value, 10);
       }
 
       results.calculatedDistance = this.dt.convertToMeters(
         results.calculatedDistance, this.lengthUnitDD.get('value'));
 
-      /*}*/
-
-      //this.currentCircle = new ShapeModel(results);
       results.geometry = this.coordTool.inputCoordinate.coordinateEsriGeometry;
       this.currentCircle = new ShapeModel(results);
 
