@@ -3,6 +3,7 @@ define([
   'dojo/_base/lang',
   'dojo/Stateful',
   'dojo/topic',
+  'dojo/Deferred',
   'esri/geometry/Point',
   'esri/SpatialReference',
   './util'
@@ -11,6 +12,7 @@ define([
   dojoLang,
   dojoStateful,
   dojoTopic,
+  DojoDeferred,
   EsriPoint,
   EsriSpatialReference,
   CoordinateUtilities
@@ -18,10 +20,14 @@ define([
 
   var mo = dojoDeclare([dojoStateful], {
 
+    formatPrefix: false,
+    _formatPrefixSetter: function (value) {
+      this.formatPrefix = value;
+    },
+
     inputString: null,
     _inputStringSetter: function (value) {
       this.inputString = value;
-      this.getInputType();
     },
 
     formatString: 'YN XE',
@@ -47,8 +53,6 @@ define([
       dojoTopic.publish('COORDINATE_INPUT_TYPE_CHANGE', this);
     },
 
-    hasError: false,
-
     /**
      *
      **/
@@ -69,17 +73,20 @@ define([
      *
      **/
     getInputType: function () {
-
+      this.inputTypeDef = new DojoDeferred();
       var tc = this.util.getCoordinateType(this.inputString);
       if (tc && tc[tc.length-1]){
-        this.hasError = false;
         this.inputType = tc[tc.length-1].name;
         this.util.getXYNotation(this.inputString, this.inputType).then(
           dojoLang.hitch(this, function (r) {
-            if (r.length <= 0){
+            if (r.length <= 0 || !r[0][0]){
               this.hasError = true;
-              this.message = 'Invalid Coordinate 1';
+              this.message = 'Invalid Coordinate';
+              this.inputTypeDef.resolve(this);
+              dojoTopic.publish('COORDINATE_INPUT_TYPE_CHANGE', this);
             } else {
+              this.isManual = true;
+              this.hasError = false;
               this.coordinateEsriGeometry = new EsriPoint(
                 r[0][0],
                 r[0][1],
@@ -87,9 +94,8 @@ define([
                   wkid: 4326
                 })
               );
-              this.isManual = true;
-              this.hasError = false;
               this.message = '';
+              this.inputTypeDef.resolve(this);
             }
 
           }),
@@ -98,14 +104,26 @@ define([
             this.inputType = 'UNKNOWN';
             this.message = 'Invalid Coordinate 2';
             dojoTopic.publish('COORDINATE_INPUT_TYPE_CHANGE', this);
+            this.inputTypeDef.resolve(this);
           })
         );
       } else {
         this.hasError = true;
         this.inputType = 'UNKNOWN';
         this.message = 'Invalid Coordinate 3';
+        this.inputTypeDef.resolve(this);
         dojoTopic.publish('COORDINATE_INPUT_TYPE_CHANGE', this);
       }
+
+      return this.inputTypeDef;
+    },
+
+    /**
+     *
+     **/
+    gettInputTypeSync: function () {
+      var v = this.util.getCoordinateType(this.inputString);
+      return v !== null;
     },
 
     /**
@@ -128,7 +146,7 @@ define([
      * Get coordinate notation in user provided format
      **/
     getCoordUI: function (fromValue) {
-      var as = false;
+      var as = this.get('formatPrefix');
       var r;
       var formattedStr;
       switch (this.formatType) {

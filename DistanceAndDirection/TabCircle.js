@@ -126,8 +126,8 @@ define([
       this.distCalcControl.watch('open', dojoLang.hitch(this, this.distCalcDidExpand));
 
       dojoTopic.subscribe('DD_CLEAR_GRAPHICS', dojoLang.hitch(this, this.clearGraphics));
-      dojoTopic.subscribe('DD_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
-      dojoTopic.subscribe('DD_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
+      //dojoTopic.subscribe('DD_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
+      //dojoTopic.subscribe('DD_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
       dojoTopic.subscribe('COORDINATE_INPUT_TYPE_CHANGE', dojoLang.hitch(this, this.setGraphic));
       dojoTopic.subscribe('COORDINATE_INPUT_FORMAT_CHANGE', dojoLang.hitch(this, function () {
         console.log('TabCircle: Coordinate_Input_Format_Change', this.coordTool.inputCoordinate.outputString);
@@ -209,6 +209,7 @@ define([
           if (fs.useCustom) {
             cfs = fs.customFormat;
           }
+          this.coordTool.inputCoordinate.set('formatPrefix', this.coordinateFormat.content.addSignChkBox.checked);
           this.coordTool.inputCoordinate.set('formatString', cfs);
           this.coordTool.inputCoordinate.set('formatType', fv);
 
@@ -230,8 +231,8 @@ define([
      **/
     coordToolDidLoseFocus: function () {
       this.coordTool.inputCoordinate.isManual = true;
-      this.coordTool.set('validateOnInput', true);
-      this.coordTool.isValid();
+      //this.coordTool.set('validateOnInput', true);
+      this.coordTool.inputCoordinate.getInputType();
     },
 
     /**
@@ -407,11 +408,14 @@ define([
       /*if (this.calculatedRadiusInMeters && this.calculatedRadiusInMeters > 0) {
         results.calculatedDistance = this.calculatedRadiusInMeters;
       } else {*/
-        if (this.creationType.get('value') === 'Radius') {
-          results.calculatedDistance = parseInt(this.lengthInput.value, 10);
-        } else {
-          results.calculatedDistance = parseInt(this.lengthInput.value, 10) / 2;
-        }
+      if (this.creationType.get('value') === 'Radius') {
+        results.calculatedDistance = parseInt(this.lengthInput.value, 10);
+      } else {
+        results.calculatedDistance = parseInt(this.lengthInput.value, 10) / 2;
+      }
+
+      results.calculatedDistance = this.dt.convertToMeters(
+        results.calculatedDistance, this.lengthUnitDD.get('value'));
 
       /*}*/
 
