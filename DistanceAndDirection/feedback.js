@@ -73,6 +73,8 @@ define([
       this._set('lengthUnit', u);
     },
 
+    isDiameter: true,
+
     /**
      *
      **/
@@ -218,7 +220,12 @@ define([
                 ]
               });
               _graphic.setGeometry(_graphic.geometry);
-              this.showLength(end, l);
+              if (this.isDiameter) {
+                this.showLength(end,l*2);
+              } else {
+                this.showLength(end, l);
+              }
+
             }
             ));
           break;
