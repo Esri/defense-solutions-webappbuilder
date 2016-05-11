@@ -8,8 +8,8 @@
     },
     "circleSymbol": {
       "type": "esriSFS",
-      "style": "esriSFSNull",
-      "color": [255,0,0,0],
+      "style": "esriSFSSolid",
+      "color": [255,0,0,125],
       "outline": {
         "color": [255, 50, 50, 255],
         "width": 1.25,
