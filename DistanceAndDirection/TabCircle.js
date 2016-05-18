@@ -43,6 +43,7 @@ define([
   './ShapeModel',
   './CoordinateInput',
   './EditOutputCoordinate',
+  './util',
   'dojo/text!./templates/TabCircle.html'
 ], function (
   dojoDeclare,
@@ -72,6 +73,7 @@ define([
   ShapeModel,
   CoordInput,
   EditOutputCoordinate,
+  Util,
   templateStr
   ) {
   'use strict';
@@ -90,6 +92,9 @@ define([
      * dijit post create
      **/
     postCreate: function () {
+
+      this.utils = new Util(this.appConfig.geometryService);
+
       this.useCalculatedDistance = false;
 
       this.currentLengthUnit = this.lengthUnitDD.get('value');
@@ -107,7 +112,7 @@ define([
       this.dt.setFillSymbol(this._circleSym);
       this.dt.set('lengthLayer', this._lengthLayer);
 
-      this.coordTool = new CoordInput({}, this.startPointCoords);
+      this.coordTool = new CoordInput({appConfig: this.appConfig}, this.startPointCoords);
       this.coordTool.inputCoordinate.formatType = 'DD';
 
       this.coordinateFormat = new DijitTooltipDialog({
@@ -232,7 +237,9 @@ define([
     coordToolDidLoseFocus: function () {
       this.coordTool.inputCoordinate.isManual = true;
       //this.coordTool.set('validateOnInput', true);
-      this.coordTool.inputCoordinate.getInputType();
+      this.coordTool.inputCoordinate.getInputType().then(function (r) {
+        console.log("hello");
+      });
     },
 
     /**
@@ -383,7 +390,11 @@ define([
       if (!centerPoint) {
         centerPoint = esriWMUtils.webMercatorToGeographic(results.geometry);
       } else {
-        dojoDomAttr.set(this.lengthInput, 'value', results.geometry.radius);
+        var cnvrtdLength = this.utils.convertMetersToUnits(
+          results.geometry.radius,
+          this.lengthUnitDD.get('value')
+        );
+        dojoDomAttr.set(this.lengthInput, 'value', cnvrtdLength);
       }
       this.coordTool.inputCoordinate.isManual = false;
       this.coordTool.inputCoordinate.hasError = false;

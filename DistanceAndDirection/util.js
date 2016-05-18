@@ -33,11 +33,14 @@ define([
     'use strict';
     return dojoDeclare(null, {
 
-        constructor: function (ac) {
-            this.appConfig = ac.appConfig;
-            this.geomService = new EsriGeometryService(
-              this.appConfig.coordinateconversion.geometryService.url
-            );
+        /**
+         *
+         **/
+        constructor: function (geoServiceURL) {
+            if (!geoServiceURL) {
+              geoServiceURL = '//utility.arcgisonline.com/arcgis/rest/services/Geometry/GeometryServer';
+            }
+            this.geomService = new EsriGeometryService(geoServiceURL);
         },
 
         /**

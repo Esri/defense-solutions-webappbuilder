@@ -58,15 +58,7 @@ define([
      **/
     constructor: function (args) {
       dojoDeclare.safeMixin(this, args);
-      this.util = new CoordinateUtilities({
-        'appConfig': {
-          'coordinateconversion': {
-            'geometryService': {
-              'url': 'http://pscltags1.eastus.cloudapp.azure.com/arcgis/rest/services/Utilities/Geometry/GeometryServer'
-            }
-        }
-        }
-      });
+      this.util = new CoordinateUtilities(this.appConfig.geometryService);
     },
 
     /**

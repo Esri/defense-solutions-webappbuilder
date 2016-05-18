@@ -67,6 +67,7 @@ define([
 
       this.circleTab = new TabCircle({
         map: this.map,
+        appConfig: this.appConfig,
         circleSymbol: this.config.feedback.circleSymbol || {
           type: 'esriSFS',
           style: 'esriSFSNull',
