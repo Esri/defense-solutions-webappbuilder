@@ -105,7 +105,7 @@ define([
     formatLength: function (length, withUnit) {
       return dojoNumber.format(length, {
         places: 4
-      })
+      });
     },
 
     /**
@@ -114,9 +114,9 @@ define([
     constructor: function (args) {
       dojoDeclare.safeMixin(this, args);
 
-      if (this.geometry.type === "polygon") {
-        if (this.geometry.hasOwnProperty("drawType")) {
-          if (this.geometry.drawType === "ellipse") {
+      if (this.geometry.type === 'polygon') {
+        if (this.geometry.hasOwnProperty('drawType')) {
+          if (this.geometry.drawType === 'ellipse') {
             var line = new esriPolyline();
             dojoArray.forEach(this.geometry.geometry.rings, dojoLang.hitch(this, function (ring) {
               line.paths.push(ring);
@@ -169,9 +169,10 @@ define([
           this.calculatedDistance,
           'meters'
         );
-
+        this.geographicGeometry = this.geometry;
         if (this.geodesicGeometry.spatialReference.wkid !== 102100 &&
           this.geodesicGeometry.spatialReference.wkid !== 3857) {
+          this.wgsGeometry = this.geodesicGeometry;
           this.wmGeometry = esriWMUtils.geographicToWebMercator(this.geodesicGeometry);
         } else {
           this.wgsGeometry = esriWMUtils.webMercatorToGeographic(this.geodesicGeometry);

@@ -17,7 +17,7 @@
 define([
   'dojo/_base/declare',
   'dojo/_base/lang',
-  "dojo/_base/connect",
+  'dojo/_base/connect',
   'dojo/has',
   'dojo/number',
   'dojo/string',
@@ -72,6 +72,8 @@ define([
     _setLengthUnit: function (u) {
       this._set('lengthUnit', u);
     },
+
+    isDiameter: true,
 
     /**
      *
@@ -218,6 +220,12 @@ define([
                 ]
               });
               _graphic.setGeometry(_graphic.geometry);
+              if (this.isDiameter) {
+                this.showLength(end,l*2);
+              } else {
+                this.showLength(end, l);
+              }
+
             }
             ));
           break;
