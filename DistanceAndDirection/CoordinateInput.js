@@ -33,7 +33,11 @@ define([
      **/
     constructor: function () {
         this.inherited(arguments);
-        this.inputCoordinate = new Coord();
+        this.inputCoordinate = new Coord({appConfig: arguments[0].appConfig});
+    },
+
+    postMixinProperties: function () {
+        console.log('Post Create');
     },
 
     /**
