@@ -1,7 +1,7 @@
 Coordinate Conversion Widget: Unit testing
 ==========================================
 
-The Predictive Analysis JavaScript API uses [Intern](http://theintern.io/) as its test runner.  Unit tests can be
+The Coordinate Conversion Widget uses [Intern](http://theintern.io/) as its test runner.  Unit tests can be
 executed directly from a browser.  To run functional tests, you will have to use either a hosted environment such as
 [Sauce Labs](https://saucelabs.com/).
 
@@ -22,8 +22,8 @@ folder(web).
 
 #### From a browser
 
-1. Deploy the lib, test, and intern components to a web server.
-2. Open a browser to http://hostname/path_to_predictive_analysis/node_modules/intern/client.html?config=test/intern-client
+1. Deploy the CoordinateConversion and intern components to a web server.
+2. Open a browser to http://hostname/path_to_coordinate_conversion_folder/node_modules/intern/client.html?config=test/intern-client
 3. View the results in the browser console window.  Note, some tests intentionally raise exceptions so you may find it
 useful to disable any pause on exception features within your developer tools.
 
