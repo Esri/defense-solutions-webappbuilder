@@ -71,8 +71,17 @@ In order to develop and test widgets you need to deploy the DistanceAndDirection
       Note: The ‘Center Point’ and ‘Radius/Diameter’ will update based on parameters from newly created circle.
 	* If desired you can clear all graphics with the clear graphics button
 
-### Create a Circle using the Distance Calculator Interactively
+### Create a Circle manually
+	* Choose the Circle tab on the Distance and Direction Widget
+	* Choose the type of circle you will create from in the ‘Create Circle From’ drop down list.
+	* Enter a coordinate into the **Center Point text** box
+	* Optionally change the units using the **Radius** dropdown box
+	* Enter the desired Radius
+	* Press the **Enter** key
+	* A graphic will then be displayed on the map showing the circle you created
+	* If desired you can clear all graphics with the clear graphics button
 
+### Create a Circle using the Distance Calculator Interactively
 	* Choose the Circle tab on the Distance and Direction Widget
 	* Expand the Distance Calculator section
 	* Enter a Time
@@ -80,6 +89,18 @@ In order to develop and test widgets you need to deploy the DistanceAndDirection
 	* Start an interactive session by selecting the ‘Map Point’ icon
 	* Click on the map to create a starting (center) point.
 	* A graphic will be displayed using the calculated distance and the clicked point
+
+### Create a Circle using the Distance Calculator manually
+	* Choose the Circle tab on the Distance and Direction Widget
+	* Choose the type of circle you will create from in the ‘Create Circle From’ drop down list.
+	* Enter a coordinate into the **Center Point text** box
+	* Expand the Distance Calculator section
+	* Optionally change the time units using the **Time** dropdown box
+	* Enter a Time
+	* Optionally change the Rate units using the **Rate** dropdown box
+	* Enter a Rate
+	* Press the **Enter** key
+	* A graphic will then be displayed on the map showing the circle you created
 
 ### Create Ellipses Interactively
 	* Choose the Ellipse tab on the Distance and Directions Widget
