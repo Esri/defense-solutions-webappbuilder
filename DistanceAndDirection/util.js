@@ -375,9 +375,9 @@ define([
 
             //Z S X# Y#
             var s = withFormatStr.replace(/Z/, r.gzd);
-            s = s.replace(/S([^S]*)$/, r.grdsq+'$1');
-            s = s.replace(/X/, r.easting);
-            s = s.replace(/Y/, r.northing);
+            s = s.replace(/S([^S]*)$/, r.grdsq + '$1');
+            s = s.replace(/X([^X]*)$/, r.easting + '$1');
+            s = s.replace(/Y([^Y]*)$/, r.northing + '$1');
 
             r.formatResult = s;
             return r;
