@@ -169,7 +169,7 @@ define([
                     pattern: /([+-]?\d{1,3}[°]?[\s]\d*[']?[\s]\d*[.]?\d*['"]?[NnSsEeWw]?){1,2}/
                 }, {
                     name: 'GARS',
-                    pattern: /\d{3}[a-zA-Z]{2}\d?\d?/
+                    pattern: /^\d{3}[a-zA-Z]{2}\d?\d?/
                 }, {
                     name: 'MGRS',
                     pattern: /^\d{1,2}[c-hj-np-xC-HJ-NP-X][-,;:\s]*[a-hj-np-zA-HJ-NP-Z]{1}[a-hj-np-zA-HJ-NP-Z]{1}[-,;:\s]*\d{0,10}/
