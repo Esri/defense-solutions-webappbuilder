@@ -172,10 +172,10 @@ define([
                     pattern: /^\d{3}[a-zA-Z]{2}\d?\d?/
                 }, {
                     name: 'MGRS',
-                    pattern: /^\d{1,2}[c-hj-np-xC-HJ-NP-X][-,;:\s]*[a-hj-np-zA-HJ-NP-Z]{1}[a-hj-np-zA-HJ-NP-Z]{1}[-,;:\s]*\d{0,10}/
+                    pattern: /^\d{1,2}[c-hj-np-xC-HJ-NP-X][a-hj-np-zA-HJ-NP-Z]{1}[a-hj-np-zA-HJ-NP-Z]{1}\d{0,10}/
                 }, {
                     name: 'USNG',
-                    pattern: /^\d{1,2}[c-hj-np-xC-HJ-NP-X][-,;:\s]*[a-hj-np-zA-HJ-NP-Z]{1}[a-hj-np-zA-HJ-NP-Z]{1}[-,;:\s]*\d{0,10}[\s]?\d{0,10}/
+                    pattern: /^\d{1,2}[c-hj-np-xC-HJ-NP-X][-,;:\s]{1}[a-hj-np-zA-HJ-NP-Z]{1}[a-hj-np-zA-HJ-NP-Z]{1}[-,;:\s]{1}\d{0,10}[\s]?\d{0,10}/
                 }, {
                     name: 'UTM',
                     pattern: /^\d{1,3}[NnSs]{1}([\s-]\d*\.?\d*[mM]?){2}/
