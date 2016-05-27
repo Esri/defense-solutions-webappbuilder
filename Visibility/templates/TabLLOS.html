@@ -1,0 +1,70 @@
+<div class="tabPanel" data-dojo-attach-point="llosContainer">
+    <div class="controls">
+
+        <div class="controlGroup">
+            <label>Input Surface</label>
+            <div class="controlItem">
+                <select disabled="disabled" style="width: 225px" data-dojo-type="dijit/form/Select">
+                    <option selected="selected" value="InputSurface">Input Surface</option>
+                </select>
+                <span class="frmtBtn" data-dojo-attach-point="coordinateFormatButton"></span>
+            </div>  
+        </div>
+
+        <div class="controlGroup">
+            <label>Observer Points</label>
+            <div class="controlItem">
+                <input class="jimu-input coordInput" data-dojo-attach-point="observerPointCoords">
+                <div class="addPointBtn" data-dojo-attach-point="observerPointBtn"></div>
+            </div>
+        </div>
+
+        <div class="controlGroup">
+            <div class="controlItem">
+                <input class="jimu-input coordInputList" data-dojo-attach-point="observerPointCoordsList">
+            </div>
+        </div>
+
+        <div class="controlGroup">
+            <label>Target Points</label>
+            <div class="controlItem">
+                <input class="jimu-input coordInput" data-dojo-attach-point="targetPointCoords">
+                <div class="addPointBtn" data-dojo-attach-point="targetPointBtn"></div>
+            </div>
+        </div>
+
+        <div class="controlGroup">
+            <div class="controlItem">
+                <input class="jimu-input coordInputList" data-dojo-attach-point="targetPointCoordsList">
+            </div>
+        </div>
+        
+        <fieldset style="width: 225px">
+            <legend>Offsets</legend>
+            <div class="controlGroup">
+                <label>Observer</label>
+                <div class="controlItem">
+                    <input style="width: 200px" data-dojo-attach-point="observerOffset">
+                </div>
+            </div>
+            <div class="controlGroup">
+                <label>Target</label>
+                <div class="controlItem">
+                    <input style="width: 200px" data-dojo-attach-point="targetOffset">
+                </div>
+            </div>
+            <div class="controlGroup">
+                <div class="controlItem">
+                    <select style="width: 200px" data-dojo-type="dijit/form/Select" data-dojo-attach-point="lengthUnitDD">
+                        <option value="feet">Feet</option>
+                        <option value="meters" selected="selected">Meters</option>
+                        <option value="yards">Yards</option>
+                        <option value="kilometers">Kilometers</option>
+                        <option value="miles">Miles</option>
+                        <option value="nautical-miles">Nautical Mile</option>
+                    </select>
+                </div>
+            </div>
+        </fieldset> 
+    </div>
+</div>

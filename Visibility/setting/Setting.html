@@ -1,0 +1,39 @@
+<div style="width:100%;height:100%;overflow:hidden;" class="nihilo">
+    <div>
+        <div class="visibility-setting-style">
+            <h3 class="visibility-setting-h3">Visibility Style</h3>
+            <br />
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feedback Shape</th>
+                        <th>Line Color</th>
+                        <th>Line Width</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Observer Point</td>
+                    <td>
+                        <div data-dojo-attach-point="observerPointColorPicker" class="visibility-setting-color-picker" data-dojo-type="jimu/dijit/ColorPicker"></div>
+                    </td>
+                    <td>
+                        <div class="visibility-setting-line-size" data-dojo-attach-point="observerPointSize" data-dojo-type="dijit/form/NumberSpinner"
+                             data-dojo-props="intermediateChanges:true, smallDelta:1, constraints:{min:1,max:10,places:0}, value:2"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Target Point</td>
+                    <td>
+                        <div data-dojo-attach-point="targetPointColorPicker" class="visibility-setting-color-picker" data-dojo-type="jimu/dijit/ColorPicker"></div>
+                    </td>
+                    <td>
+                        <div class="visibility-setting-line-size" data-dojo-attach-point="targetPointSize" data-dojo-type="dijit/form/NumberSpinner"
+                             data-dojo-props="intermediateChanges:true, smallDelta:1, constraints:{min:1,max:10,places:0}, value:2"></div>
+                    </td>
+                </tr>  
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

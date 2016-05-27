@@ -18,7 +18,7 @@ The Widget Repository currently includes:
 
 * [Distance and Direction](./DistanceAndDirection/ReadMe.md)
 * [Coordinate Conversion](./CoordinateConversion/ReadMe.md) 
-
+* [Visibility](./Visibility/ReadMe.md) 
 
 ![Screenshots](images/screenshots.PNG)
 
