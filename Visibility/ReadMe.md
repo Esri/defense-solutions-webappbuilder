@@ -85,22 +85,6 @@ In order to develop and test widgets you need to deploy the Visibility folder to
 7. Optionally, type an **Observer Offset**, **Target Offset**, and select the offset units.
 8. Select **OK**
 
-## Workflows - RLOS
-Note that the input surface used for RLOS must be in a projected coordinate system (PCS), or the ArcMap Data Frame must be set to  a PCS.
-
-### <a name="radial-line-of-sight-rlos"></a> Radial Line Of Sight (RLOS) 
-1. Add an elevation surface to the map. 
-	* This may be a raster dataset, image service, or mosaic dataset.
-2. Open the *Visibility Tools*
-3. Select the **RLOS** tab
-4. Select the **Input Surface** layer from the list
-5. Use the **Observer Map Point Tool** to select an observer location on the map.
-6. Check **Symbolize Non-Visible Data in Output** to add non-visible areas to the output.
-	1. If unchecked the output will *only* show areas that are visible to the observers.
-7. Optionally, type an **Observer Offset**, **Surface Offset**, and **Distance**, and select the appropriate units.
-8. Additional options are **Horizontal Field of View** and **Vertical Field of View**, and select the appropriate units.
-8. Select **OK**
-
 ## General Help
 
   * [New to Github? Get started here.](http://htmlpreview.github.com/?https://github.com/Esri/esri.github.com/blob/master/help/esri-getting-to-know-github.html)
