@@ -1,29 +1,29 @@
-.distance-and-direction-setting {
+.visibility-setting {
   margin-left: 0px;
 }
 
-.distance-and-direction-setting-h3 {
+.visibility-setting-h3 {
     color: #596679;
 }
 
-.distance-and-direction-setting-style table {
+.visibility-setting-style table {
     color: #333333;
     width: 100%;
     border-collapse: collapse;
 }
 
-.distance-and-direction-setting-style th {
+.visibility-setting-style th {
     background-color: #518dca;
     padding: 8px;
     text-align: left;
     color: #ffffff;
 }
 
-.distance-and-direction-setting-style tr {
+.visibility-setting-style tr {
     background-color: #ffffff;
 }
 
-.distance-and-direction-setting-style td {
+.visibility-setting-style td {
     padding: 8px;
 }
 
@@ -31,15 +31,15 @@
     vertical-align: top;
 }
 
-.distance-and-direction-setting-line-size {
+.visibility-setting-line-size {
     width: 70px;
 }
 
-.distance-and-direction-setting-color-picker {
+.visibility-setting-color-picker {
     width: 70px;
 }
 
-.distance-and-direction-setting-interval-width {
+.visibility-setting-interval-width {
     border-color: #000;
     border-style: hidden solid solid solid;
     border-width: 1px;
@@ -47,7 +47,7 @@
     margin: auto;
 }
 
-.distance-and-direction-setting-style-map {
+.visibility-setting-style-map {
     width: 500px;
     height: 550px;
     float: left;

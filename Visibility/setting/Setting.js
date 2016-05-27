@@ -38,46 +38,30 @@ define([
     ) {
 
     return declare([BaseWidgetSetting, _WidgetsInTemplateMixin], {
-      baseClass: 'distance-and-direction-setting',      
+      baseClass: 'visibility-setting',      
 
       postCreate: function(){
         this.setConfig(this.config);
 
-        this.lineColorPicker.onChange = lang.hitch(this, function(val) {
-          this.setColorText(this.lineColorPicker.domNode, val); 
+        this.observerPointColorPicker.onChange = lang.hitch(this, function(val) {
+          this.setColorText(this.observerPointColorPicker.domNode, val); 
         });
-        this.circleColorPicker.onChange = lang.hitch(this, function(val) {
-          this.setColorText(this.circleColorPicker.domNode, val); 
-        });
-        this.ellipseColorPicker.onChange = lang.hitch(this, function(val) {
-          this.setColorText(this.ellipseColorPicker.domNode, val); 
-        });
-        this.rangeRingColorPicker.onChange = lang.hitch(this, function(val) {
-          this.setColorText(this.rangeRingColorPicker.domNode, val); 
+        this.targetPointColorPicker.onChange = lang.hitch(this, function(val) {
+          this.setColorText(this.targetPointColorPicker.domNode, val); 
         });
       },
 
       setConfig: function(config){
         var controls = [{
-            colorPicker: this.lineColorPicker,
-            numberCtrl: this.lineSize,
-            color: config.feedback.lineSymbol.color,
-            width: config.feedback.lineSymbol.width
+            colorPicker: this.observerPointColorPicker,
+            numberCtrl: this.observerPointSize,
+            color: config.feedback.pointSymbol.color,
+            width: config.feedback.pointSymbol.width
           }, {
-            colorPicker: this.circleColorPicker,
-            numberCtrl: this.circleSize,
-            color: config.feedback.circleSymbol.outline.color,
-            width: config.feedback.circleSymbol.outline.width
-          }, {
-            colorPicker: this.ellipseColorPicker,
-            numberCtrl: this.ellipseSize,
-            color: config.feedback.ellipseSymbol.outline.color,
-            width: config.feedback.ellipseSymbol.outline.width
-          }, {
-            colorPicker: this.rangeRingColorPicker,
-            numberCtrl: this.rangeRingSize,
-            color: config.feedback.rangeRingSymbol.outline.color,
-            width: config.feedback.rangeRingSymbol.outline.width            
+            colorPicker: this.targetPointColorPicker,
+            numberCtrl: this.targetPointSize,
+            color: config.feedback.pointSymbol.outline.color,
+            width: config.feedback.pointSymbol.outline.width
           }
         ];        
         array.forEach(controls, lang.hitch(this, function (control) {
@@ -89,46 +73,13 @@ define([
       getConfig: function(){
 
         this.config.feedback = {
-          lineSymbol: {
-            type: "esriSLS",
-            style: "esriSLSSolid",
-            color: this.lineColorPicker.get("color"), 
-            width: this.lineSize.get("value"),            
-          },
-          circleSymbol: {
-            type: "esriSFS",
-            style: "esriSFSNull",
-            color: [255,0,0,0],
-            outline: {
-              color: this.circleColorPicker.get("color"), 
-              width: this.circleSize.get("value"),
-              type: "esriSLS",
-              style: "esriSLSSolid"
-            }
-          },
-          ellipseSymbol: {
-            type: "esriSFS",
-            style: "esriSFSNull",
-            color: [255,0,0,0],
-            outline: {
-              color: this.ellipseColorPicker.get("color"), 
-              width: this.ellipseSize.get("value"),
-              type: "esriSLS",
-              style: "esriSLSSolid"
-            }
-          },
-          rangeRingSymbol: {
-            type: "esriSFS",
-            style: "esriSFSNull",
-            color: [255,0,0,0],
-            outline: {
-              color: this.rangeRingColorPicker.get("color"), 
-              width: this.rangeRingSize.get("value"),
-              type: "esriSLS",
-              style: "esriSLSSolid"
-            }
-          }
-        };      
+            "pointSymbol": {
+                "type": "esriSMS",
+                "style": "STYLE_CIRCLE",
+                "color": [255, 50, 50, 255],
+                "width": 100
+            }         
+        }     
 
         return this.config;
       },
