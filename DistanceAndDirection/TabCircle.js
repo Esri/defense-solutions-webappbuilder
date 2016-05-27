@@ -25,6 +25,7 @@ define([
   'dojo/dom-style',
   'dojo/string',
   'dojo/number',
+  'dojo/keys',
   'dijit/_WidgetBase',
   'dijit/_TemplatedMixin',
   'dijit/_WidgetsInTemplateMixin',
@@ -55,6 +56,7 @@ define([
   dojoDomStyle,
   dojoString,
   dojoNumber,
+  dojoKeys,
   dijitWidgetBase,
   dijitTemplatedMixin,
   dijitWidgetsInTemplate,
@@ -185,6 +187,12 @@ define([
         dojoLang.hitch(this, this.distanceInputDidChange)
       ));
 
+      this.own(dojoOn(
+        this.distanceInput,
+        'keyup',
+        dojoLang.hitch(this, this.distanceInputKeyWasPressed)
+      ));
+
       this.own(this.distanceUnitDD.on(
         'change',
         dojoLang.hitch(this, this.distanceInputDidChange)
@@ -217,6 +225,7 @@ define([
           this.coordTool.inputCoordinate.set('formatPrefix', this.coordinateFormat.content.addSignChkBox.checked);
           this.coordTool.inputCoordinate.set('formatString', cfs);
           this.coordTool.inputCoordinate.set('formatType', fv);
+          this.setCoordLabel(fv);
 
           DijitPopup.close(this.coordinateFormat);
         }
@@ -237,16 +246,16 @@ define([
     coordToolDidLoseFocus: function () {
       this.coordTool.inputCoordinate.isManual = true;
       //this.coordTool.set('validateOnInput', true);
-      this.coordTool.inputCoordinate.getInputType().then(function (r) {
-        console.log("hello");
-      });
+      this.coordTool.inputCoordinate.getInputType().then(dojoLang.hitch(this, function (r){
+       this.setCoordLabel(r.inputType);
+     }));
     },
 
     /**
      *
      **/
     coordinateFormatButtonWasClicked: function () {
-      this.coordinateFormat.content.set('ct', this.coordTool.inputCoordinate.inputType);
+      this.coordinateFormat.content.set('ct', this.coordTool.inputCoordinate.formatType);
       DijitPopup.open({
         popup: this.coordinateFormat,
         around: this.coordinateFormatButton
@@ -283,6 +292,15 @@ define([
     timeInputDidChange: function () {
       this.currentTimeInSeconds = this.timeInput.value  * this.timeUnitDD.value;
       this.getCalculatedDistance();
+    },
+
+    /**
+     * Rate Input key up event handler
+     **/
+    distanceInputKeyWasPressed: function (evt) {
+      if (evt.keyCode === dojoKeys.ENTER) {
+        this.setGraphic();
+      }
     },
 
     /**
@@ -333,7 +351,7 @@ define([
           'value',
           fr
         );
-        this.setGraphic();
+        //this.setGraphic();
       } else {
         this.calculatedRadiusInMeters = null;
         this.useCalculatedDistance = true;
@@ -399,8 +417,15 @@ define([
       this.coordTool.inputCoordinate.isManual = false;
       this.coordTool.inputCoordinate.hasError = false;
       this.coordTool.inputCoordinate.set('coordinateEsriGeometry', centerPoint);
+
     },
 
+    /**
+     *
+     **/
+    setCoordLabel: function (toType) {
+      this.coordInputLabel.innerHTML = dojoString.substitute('Center Point (${crdType})', {crdType: toType});
+    },
     /**
      *
      **/
@@ -416,8 +441,8 @@ define([
 
       if (!this.coordTool.inputCoordinate.isManual) {
         this.coordTool.set('validateOnInput', false);
-
         this.coordTool.set('value', this.coordTool.inputCoordinate.outputString);
+        this.setCoordLabel(this.coordTool.inputCoordinate.formatType);
       }
 
       if (!this.lengthInput.value || this.lengthInput.value <= 0) {return;}
