@@ -169,13 +169,13 @@ define([
                     pattern: /([+-]?\d{1,3}[°]?[\s]\d*[']?[\s]\d*[.]?\d*['"]?[NnSsEeWw]?){1,2}/
                 }, {
                     name: 'GARS',
-                    pattern: /\d{3}[a-zA-Z]{2}\d?\d?/
+                    pattern: /^\d{3}[a-zA-Z]{2}\d?\d?/
                 }, {
                     name: 'MGRS',
-                    pattern: /^\d{1,2}[c-hj-np-xC-HJ-NP-X][-,;:\s]*[a-hj-np-zA-HJ-NP-Z]{1}[a-hj-np-zA-HJ-NP-Z]{1}[-,;:\s]*\d{0,10}/
+                    pattern: /^\d{1,2}[c-hj-np-xC-HJ-NP-X][a-hj-np-zA-HJ-NP-Z]{1}[a-hj-np-zA-HJ-NP-Z]{1}\d{0,10}/
                 }, {
                     name: 'USNG',
-                    pattern: /^\d{1,2}[c-hj-np-xC-HJ-NP-X][-,;:\s]*[a-hj-np-zA-HJ-NP-Z]{1}[a-hj-np-zA-HJ-NP-Z]{1}[-,;:\s]*\d{0,10}[\s]?\d{0,10}/
+                    pattern: /^\d{1,2}[c-hj-np-xC-HJ-NP-X][-,;:\s]{1}[a-hj-np-zA-HJ-NP-Z]{1}[a-hj-np-zA-HJ-NP-Z]{1}[-,;:\s]{1}\d{0,10}[\s]?\d{0,10}/
                 }, {
                     name: 'UTM',
                     pattern: /^\d{1,3}[NnSs]{1}([\s-]\d*\.?\d*[mM]?){2}/
@@ -375,9 +375,9 @@ define([
 
             //Z S X# Y#
             var s = withFormatStr.replace(/Z/, r.gzd);
-            s = s.replace(/S([^S]*)$/, r.grdsq+'$1');
-            s = s.replace(/X/, r.easting);
-            s = s.replace(/Y/, r.northing);
+            s = s.replace(/S([^S]*)$/, r.grdsq + '$1');
+            s = s.replace(/X([^X]*)$/, r.easting + '$1');
+            s = s.replace(/Y([^Y]*)$/, r.northing + '$1');
 
             r.formatResult = s;
             return r;
