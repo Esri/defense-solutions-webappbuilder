@@ -9,23 +9,31 @@ executed directly from a browser.  To run functional tests, you will have to use
 
 ### Getting Intern
 
-Install the latest version of Intern 2.x using npm at the web folder level.
+Install the latest version of Intern 2.x using npm at the web folder level. NPM needs to be installed first.
 
 ```
 npm install intern
 ```
 
-The following sections assume tests and node_modules (intern) folders all exist within the same parent
-folder(web).
+The following sections assume test folder  and node_modules (intern) folders all exist within the same parent
+test WAB app folder.
 
 ### Running the units tests
 
 #### From a browser
 
-1. Deploy the DistanceAndDirection and intern components to a web server.
-2. Open a browser to http://hostname/path-to-distance-and-direction-folder/node_modules/intern/client.html?config=tests/intern
-3. View the results in the browser console window.  Note, some tests intentionally raise exceptions so you may find it
-useful to disable any pause on exception features within your developer tools.
+1. Create a test WAB app using Web AppBuilder
+2. Download the test WAB app and extract to a folder
+3. Create a virtual directory pointing to the location of the test WAB app
+4. Deploy the DistanceAndDirection widget to the test WAB app widgets folder 
+5. Install Intern components to the root folder to a web server. 
+	Note: NPM needs to be installed before calling
+	```
+	npm install intern
+	```
+6. Copy the test folder to the root folder of the test WAB app
+7. Open a browser and navigate to http://hostname/path-to-distance-and-direction-folder/node_modules/intern/client.html?config=test/intern
+8. View the results in the browser console window.  
 
 #### Through a hosted unit test environment
 
