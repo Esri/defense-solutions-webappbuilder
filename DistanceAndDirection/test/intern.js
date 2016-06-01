@@ -71,7 +71,7 @@ define([], function() {
           location: 'http://js.arcgis.com/3.16/dijit'
         }, {
           name: 'jimu',
-          location: '../../../jimu.js'
+          location: './jimu.js'
         }
       ]
     },
