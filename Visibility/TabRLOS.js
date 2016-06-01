@@ -31,15 +31,12 @@ define([
   'dijit/TitlePane',
   'dijit/TooltipDialog',
   'dijit/popup',
-<<<<<<< HEAD
   'esri/layers/GraphicsLayer',
   'esri/symbols/SimpleMarkerSymbol',
   'esri/graphic',
   'esri/toolbars/draw',
   './CoordinateInput',
   './EditOutputCoordinate',
-=======
->>>>>>> refs/remotes/origin/dev
   'dojo/text!./templates/TabRLOS.html'
 ], function (
   dojoDeclare,
@@ -57,15 +54,13 @@ define([
   dijitTitlePane,
   DijitTooltipDialog,
   DijitPopup,
-<<<<<<< HEAD
   EsriGraphicsLayer,
   EsriSimpleMarkerSymbol,  
   Graphic,
   Draw,
   CoordInput,
   EditOutputCoordinate,
-=======
->>>>>>> refs/remotes/origin/dev
+
   templateStr
   ) {
   'use strict';
@@ -85,7 +80,6 @@ define([
      **/
     postCreate: function () {
 
-<<<<<<< HEAD
         this._rlosGL = new EsriGraphicsLayer();
         this.map.addLayers([this._rlosGL]);
 
@@ -200,16 +194,6 @@ define([
         if (this._rlosGL) {
             this._rlosGL.show();
         }
-=======
-      this.syncEvents();
-    },
-
-    /**
-     * Start up event listeners
-     **/
-    syncEvents: function () {
-
->>>>>>> refs/remotes/origin/dev
     }
 
   });

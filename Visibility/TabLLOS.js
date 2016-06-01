@@ -30,10 +30,6 @@ define([
     'esri/layers/GraphicsLayer',
     'esri/symbols/SimpleMarkerSymbol',
     'esri/graphic',
-<<<<<<< HEAD
-=======
-    'esri/graphic',
->>>>>>> refs/remotes/origin/dev
     'esri/toolbars/draw',
     'dijit/TooltipDialog',
     './CoordinateInput',
@@ -53,10 +49,6 @@ define([
     DijitPopup,
     EsriGraphicsLayer,
     EsriSimpleMarkerSymbol,
-<<<<<<< HEAD
-=======
-    EsriGraphic,
->>>>>>> refs/remotes/origin/dev
     Graphic,
     Draw,
     DijitTooltipDialog,
@@ -81,15 +73,9 @@ define([
          **/
         postCreate: function () {
 
-<<<<<<< HEAD
           this._llosGL = new EsriGraphicsLayer();
         
           this.map.addLayers([this._llosGL]);
-=======
-          this._gl = new EsriGraphicsLayer();
-        
-          this.map.addLayers([this._gl]);
->>>>>>> refs/remotes/origin/dev
 
           this._pointSym = new EsriSimpleMarkerSymbol(this.pointSymbol);
 
@@ -113,14 +99,8 @@ define([
          *
          **/
         syncEvents: function () {
-<<<<<<< HEAD
           dojoTopic.subscribe('VISIBILITY_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
           dojoTopic.subscribe('VISIBILITY_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
-=======
-            dojoTopic.subscribe('VISIBILITY_CLEAR_GRAPHICS', dojoLang.hitch(this, this.clearGraphics));
-            dojoTopic.subscribe('VISIBILITY_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
-            dojoTopic.subscribe('VISIBILITY_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
->>>>>>> refs/remotes/origin/dev
 
           this.own(dojoOn(
             this.coordinateFormatButton,
@@ -128,15 +108,12 @@ define([
             dojoLang.hitch(this, this.coordinateFormatButtonWasClicked)
           ));
 
-<<<<<<< HEAD
           this.own(dojoOn(
             this.clearGraphicsButton,
             'click',
             dojoLang.hitch(this, this.clearGraphics)
           ));
 
-=======
->>>>>>> refs/remotes/origin/dev
           this.own(
             this._drawTb.on(
               'draw-end',
@@ -197,32 +174,21 @@ define([
                 symbol = this._pointSym;
             }
 
-<<<<<<< HEAD
             this._llosGL.add(new Graphic(evt.geometry, symbol));
-=======
-            this._gl.add(new Graphic(evt.geometry, symbol));
->>>>>>> refs/remotes/origin/dev
+
         },
 
         /**
          *
          **/
         clearGraphics: function () {
-<<<<<<< HEAD
             if (this._llosGL) {
                 this._llosGL.clear();
             dojoDomAttr.set(this.observerPointCoords, 'value', '');
             dojoDomAttr.set(this.targetPointCoords, 'value', '');
             dojoDomAttr.set(this.observerPointCoordsList, 'value', '');
             dojoDomAttr.set(this.targetPointCoordsList, 'value', '');
-=======
-          if (this._gl) {
-            this._gl.clear();
-            dojoDomAttr.set(this.observerPointCoords, 'value', '');
-            dojoDomAttr.set(this.targetPointCoords, 'value', '');
-            dojoDomAttr.set(this.observerOffset, 'value', '2');
-            dojoDomAttr.set(this.targetOffset, 'value', '0');
->>>>>>> refs/remotes/origin/dev
+
           }
         },
 
@@ -230,13 +196,8 @@ define([
          *
          **/
         setGraphicsHidden: function () {
-<<<<<<< HEAD
             if (this._llosGL) {
                 this._llosGL.hide();
-=======
-          if (this._gl) {
-            this._gl.hide();
->>>>>>> refs/remotes/origin/dev
           }
         },
 
@@ -244,13 +205,8 @@ define([
          *
          **/
         setGraphicsShown: function () {
-<<<<<<< HEAD
             if (this._llosGL) {
                 this._llosGL.show();
-=======
-          if (this._gl) {
-            this._gl.show();
->>>>>>> refs/remotes/origin/dev
           }
         }
     });
