@@ -30,7 +30,6 @@ define([
     'esri/layers/GraphicsLayer',
     'esri/symbols/SimpleMarkerSymbol',
     'esri/graphic',
-    'esri/graphic',
     'esri/toolbars/draw',
     'dijit/TooltipDialog',
     './CoordinateInput',
@@ -50,7 +49,6 @@ define([
     DijitPopup,
     EsriGraphicsLayer,
     EsriSimpleMarkerSymbol,
-    EsriGraphic,
     Graphic,
     Draw,
     DijitTooltipDialog,
@@ -75,9 +73,9 @@ define([
          **/
         postCreate: function () {
 
-          this._gl = new EsriGraphicsLayer();
+          this._llosGL = new EsriGraphicsLayer();
         
-          this.map.addLayers([this._gl]);
+          this.map.addLayers([this._llosGL]);
 
           this._pointSym = new EsriSimpleMarkerSymbol(this.pointSymbol);
 
@@ -101,14 +99,19 @@ define([
          *
          **/
         syncEvents: function () {
-            dojoTopic.subscribe('VISIBILITY_CLEAR_GRAPHICS', dojoLang.hitch(this, this.clearGraphics));
-            dojoTopic.subscribe('VISIBILITY_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
-            dojoTopic.subscribe('VISIBILITY_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
+          dojoTopic.subscribe('VISIBILITY_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
+          dojoTopic.subscribe('VISIBILITY_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
 
           this.own(dojoOn(
             this.coordinateFormatButton,
             'click',
             dojoLang.hitch(this, this.coordinateFormatButtonWasClicked)
+          ));
+
+          this.own(dojoOn(
+            this.clearGraphicsButton,
+            'click',
+            dojoLang.hitch(this, this.clearGraphics)
           ));
 
           this.own(
@@ -171,19 +174,21 @@ define([
                 symbol = this._pointSym;
             }
 
-            this._gl.add(new Graphic(evt.geometry, symbol));
+            this._llosGL.add(new Graphic(evt.geometry, symbol));
+
         },
 
         /**
          *
          **/
         clearGraphics: function () {
-          if (this._gl) {
-            this._gl.clear();
+            if (this._llosGL) {
+                this._llosGL.clear();
             dojoDomAttr.set(this.observerPointCoords, 'value', '');
             dojoDomAttr.set(this.targetPointCoords, 'value', '');
-            dojoDomAttr.set(this.observerOffset, 'value', '2');
-            dojoDomAttr.set(this.targetOffset, 'value', '0');
+            dojoDomAttr.set(this.observerPointCoordsList, 'value', '');
+            dojoDomAttr.set(this.targetPointCoordsList, 'value', '');
+
           }
         },
 
@@ -191,8 +196,8 @@ define([
          *
          **/
         setGraphicsHidden: function () {
-          if (this._gl) {
-            this._gl.hide();
+            if (this._llosGL) {
+                this._llosGL.hide();
           }
         },
 
@@ -200,8 +205,8 @@ define([
          *
          **/
         setGraphicsShown: function () {
-          if (this._gl) {
-            this._gl.show();
+            if (this._llosGL) {
+                this._llosGL.show();
           }
         }
     });
