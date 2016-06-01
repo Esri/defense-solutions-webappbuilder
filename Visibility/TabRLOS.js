@@ -31,6 +31,12 @@ define([
   'dijit/TitlePane',
   'dijit/TooltipDialog',
   'dijit/popup',
+  'esri/layers/GraphicsLayer',
+  'esri/symbols/SimpleMarkerSymbol',
+  'esri/graphic',
+  'esri/toolbars/draw',
+  './CoordinateInput',
+  './EditOutputCoordinate',
   'dojo/text!./templates/TabRLOS.html'
 ], function (
   dojoDeclare,
@@ -48,6 +54,13 @@ define([
   dijitTitlePane,
   DijitTooltipDialog,
   DijitPopup,
+  EsriGraphicsLayer,
+  EsriSimpleMarkerSymbol,  
+  Graphic,
+  Draw,
+  CoordInput,
+  EditOutputCoordinate,
+
   templateStr
   ) {
   'use strict';
@@ -67,14 +80,120 @@ define([
      **/
     postCreate: function () {
 
-      this.syncEvents();
+        this._rlosGL = new EsriGraphicsLayer();
+        this.map.addLayers([this._rlosGL]);
+
+        this._pointSym = new EsriSimpleMarkerSymbol(this.pointSymbol);
+
+        this._drawTb = new Draw(this.map);
+
+        this.coordinateFormat = new DijitTooltipDialog({
+            content: new EditOutputCoordinate(),
+            style: 'width: 400px'
+        });
+
+        this.own(dojoOn(this.clearGraphicsButton, 'click', this.clearGraphicsButtonClick));
+
+        // set default values
+        dojoDomAttr.set(this.observerOffset, 'value', '2');
+        dojoDomAttr.set(this.surfaceOffset, 'value', '0');
+        dojoDomAttr.set(this.distanceFrom, 'value', '0');
+        dojoDomAttr.set(this.distanceTo, 'value', '1000');
+        dojoDomAttr.set(this.horizontalDistanceFrom, 'value', '0');
+        dojoDomAttr.set(this.horizontalDistanceTo, 'value', '360');
+        dojoDomAttr.set(this.verticalDistanceFrom, 'value', '-90');
+        dojoDomAttr.set(this.verticalDistanceTo, 'value', '90');
+
+        this.syncEvents();
     },
 
     /**
-     * Start up event listeners
-     **/
+    * Start up event listeners
+    **/
     syncEvents: function () {
+        
+        dojoTopic.subscribe('VISIBILITY_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
+        dojoTopic.subscribe('VISIBILITY_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
 
+        this.own(dojoOn(
+            this.observerPointBtn,
+            'click',
+            dojoLang.hitch(this, this.observerPointButtonWasClicked)
+          ));
+
+        this.own(dojoOn(
+            this.clearGraphicsButton,
+            'click',
+            dojoLang.hitch(this, this.clearGraphics)
+          ));
+
+        this.own(dojoOn(
+          this.coordinateFormatButton,
+          'click',
+          dojoLang.hitch(this, this.coordinateFormatButtonWasClicked)
+        ));
+
+        this.own(
+          this._drawTb.on(
+            'draw-end',
+            dojoLang.hitch(this, this.addGraphic)
+        ));
+
+    },
+
+    /**
+    * Observer Point button click event
+    **/
+    observerPointButtonWasClicked: function () {
+        this.map.disableMapNavigation();
+        this._drawTb.activate('point');
+        dojoDomClass.toggle(this.observerPointBtn, 'jimu-state-active');
+    },
+
+    /**
+    * Add graphic to map
+    **/
+    addGraphic: function (evt) {
+        //deactivate the toolbar and clear existing graphics 
+        this._drawTb.deactivate();
+        this.map.enableMapNavigation();
+
+        // figure out which symbol to use
+        var symbol;
+        if (evt.geometry.type === "point" || evt.geometry.type === "multipoint") {
+            symbol = this._pointSym;
+        }
+
+        this._rlosGL.add(new Graphic(evt.geometry, symbol));
+    },
+
+    /**
+    * Clear graphics layer
+    **/
+    clearGraphics: function () {
+        if (this._rlosGL) {
+            this._rlosGL.clear();
+            dojoDomAttr.set(this.observerPointCoords, 'value', '');
+            dojoDomAttr.set(this.observerPointCoordsList, 'value', '');
+        }
+    },
+
+      /**
+           *
+           **/
+    setGraphicsHidden: function () {
+        if (this._rlosGL) {
+            this._rlosGL.hide();
+        }
+    },
+
+      /**
+       *
+       **/
+    setGraphicsShown: function () {
+        if (this._rlosGL) {
+            this._rlosGL.show();
+        }
     }
 
   });
