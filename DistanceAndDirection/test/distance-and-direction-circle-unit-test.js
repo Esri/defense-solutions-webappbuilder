@@ -60,7 +60,8 @@ define([
             console.log('Start CTOR test');
 
             circleTab = new TabCircle({
-                map: map
+                map: map,
+                appConfig: {geometryService:""}
             }}, domConstruct.create("div")).placeAt("circleNode");
             circleTab.startup();
 
