@@ -1,0 +1,54 @@
+.visibility-setting {
+  margin-left: 0px;
+}
+
+.visibility-setting-h3 {
+    color: #596679;
+}
+
+.visibility-setting-style table {
+    color: #333333;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.visibility-setting-style th {
+    background-color: #518dca;
+    padding: 8px;
+    text-align: left;
+    color: #ffffff;
+}
+
+.visibility-setting-style tr {
+    background-color: #ffffff;
+}
+
+.visibility-setting-style td {
+    padding: 8px;
+}
+
+.settings-section tr {
+    vertical-align: top;
+}
+
+.visibility-setting-line-size {
+    width: 70px;
+}
+
+.visibility-setting-color-picker {
+    width: 70px;
+}
+
+.visibility-setting-interval-width {
+    border-color: #000;
+    border-style: hidden solid solid solid;
+    border-width: 1px;
+    height: 10px;
+    margin: auto;
+}
+
+.visibility-setting-style-map {
+    width: 500px;
+    height: 550px;
+    float: left;
+}

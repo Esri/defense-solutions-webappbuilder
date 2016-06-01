@@ -1,0 +1,10 @@
+{
+    "feedback": {
+        "pointSymbol": {
+          "type": "esriSMS",
+          "style": "STYLE_CIRCLE",
+          "color": [255, 50, 50, 255],
+          "width": 100
+        }
+    }
+}
