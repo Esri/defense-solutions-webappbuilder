@@ -64,6 +64,7 @@ define([
       this.rlosTab = new TabRLOS({
         map: this.map,
         appConfig: this.appConfig,
+<<<<<<< HEAD
         pointSymbol: this.config.feedback.pointSymbol || {
             "type": "esriSMS",
             "style": "STYLE_CIRCLE",
@@ -71,6 +72,19 @@ define([
             "width": 100
         }
       },
+=======
+        circleSymbol: this.config.feedback.circleSymbol || {
+          type: 'esriSFS',
+          style: 'esriSFSNull',
+          color: [255,0,0,0],
+          outline: {
+            color: [255, 50, 50, 255],
+            width: 1.25,
+            type: 'esriSLS',
+            style: 'esriSLSSolid'
+          }
+        }},
+>>>>>>> refs/remotes/origin/dev
         this.rlosTabNode
       );
 
@@ -94,6 +108,12 @@ define([
         ]
       }, this.tabContainer);
 
+<<<<<<< HEAD
+=======
+      this.own(dojoOn(this.clearGraphicsButton, 'click', function (){
+        dojoTopic.publish('VISIBILITY_CLEAR_GRAPHICS');
+      }));
+>>>>>>> refs/remotes/origin/dev
     },
 
     onClose: function () {
@@ -103,7 +123,10 @@ define([
     onOpen: function () {
         dojoTopic.publish('VISIBILITY_WIDGET_OPEN');
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> refs/remotes/origin/dev
   });
   return clz;
 });
