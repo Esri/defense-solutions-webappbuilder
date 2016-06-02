@@ -26,14 +26,12 @@ test WAB app folder.
 2. Download the test WAB app and extract to a folder
 3. Create a virtual directory pointing to the location of the test WAB app
 4. Deploy the DistanceAndDirection widget to the test WAB app widgets folder 
-5. Install Intern components to the root folder to a web server. 
-	Note: NPM needs to be installed before calling
-	```
-	npm install intern
-	```
-6. Copy the test folder to the root folder of the test WAB app
-7. Open a browser and navigate to http://hostname/path-to-distance-and-direction-folder/node_modules/intern/client.html?config=test/intern
-8. View the results in the browser console window.  
+5. Install Intern components to the root folder to a web server. Note: NPM needs to be installed before calling
+```
+npm install intern
+```
+6. Open a browser and navigate to http://hostname/path-to-distance-and-direction-folder/node_modules/intern/client.html?config=widgets/DistanceAndDirection/tests/intern
+7. View the results in the browser console window.  
 
 #### Through a hosted unit test environment
 
