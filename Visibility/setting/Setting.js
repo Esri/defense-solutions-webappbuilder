@@ -54,14 +54,10 @@ define([
       setConfig: function(config){
         var controls = [{
             colorPicker: this.observerPointColorPicker,
-            numberCtrl: this.observerPointSize,
-            color: config.feedback.pointSymbol.color,
-            width: config.feedback.pointSymbol.width
+            numberCtrl: this.observerPointSize
           }, {
             colorPicker: this.targetPointColorPicker,
-            numberCtrl: this.targetPointSize,
-            color: config.feedback.pointSymbol.outline.color,
-            width: config.feedback.pointSymbol.outline.width
+            numberCtrl: this.targetPointSize
           }
         ];        
         array.forEach(controls, lang.hitch(this, function (control) {
