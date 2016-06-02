@@ -76,7 +76,9 @@ define([], function() {
       ]
     },
 
-    suites: ['test/distance-and-direction-line-unit-test'],
+    suites: ['test/distance-and-direction-line-unit-test',
+             'test/distance-and-direction-circle-unit-test',
+             'test/distance-and-direction-ellipse-unit-test'],
 
     //functionalSuites: ['test/distance-direction-line-functional-test'],
 
