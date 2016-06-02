@@ -43,8 +43,8 @@ define([], function() {
     loader: {
       packages: [
         {
-          name: 'test',
-          location: 'test'
+          name: 'tests',
+          location: './widgets/DistanceAndDirection/tests'
         }, {
           name: 'DD',
           location: './widgets/DistanceAndDirection'
@@ -76,11 +76,9 @@ define([], function() {
       ]
     },
 
-    suites: ['test/distance-and-direction-line-unit-test',
-             'test/distance-and-direction-circle-unit-test',
-             'test/distance-and-direction-ellipse-unit-test'],
-
-    //functionalSuites: ['test/distance-direction-line-functional-test'],
+    suites: ['tests/distance-and-direction-line-unit-test',
+             'tests/distance-and-direction-circle-unit-test',
+             'tests/distance-and-direction-ellipse-unit-test'],
 
     excludeInstrumentation: /^(?:test|node_modules)/
   };
