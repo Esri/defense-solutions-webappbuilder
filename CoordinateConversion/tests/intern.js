@@ -43,8 +43,11 @@ define([], function() {
     loader: {
       packages: [
         {
-          name: 'test',
-          location: './test'
+          name: 'tests',
+          location: './widgets/CoordinateConversion/tests'
+        }, {
+          name: 'CC',
+          location: './widgets/CoordinateConversion'
         }, {
           name: 'esri',
           location: 'http://js.arcgis.com/3.16/esri'
@@ -68,14 +71,15 @@ define([], function() {
           location: 'http://js.arcgis.com/3.16/dijit'
         }, {
           name: 'jimu',
-          location: '../../../jimu.js'
+          location: './jimu.js'
+        }, {
+          name: 'moment',
+          location: './widgets/CoordinateConversion/tests'
         }
       ]
     },
 
-    suites: ['test/coordinate-conversion-unit-test'],
-
-    functionalSuites: ['test/coordinate-conversion-functional-test'],
+    suites: ['tests/coordinate-conversion-unit-test'],
 
     excludeInstrumentation: /^(?:test|node_modules)/
   };

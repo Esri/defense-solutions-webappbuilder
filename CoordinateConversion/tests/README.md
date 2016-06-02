@@ -22,10 +22,17 @@ folder(web).
 
 #### From a browser
 
-1. Deploy the CoordinateConversion and intern components to a web server.
-2. Open a browser to http://hostname/path_to_coordinate_conversion_folder/node_modules/intern/client.html?config=test/intern-client
-3. View the results in the browser console window.  Note, some tests intentionally raise exceptions so you may find it
-useful to disable any pause on exception features within your developer tools.
+1. Create a test WAB app using Web AppBuilder
+2. Download the test WAB app and extract to a folder
+3. Create a virtual directory pointing to the location of the test WAB app
+4. Deploy the CoordinateConversion widget to the test WAB app widgets folder 
+5. Install Intern components to the root folder to a web server. Note: NPM needs to be installed before calling
+	```
+	npm install intern
+	```
+6. Copy the test folder to the root folder of the test WAB app
+7. Open a browser and navigate to http://hostname/path-to-distance-and-direction-folder/node_modules/intern/client.html?config=widgets/CoordinateConversion/tests/intern
+8. View the results in the browser console window. 
 
 #### Through a hosted unit test environment
 
