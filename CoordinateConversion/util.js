@@ -35,9 +35,11 @@ define([
 
         constructor: function (ac) {
             this.appConfig = ac.appConfig;
-            this.geomService = new EsriGeometryService(
-              this.appConfig.coordinateconversion.geometryService.url
-            );
+            var gs = this.appConfig.geometryService;
+            if (!gs) {
+              gs = '//utility.arcgisonline.com/arcgis/rest/services/Geometry/GeometryServer';
+            }
+            this.geomService = new EsriGeometryService(gs);
         },
 
         /**

@@ -1,5 +1,6 @@
 {
   "name": "CoordinateConversion",
+  "label": "Coordinate Conversion",
   "platform": "HTML",
   "version": "1.4",
   "wabVersion": "1.4",
