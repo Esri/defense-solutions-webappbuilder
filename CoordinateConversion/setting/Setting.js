@@ -39,7 +39,7 @@ define([
     startup: function () {
       this.inherited(arguments);
 
-      this.geoservice.set('value', this.config.coordinateconversion.geometryService.url);
+      //this.geoservice.set('value', this.config.coordinateconversion.geometryService.url);
       this.notationSelect.set('value', this.config.coordinateconversion.initialCoords);
       this.scale.set('value', this.config.coordinateconversion.zoomScale);
       this.setConfig(this.config);
@@ -56,7 +56,7 @@ define([
      *
      **/
     getConfig: function () {
-      this.config.coordinateconversion.geometryService.url = this.geoservice.get('value');
+      //this.config.coordinateconversion.geometryService.url = this.geoservice.get('value');
       this.config.coordinateconversion.initialCoords= this.notationSelect.get('value');
       this.config.coordinateconversion.zoomScale = parseFloat(this.scale.value);
       return this.config;

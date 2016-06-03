@@ -138,13 +138,10 @@ define([
          **/
         setConfig: function () {
           this.util = new Util({
-            appConfig: this.parentWidget.config
+            appConfig: this.parentWidget.appConfig
           });
 
-          var geomsrvcurl = this.parentWidget.config.coordinateconversion.geometryService.url ||
-            'http://pscltags1.eastus.cloudapp.azure.com/arcgis/rest/services/Utilities/Geometry/GeometryServer';
-
-          this.geomsrvc = new EsriGeometryService(geomsrvcurl);
+          this.geomsrvc = this.util.geomService;
 
           this.zoomScale = this.parentWidget.config.coordinateconversion.zoomScale || 50000;
 
