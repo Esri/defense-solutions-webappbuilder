@@ -2,8 +2,8 @@ define([
   'dojo/_base/declare',
   'dojo/topic',
   'dijit/form/ValidationTextBox',
-  './util',
-  './Coordinate'
+  '../util',
+  '../models/Coordinate'
 ], function (
   dojoDeclare,
   dojoTopic,

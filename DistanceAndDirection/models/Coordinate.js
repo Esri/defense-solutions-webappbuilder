@@ -6,7 +6,7 @@ define([
   'dojo/Deferred',
   'esri/geometry/Point',
   'esri/SpatialReference',
-  './util'
+  '../util'
 ], function (
   dojoDeclare,
   dojoLang,

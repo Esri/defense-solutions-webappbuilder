@@ -25,7 +25,7 @@ define([
     'dijit/_WidgetBase',
     'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin',
-    'dojo/text!./templates/TabRange.html'
+    'dojo/text!../templates/TabRange.html'
 ], function (
     dojoDeclare,
     dojoLang,
