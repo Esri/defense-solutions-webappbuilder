@@ -35,9 +35,9 @@ define([
     'esri/graphic',
     'esri/units',
     'esri/geometry/webMercatorUtils',
-    './Feedback',
-    './ShapeModel',
-    'dojo/text!./templates/TabEllipse.html'
+    '../models/Feedback',
+    '../models/ShapeModel',
+    'dojo/text!../templates/TabEllipse.html'
 ], function (
     dojoDeclare,
     dojoLang,
@@ -118,7 +118,7 @@ define([
           this.own(this.ellipseType.on(
             'change',
             dojoLang.hitch(this, this.ellipseTypeChangeHandler)
-          ))
+          ));
 
           this.own(this.angleUnitDD.on(
             'change',
@@ -128,7 +128,7 @@ define([
           this.own(this.lengthUnitDD.on(
             'change',
             dojoLang.hitch(this, this.lengthUnitDDDidChange)
-          ))
+          ));
 
         },
 
@@ -163,7 +163,7 @@ define([
         ellipseTypeChangeHandler: function () {
           var majorAxisLength = this.ellipseType.get('value') === 'full' ?
             this.currentEllipse.geometry.majorAxisLength * 2 :
-            this.currentEllipse.geometry.majorAxisLength
+            this.currentEllipse.geometry.majorAxisLength;
           dojoDomAttr.set(
             this.majorAxisInput,
             'value',

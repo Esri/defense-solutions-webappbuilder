@@ -127,9 +127,7 @@ define([
             this.geodesicGeometry = esriGeometryEngine.geodesicDensify(this.geometry.geometry, 1000);
             this.wmGeometry = this.geometry.geometry;
             this.angle = this.geometry.angle;
-
             this.startPoint = esriWMUtils.webMercatorToGeographic(this.geometry.center);
-
             this.formattedStartPoint = dojoString.substitute('${xStr}, ${yStr}', {
               xStr: dojoNumber.format(this.startPoint.y, {places:4}),
               yStr: dojoNumber.format(this.startPoint.x, {places:4})

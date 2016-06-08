@@ -25,10 +25,10 @@ define([
   'jimu/BaseWidget',
   'jimu/dijit/TabContainer3',
   'jimu/dijit/ViewStack',
-  './TabLine',
-  './TabCircle',
-  './TabEllipse',
-  './TabRange'
+  './views/TabLine',
+  './views/TabCircle',
+  './views/TabEllipse',
+  './views/TabRange'
 ], function (
   dojoDeclare,
   dojoLang,

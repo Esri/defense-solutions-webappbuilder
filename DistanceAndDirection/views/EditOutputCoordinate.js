@@ -24,7 +24,7 @@ define([
     'dijit/_WidgetBase',
     'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin',
-    'dojo/text!./templates/EditOutputCoordinate.html',
+    'dojo/text!../templates/EditOutputCoordinate.html',
     'dijit/form/Select',
     'jimu/dijit/CheckBox'
 ], function (
