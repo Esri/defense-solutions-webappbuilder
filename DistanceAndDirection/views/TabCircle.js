@@ -40,12 +40,12 @@ define([
   'esri/units',
   'esri/geometry/webMercatorUtils',
   'esri/geometry/Circle',
-  './Feedback',
-  './ShapeModel',
-  './CoordinateInput',
-  './EditOutputCoordinate',
-  './util',
-  'dojo/text!./templates/TabCircle.html'
+  '../models/Feedback',
+  '../models/ShapeModel',
+  '../views/CoordinateInput',
+  '../views/EditOutputCoordinate',
+  '../util',
+  'dojo/text!../templates/TabCircle.html'
 ], function (
   dojoDeclare,
   dojoLang,

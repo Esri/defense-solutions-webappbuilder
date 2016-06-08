@@ -34,9 +34,9 @@ define([
     'esri/graphic',
     'esri/units',
     'esri/geometry/webMercatorUtils',
-    './Feedback',
-    './ShapeModel',
-    'dojo/text!./templates/TabLine.html'
+    '../models/LineFeedback',
+    '../models/ShapeModel',
+    'dojo/text!../templates/TabLine.html'
 ], function (
     dojoDeclare,
     dojoLang,
@@ -134,7 +134,7 @@ define([
          **/
         pointButtonWasClicked: function () {
           this.map.disableMapNavigation();
-          this.dt.activate('line');
+          this.dt.activate('polyline');
           dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
         },
 
@@ -192,6 +192,7 @@ define([
           );
 
           this.lengthUnitDDDidChange();
+
           this.angleUnitDDDidChange();
 
           this._gl.add(this.currentLine.graphic);
@@ -205,6 +206,7 @@ define([
           this.emit('graphic_created', this.currentLine);
 
           this.map.enableMapNavigation();
+
           this.dt.deactivate();
 
           dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');

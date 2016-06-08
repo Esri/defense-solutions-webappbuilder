@@ -37,7 +37,8 @@ define([
   'esri/symbols/TextSymbol',
   'esri/symbols/Font',
   'esri/geometry/webMercatorUtils',
-  'esri/units'
+  'esri/units',
+  './Feedback'
 ], function (
   dojoDeclare,
   dojoLang,
@@ -60,90 +61,16 @@ define([
   EsriTextSymbol,
   EsriFont,
   EsriWebMercatorUtils,
-  EsriUnits
+  EsriUnits,
+  DrawFeedBack
   ) {
-  return dojoDeclare([esriDraw, dojoStateful], {
-
-    lengthLayer: null,
-    _setLengthLayer: function (l) {
-      this._set('lengthLayer', l);
-    },
-
-    lengthUnit: 'meters',
-    _setLengthUnit: function (u) {
-      this._set('lengthUnit', u);
-    },
-
-    isDiameter: true,
+  return dojoDeclare([esriDraw, dojoStateful, DrawFeedBack], {
 
     /**
      *
      **/
     constructor: function () {
-      // force loading of the geometryEngine
-      // prevents lag in feedback when used in mousedrag
-      esriGeoDUtils.isSimple(new EsriPoint({
-        'x': -122.65,
-        'y': 45.53,
-        'spatialReference': {
-          'wkid': 4326
-        }
-      })).then(function () {
-        console.log('Geometry Engine initialized');
-      });
-
-      // this.inherited(arguments);
-    },
-
-    /**
-     *
-     * http://ekenes.github.io/esri-js-samples/ge-length/
-     **/
-    showLength: function (pt, result) {
-      if (!this.lengthLayer) { return; }
-
-      this.lengthLayer.clear();
-
-      var length = dojoNumber.format(result, { places: 2 });
-      var lenStr = dojoString.substitute('${len} ${units}', {
-        len: length,
-        units: this.lengthUnit
-      });
-
-      var screen = esriScreenUtils.toScreenPoint(
-        this.map.extent,
-        this.map.width,
-        this.map.height,
-        pt
-      );
-      screen.x -= 40;
-      screen.y += 20;
-
-      var lengthLoc = esriScreenUtils.toMapPoint(
-        this.map.extent,
-        this.map.width,
-        this.map.height,
-        screen
-      );
-
-      var lblFont = new EsriFont(
-        14,
-        EsriFont.STYLE_NORMAL,
-        EsriFont.VARIANT_NORMAL,
-        EsriFont.WEIGHT_BOLD,
-        'Arial'
-      );
-
-      var txtLbl = new EsriTextSymbol(lenStr, lblFont, new EsriColor('black'));
-
-      this.lengthLayer.add(new EsriGraphic(lengthLoc, txtLbl));
-    },
-
-    /**
-     *
-     **/
-    numberWithCommas: function (x) {
-      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      this.inherited(arguments);
     },
 
     /**
@@ -239,15 +166,20 @@ define([
       //this.inherited(arguments);
     },
 
+    /**
+     *
+     **/
     _onClickHandler: function (evt) {
       var snappingPoint;
       if (this.map.snappingManager) {
         snappingPoint = this.map.snappingManager._snappingPoint;
       }
-      var start = snappingPoint || evt.mapPoint,
-        map = this.map,
-        screenPoint = map.toScreen(start),
-        tGraphic, geom, polygon;
+
+      var start = snappingPoint || evt.mapPoint;
+      var  map = this.map;
+      var screenPoint = map.toScreen(start);
+      var tGraphic;
+      var geom;
 
       this._points.push(start.offset(0, 0));
       switch (this._geometryType) {
@@ -256,29 +188,28 @@ define([
           this._setTooltipMessage(0);
           break;
         case esriDraw.POLYLINE:
-          if (this._points.length === 3) {
+          if (this._points.length === 2) {
+            this.set('endPoint', this._points[1]);
             this._onDblClickHandler();
             return;
           }
           if (this._points.length === 1) {
+            this.set('startPoint', this._points[0]);
             var polyline = new EsriPolyLine(map.spatialReference);
             polyline.addPath(this._points);
             this._graphic = map.graphics.add(new Graphic(polyline, this.lineSymbol), true);
             if (map.snappingManager) {
               map.snappingManager._setGraphic(this._graphic);
             }
-            this._onMouseMoveHandler_connect = connect.connect(map, "onMouseMove", this._onMouseMoveHandler);
-
+            this._onMouseMoveHandler_connect = connect.connect(map, 'onMouseMove', this._onMouseMoveHandler);
 
             this._tGraphic = map.graphics.add(new Graphic(new EsriPolyLine({
               paths: [[[start.x, start.y], [start.x, start.y]]],
               spatialReference: map.spatialReference
             }), this.lineSymbol), true);
-          }
-          else {
+          } else {
             this._graphic.geometry._insertPoints([start.offset(0, 0)], 0);
             // map.graphics.remove(this._tGraphic, true);
-
             this._graphic.setGeometry(this._graphic.geometry).setSymbol(this.lineSymbol);
 
             tGraphic = this._tGraphic;
@@ -289,15 +220,19 @@ define([
           }
           break;
       }
+
       this._setTooltipMessage(this._points.length);
       if (this._points.length === 2 && this._geometryType === 'polyline') {
         var tooltip = this._tooltip;
         if (tooltip) {
-          tooltip.innerHTML = "Click to finish drawing ellipse";
+          tooltip.innerHTML = 'Click to finish drawing line';
         }
       }
     },
 
+    /**
+     *
+     **/
     _onDblClickHandler: function (evt) {
       var geometry,
         _pts = this._points,
@@ -308,94 +243,20 @@ define([
         _pts.push(evt.mapPoint);
       }
 
-      var currentVertex = _pts[_pts.length - 1];
-      var previousVertex = _pts[_pts.length - 2];
-
-      if (currentVertex && previousVertex && currentVertex.x ===
-        previousVertex.x && currentVertex.y === previousVertex.y) {
-        _pts = _pts.slice(0, _pts.length - 1);
-      } else {
-        _pts = _pts.slice(0, _pts.length);
-      }
-
-      switch (this._geometryType) {
-        case esriDraw.POLYLINE:
-          if (!this._graphic || _pts.length < 2) {
-            connect.disconnect(this._onMouseMoveHandler_connect);
-            this._clear();
-            this._onClickHandler(evt);
-            return;
-          }
-
-          geometry = new EsriPolygon(spatialReference);
-
-          var majorAxisGeom = new EsriPolyLine({ paths: [[[_pts[0].x, _pts[0].y], [_pts[1].x, _pts[1].y]]], spatialReference: spatialReference });
-          var minorAxisGeom = new EsriPolyLine({ paths: [[[_pts[0].x, _pts[0].y], [_pts[2].x, _pts[2].y]]], spatialReference: spatialReference });
-          var majorAxisLength = esriGeometryEngine.geodesicLength(majorAxisGeom, 9001);
-          var minorAxisLength = esriGeometryEngine.geodesicLength(minorAxisGeom, 9001);
-
-          var lineLength = function (x, y, x0, y0) {
-            return Math.sqrt((x -= x0) * x + (y -= y0) * y);
-          };
-
-          var computeAngle = function (pointA, pointB) {
-            var deltaX = pointB.y - pointA.y;
-            var deltaY = pointB.x - pointA.x;
-            var azi = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
-            return ((azi + 360) % 360);
-          };
-
-          var convertAngle = function (angle) {
-            if (0 <= angle && angle < 90) {
-              return 90 - angle;
-            }
-            if (90 <= angle && angle < 180) {
-              return (180 - angle) + 270;
-            }
-            if (180 <= angle && angle < 270) {
-              return (270 - angle) + 180;
-            }
-            if (270 <= angle && angle < 360) {
-              return 180 - (angle - 270);
-            }
-            return angle;
-          };
-
-          var centerScreen = this.map.toScreen(_pts[0]);
-          var majorScreen = this.map.toScreen(_pts[1]);
-          var minorScreen = this.map.toScreen(_pts[2]);
-          var majorRadius = lineLength(centerScreen.x, centerScreen.y, majorScreen.x, majorScreen.y);
-          var minorRadius = lineLength(centerScreen.x, centerScreen.y, minorScreen.x, minorScreen.y);
-
-          var angleDegrees = computeAngle(EsriWebMercatorUtils.webMercatorToGeographic(_pts[0]),
-            EsriWebMercatorUtils.webMercatorToGeographic(_pts[1]));
-
-          var ellipseParams = {
-            center: centerScreen,
-            longAxis: majorRadius,
-            shortAxis: minorRadius,
-            numberOfPoints: 60,
-            map: this.map
-          }
-          var ellipse = EsriPolygon.createEllipse(ellipseParams);
-          geometry.geometry = esriGeometryEngine.rotate(ellipse, convertAngle(angleDegrees));
-
-          geometry = dojoLang.mixin(geometry, {
-            majorAxisLength: majorAxisLength,
-            minorAxisLength: minorAxisLength,
-            angle: angleDegrees.toFixed(2),
-            drawType: "ellipse",
-            center: _pts[0]
-          })
-          break;
-      }
+      geometry = new EsriPolyLine({ paths: [[[_pts[0].x, _pts[0].y], [_pts[1].x, _pts[1].y]]], spatialReference: spatialReference });
+      //geometry = new EsriPolygon(spatialReference);
+      geometry.geodesicLength = esriGeometryEngine.geodesicLength(geometry, 9001);
 
       connect.disconnect(this._onMouseMoveHandler_connect);
+
       this._clear();
       this._setTooltipMessage(0);
       this._drawEnd(geometry);
     },
 
+    /**
+     *
+     **/
     _onMouseMoveHandler: function (evt) {
       var snappingPoint;
       if (this.map.snappingManager) {
@@ -432,54 +293,5 @@ define([
       }
     },
 
-    getRadiusUnitType: function () {
-      var selectedUnit = EsriUnits.METERS;
-      switch (this.lengthUnit) {
-        case "meters":
-          selectedUnit = EsriUnits.METERS;
-          break;
-        case "feet":
-          selectedUnit = EsriUnits.FEET;
-          break;
-        case "kilometers":
-          selectedUnit = EsriUnits.KILOMETERS;
-          break;
-        case "miles":
-          selectedUnit = EsriUnits.MILES;
-          break;
-        case "nautical-miles":
-          selectedUnit = EsriUnits.NAUTICAL_MILES;
-          break;
-        case "yards":
-          selectedUnit = EsriUnits.YARDS;
-          break;
-      }
-      return selectedUnit;
-    },
-
-    convertToMeters: function (length) {
-      var convertedLength = length;
-      switch (this.lengthUnit) {
-        case "meters":
-          convertedLength = length;
-          break;
-        case "feet":
-          convertedLength = length * 0.3048;
-          break;
-        case "kilometers":
-          convertedLength = length * 1000;
-          break;
-        case "miles":
-          convertedLength = length * 1609.34;
-          break;
-        case "nautical-miles":
-          convertedLength = length * 1852.001376036;
-          break;
-        case "yards":
-          convertedLength = length * 0.9144;
-          break;
-      }
-      return convertedLength;
-    }
   });
 });
