@@ -100,10 +100,32 @@ define([
         /**
          *
          **/
+        lineLengthDidChange: function (r) {
+          dojoDomAttr.set(this.lengthInput, 'value', r);
+        },
+
+        /**
+         *
+         **/
+        lineAngleDidChange: function (r) {
+          dojoDomAttr.set(this.angleInput, 'value', r);
+        },
+
+        /**
+         *
+         **/
         syncEvents: function () {
           dojoTopic.subscribe('DD_CLEAR_GRAPHICS', dojoLang.hitch(this, this.clearGraphics));
           dojoTopic.subscribe('DD_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
           dojoTopic.subscribe('DD_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
+          dojoTopic.subscribe(
+            DrawFeedBack.drawnLineLengthDidChange,
+            dojoLang.hitch(this, this.lineLengthDidChange)
+          );
+          dojoTopic.subscribe(
+            DrawFeedBack.drawnLineAngleDidChange,
+            dojoLang.hitch(this, this.lineAngleDidChange)
+          );
 
           this.own(
             this.dt.on(
@@ -159,6 +181,7 @@ define([
          **/
         angleUnitDDDidChange: function () {
           this.currentAngleUnit = this.angleUnitDD.get('value');
+          this.dt.set('angleUnit', this.currentAngleUnit);
 
           if (this.currentLine) {
             dojoDomAttr.set(
