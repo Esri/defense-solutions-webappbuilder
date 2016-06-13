@@ -38,7 +38,8 @@ define([
   'esri/symbols/TextSymbol',
   'esri/symbols/Font',
   'esri/geometry/webMercatorUtils',
-  'esri/units'
+  'esri/units',
+  '../util',
 ], function (
   dojoDeclare,
   dojoLang,
@@ -61,7 +62,8 @@ define([
   EsriTextSymbol,
   EsriFont,
   EsriWebMercatorUtils,
-  EsriUnits
+  EsriUnits,
+  Utils
   ) {
     var w = dojoDeclare([esriDraw, dojoStateful], {
       startPoint: null,
@@ -102,6 +104,7 @@ define([
           console.log('Geometry Engine initialized');
         });
 
+        this._utils = new Utils();
         // this.inherited(arguments);
       },
 
