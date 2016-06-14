@@ -75,7 +75,6 @@ define([
          **/
         constructor: function () {
           this.inherited(arguments);
-          this._utils = new Utils();
         },
 
         /**

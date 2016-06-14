@@ -40,7 +40,7 @@ define([
   'esri/units',
   'esri/geometry/webMercatorUtils',
   'esri/geometry/Circle',
-  '../models/Feedback',
+  '../models/CircleFeedback',
   '../models/ShapeModel',
   '../views/CoordinateInput',
   '../views/EditOutputCoordinate',
@@ -133,9 +133,16 @@ define([
       this.distCalcControl.watch('open', dojoLang.hitch(this, this.distCalcDidExpand));
 
       dojoTopic.subscribe('DD_CLEAR_GRAPHICS', dojoLang.hitch(this, this.clearGraphics));
+
+      dojoTopic.subscribe(
+        DrawFeedBack.DD_CIRCLE_LENGTH_DID_CHANGE,
+        dojoLang.hitch(this, this.circleLengthDidChange)
+      );
+
       //dojoTopic.subscribe('DD_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
       //dojoTopic.subscribe('DD_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
       dojoTopic.subscribe('COORDINATE_INPUT_TYPE_CHANGE', dojoLang.hitch(this, this.setGraphic));
+
       dojoTopic.subscribe('COORDINATE_INPUT_FORMAT_CHANGE', dojoLang.hitch(this, function () {
         console.log('TabCircle: Coordinate_Input_Format_Change', this.coordTool.inputCoordinate.outputString);
         this.coordTool.inputCoordinate.validateOnInput = false;
@@ -238,6 +245,19 @@ define([
           DijitPopup.close(this.coordinateFormat);
         }
       )));
+    },
+
+    /**
+     *
+     **/
+    circleLengthDidChange: function (l) {
+
+      var fl = dojoNumber.format(l, {places: 2});
+      dojoDomAttr.set(
+        this.lengthInput,
+        'value',
+        fl
+      );
     },
 
     /**
@@ -368,7 +388,7 @@ define([
       if (this.distCalcControl.get('open')) {
         this.dt.activate('point');
       } else {
-        this.dt.activate('circle');
+        this.dt.activate('polyline');
       }
 
       dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
