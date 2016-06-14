@@ -1,3 +1,4 @@
+
 ///////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2016 Esri. All Rights Reserved.
 //
@@ -37,7 +38,8 @@ define([
   'esri/symbols/TextSymbol',
   'esri/symbols/Font',
   'esri/geometry/webMercatorUtils',
-  'esri/units'
+  'esri/units',
+  '../util',
 ], function (
   dojoDeclare,
   dojoLang,
@@ -60,105 +62,108 @@ define([
   EsriTextSymbol,
   EsriFont,
   EsriWebMercatorUtils,
-  EsriUnits
+  EsriUnits,
+  Utils
   ) {
-  return dojoDeclare([esriDraw, dojoStateful], {
+    var w = dojoDeclare([esriDraw, dojoStateful], {
+      startPoint: null,
+      _setStartPoint: function (p){
+        this._set('startPoint', p);
+      },
 
-    startPoint: null,
-    _setStartPoint: function (p){
-      this._set('startPoint', p);
-    },
+      endPoint: null,
+      _setEndPoint: function (p){
+        this._set('endPoint', p);
+      },
 
-    endPoint: null,
-    _setEndPoint: function (p){
-      this._set('endPoint', p);
-    },
+      lengthUnit: 'meters',
+      _setLengthUnit: function (u) {
+        this._set('lengthUnit', u);
+      },
 
-    lengthUnit: 'meters',
-    _setLengthUnit: function (u) {
-      this._set('lengthUnit', u);
-    },
+      angleUnit: 'degrees',
+      _setAngle: function (a) {
+        this._set('angleUnit', a);
+      },
 
-    angle: null,
-    _setAngle: function (p) {
-      this._set('angle', p);
-    }
-    
-    isDiameter: true,
+      isDiameter: true,
 
-    /**
-     *
-     **/
-    constructor: function () {
-      // force loading of the geometryEngine
-      // prevents lag in feedback when used in mousedrag
-      esriGeoDUtils.isSimple(new EsriPoint({
-        'x': -122.65,
-        'y': 45.53,
-        'spatialReference': {
-          'wkid': 4326
+      /**
+       *
+       **/
+      constructor: function () {
+        // force loading of the geometryEngine
+        // prevents lag in feedback when used in mousedrag
+        esriGeoDUtils.isSimple(new EsriPoint({
+          'x': -122.65,
+          'y': 45.53,
+          'spatialReference': {
+            'wkid': 4326
+          }
+        })).then(function () {
+          console.log('Geometry Engine initialized');
+        });
+
+        this._utils = new Utils();
+        // this.inherited(arguments);
+      },
+
+      /**
+       *
+       **/
+      getRadiusUnitType: function () {
+        var selectedUnit = EsriUnits.METERS;
+        switch (this.lengthUnit) {
+          case 'meters':
+            selectedUnit = EsriUnits.METERS;
+            break;
+          case 'feet':
+            selectedUnit = EsriUnits.FEET;
+            break;
+          case 'kilometers':
+            selectedUnit = EsriUnits.KILOMETERS;
+            break;
+          case 'miles':
+            selectedUnit = EsriUnits.MILES;
+            break;
+          case 'nautical-miles':
+            selectedUnit = EsriUnits.NAUTICAL_MILES;
+            break;
+          case 'yards':
+            selectedUnit = EsriUnits.YARDS;
+            break;
         }
-      })).then(function () {
-        console.log('Geometry Engine initialized');
-      });
+        return selectedUnit;
+      },
 
-      // this.inherited(arguments);
-    },
-
-    /**
-     *
-     **/
-    getRadiusUnitType: function () {
-      var selectedUnit = EsriUnits.METERS;
-      switch (this.lengthUnit) {
-        case "meters":
-          selectedUnit = EsriUnits.METERS;
-          break;
-        case "feet":
-          selectedUnit = EsriUnits.FEET;
-          break;
-        case "kilometers":
-          selectedUnit = EsriUnits.KILOMETERS;
-          break;
-        case "miles":
-          selectedUnit = EsriUnits.MILES;
-          break;
-        case "nautical-miles":
-          selectedUnit = EsriUnits.NAUTICAL_MILES;
-          break;
-        case "yards":
-          selectedUnit = EsriUnits.YARDS;
-          break;
+      /**
+       *
+       **/
+      convertToMeters: function (length) {
+        var convertedLength = length;
+        switch (this.lengthUnit) {
+          case 'meters':
+            convertedLength = length;
+            break;
+          case 'feet':
+            convertedLength = length * 0.3048;
+            break;
+          case 'kilometers':
+            convertedLength = length * 1000;
+            break;
+          case 'miles':
+            convertedLength = length * 1609.34;
+            break;
+          case 'nautical-miles':
+            convertedLength = length * 1852.001376036;
+            break;
+          case 'yards':
+            convertedLength = length * 0.9144;
+            break;
+        }
+        return convertedLength;
       }
-      return selectedUnit;
-    },
-
-    /**
-     *
-     **/
-    convertToMeters: function (length) {
-      var convertedLength = length;
-      switch (this.lengthUnit) {
-        case 'meters':
-          convertedLength = length;
-          break;
-        case 'feet':
-          convertedLength = length * 0.3048;
-          break;
-        case 'kilometers':
-          convertedLength = length * 1000;
-          break;
-        case 'miles':
-          convertedLength = length * 1609.34;
-          break;
-        case 'nautical-miles':
-          convertedLength = length * 1852.001376036;
-          break;
-        case 'yards':
-          convertedLength = length * 0.9144;
-          break;
-      }
-      return convertedLength;
-    }
   });
+
+  return w;
 });

@@ -23,6 +23,7 @@ define([
   'dojo/number',
   'dojo/string',
   'dojo/Stateful',
+  'dojo/topic',
   'esri/Color',
   'esri/toolbars/draw',
   'esri/graphic',
@@ -38,7 +39,8 @@ define([
   'esri/symbols/Font',
   'esri/geometry/webMercatorUtils',
   'esri/units',
-  './Feedback'
+  './Feedback',
+  '../util'
 ], function (
   dojoDeclare,
   dojoLang,
@@ -47,6 +49,7 @@ define([
   dojoNumber,
   dojoString,
   dojoStateful,
+  dojoTopic,
   EsriColor,
   esriDraw,
   Graphic,
@@ -62,236 +65,162 @@ define([
   EsriFont,
   EsriWebMercatorUtils,
   EsriUnits,
-  DrawFeedBack
-  ) {
-  return dojoDeclare([esriDraw, dojoStateful, DrawFeedBack], {
+  DrawFeedBack,
+  Utils
+) {
+      var lf = dojoDeclare([esriDraw, dojoStateful, DrawFeedBack], {
 
-    /**
-     *
-     **/
-    constructor: function () {
-      this.inherited(arguments);
-    },
+        /**
+         *
+         **/
+        constructor: function () {
+          this.inherited(arguments);
+        },
 
-    /**
-     * override drag event to create geodesic feedback
-     **/
-    _onMouseDragHandler: function (evt) {
-      // Pressing escape while drawing causing errors for certain draw tools
-      // -- Issue #1381
-      if (!this._graphic && !this._points.length) {
-        return;
-      }
+        /**
+         *
+         **/
+        getAngle: function (stPoint, endPoint) {
+          var angle = null;
 
-      // BlackBerry legacy issue (not changing for 3x)
-      if (dojoHas('esri-touch') && !this._points.length) {
-        // BlackBerry Torch certainly needs this
-        // to prevent page from panning
-        evt.preventDefault();
-        return;
-      }
+          var delx = endPoint.y - stPoint.y;
+          var dely = endPoint.x - stPoint.x;
 
-      this._dragged = true;
-      var snappingPoint;
-      if (this.map.snappingManager) {
-        snappingPoint = this.map.snappingManager._snappingPoint;
-      }
-      var start = this._points[0],
-        end = snappingPoint || evt.mapPoint,
-        _graphic = this._graphic;
-      switch (this._geometryType) {
-        case esriDraw.LINE:
-          var g = dojoLang.mixin(_graphic.geometry, {
-            paths: [
-              [[start.x, start.y], [end.x, end.y]]
-            ]
-          });
+          var azi = Math.atan2(dely, delx) * 180 / Math.PI;
+          angle = ((azi + 360) % 360);
 
-          // get geodesic length of user drawn line
-          esriGeoDUtils.geodesicDensify(g, 10000).then(function (r) {
-            _graphic.setGeometry(r);
-          });
-
-          // draw length of current line
-          if (this.lengthLayer) {
-            esriGeoDUtils.geodesicLength(g, this.lengthUnit).then(
-              dojoLang.hitch(this, function (l) {
-                this.showLength(end, l);
-              })
-            );
+          if (this.angleUnit === 'mils') {
+            angle *= 17.777777778;
           }
-          break;
-        case esriDraw.CIRCLE:
-          var pLine = new EsriPolyLine({
-            paths: [
-              [[start.x, start.y], [end.x, end.y]]
-            ],
-            spatialReference: {
-              wkid: _graphic.geometry.spatialReference.wkid
-            }
-          });
-          pLine = EsriWebMercatorUtils.webMercatorToGeographic(pLine);
 
-          esriGeoDUtils.geodesicLength(pLine, this.lengthUnit).then(
-            dojoLang.hitch(this, function (l) {
-              var circleParams = {
-                center: EsriWebMercatorUtils.webMercatorToGeographic(start),
-                geodesic: true,
-                numberOfPoints: 60,
-                radius: this.convertToMeters(l),
-                radiusUnits: this.getRadiusUnitType()
-              };
-              var g = new EsriCircle(circleParams);
-              _graphic.geometry = dojoLang.mixin(g, {
-                paths: [
-                  [[start.x, start.y], [end.x, end.y]]
-                ]
-              });
-              _graphic.setGeometry(_graphic.geometry);
-              if (this.isDiameter) {
-                this.showLength(end,l*2);
-              } else {
-                this.showLength(end, l);
+          return angle.toFixed(2);
+        },
+
+        /**
+         *
+         **/
+        _onClickHandler: function (evt) {
+          var snappingPoint;
+
+          if (this.map.snappingManager) {
+            snappingPoint = this.map.snappingManager._snappingPoint;
+          }
+
+          var start = snappingPoint || evt.mapPoint;
+          var  map = this.map;
+          var screenPoint = map.toScreen(start);
+          var tGraphic;
+          var geom;
+
+          this._points.push(start.offset(0, 0));
+          switch (this._geometryType) {
+            case esriDraw.POINT:
+              this._drawEnd(start.offset(0, 0));
+              this._setTooltipMessage(0);
+              break;
+            case esriDraw.POLYLINE:
+              if (this._points.length === 2) {
+                this.set('endPoint', this._points[1]);
+                this._onDblClickHandler();
+                return;
               }
 
+              if (this._points.length === 1) {
+                this.set('startPoint', this._points[0]);
+                var polyline = new EsriPolyLine(map.spatialReference);
+                polyline.addPath(this._points);
+                this._graphic = map.graphics.add(new Graphic(polyline, this.lineSymbol), true);
+                if (map.snappingManager) {
+                  map.snappingManager._setGraphic(this._graphic);
+                }
+
+                this._onMouseMoveHandler_connect = connect.connect(map, 'onMouseMove', this._onMouseMoveHandler);
+
+                this._tGraphic = map.graphics.add(new Graphic(new EsriPolyLine({
+                  paths: [[[start.x, start.y], [start.x, start.y]]],
+                  spatialReference: map.spatialReference
+                }), this.lineSymbol), true);
+              } else {
+                this._graphic.geometry._insertPoints([start.offset(0, 0)], 0);
+                // map.graphics.remove(this._tGraphic, true);
+                this._graphic.setGeometry(this._graphic.geometry).setSymbol(this.lineSymbol);
+
+                tGraphic = this._tGraphic;
+                geom = tGraphic.geometry;
+                geom.setPoint(0, 0, start.offset(0, 0));
+                geom.setPoint(0, 1, start.offset(0, 0));
+                tGraphic.setGeometry(geom);
             }
-            ));
-          break;
-      }
+            break;
+          }
 
-      if (dojoHas('esri-touch')) {
-        // Prevent iOS from panning the web page
-        evt.preventDefault();
-      }
-      //this.inherited(arguments);
-    },
+          this._setTooltipMessage(this._points.length);
+          if (this._points.length === 2 && this._geometryType === 'polyline') {
+            var tooltip = this._tooltip;
+            if (tooltip) {
+              tooltip.innerHTML = 'Click to finish drawing line';
+            }
+          }
+        },
 
-    /**
-     *
-     **/
-    _onClickHandler: function (evt) {
-      var snappingPoint;
-      if (this.map.snappingManager) {
-        snappingPoint = this.map.snappingManager._snappingPoint;
-      }
+        /**
+         *
+         **/
+        _onDblClickHandler: function (evt) {
+          var geometry;
+          var _pts = this._points;
+          var map = this.map;
+          var spatialreference = map.spatialReference;
 
-      var start = snappingPoint || evt.mapPoint;
-      var  map = this.map;
-      var screenPoint = map.toScreen(start);
-      var tGraphic;
-      var geom;
+          if (dojoHas('esri-touch') && evt) {
+            _pts.push(evt.mapPoint);
+          }
+          geometry = new EsriPolyLine({
+            paths: [[[_pts[0].x, _pts[0].y], [_pts[1].x, _pts[1].y]]],
+            spatialReference: spatialreference
+          });
+          //geometry = new EsriPolygon(spatialReference);
+          geometry.geodesicLength = esriGeometryEngine.geodesicLength(geometry, 9001);
 
-      this._points.push(start.offset(0, 0));
-      switch (this._geometryType) {
-        case esriDraw.POINT:
-          this._drawEnd(start.offset(0, 0));
+          connect.disconnect(this._onMouseMoveHandler_connect);
+
+          this._clear();
           this._setTooltipMessage(0);
-          break;
-        case esriDraw.POLYLINE:
-          if (this._points.length === 2) {
-            this.set('endPoint', this._points[1]);
-            this._onDblClickHandler();
-            return;
+          this._drawEnd(geometry);
+        },
+
+        /**
+         *
+         **/
+        _onMouseMoveHandler: function (evt) {
+          var snappingPoint;
+          if (this.map.snappingManager) {
+            snappingPoint = this.map.snappingManager._snappingPoint;
           }
-          if (this._points.length === 1) {
-            this.set('startPoint', this._points[0]);
-            var polyline = new EsriPolyLine(map.spatialReference);
-            polyline.addPath(this._points);
-            this._graphic = map.graphics.add(new Graphic(polyline, this.lineSymbol), true);
-            if (map.snappingManager) {
-              map.snappingManager._setGraphic(this._graphic);
-            }
-            this._onMouseMoveHandler_connect = connect.connect(map, 'onMouseMove', this._onMouseMoveHandler);
 
-            this._tGraphic = map.graphics.add(new Graphic(new EsriPolyLine({
-              paths: [[[start.x, start.y], [start.x, start.y]]],
-              spatialReference: map.spatialReference
-            }), this.lineSymbol), true);
-          } else {
-            this._graphic.geometry._insertPoints([start.offset(0, 0)], 0);
-            // map.graphics.remove(this._tGraphic, true);
-            this._graphic.setGeometry(this._graphic.geometry).setSymbol(this.lineSymbol);
+          var start = (this._geometryType === esriDraw.POLYLINE) ?
+          this._points[0] : this._points[this._points.length - 1];
 
-            tGraphic = this._tGraphic;
-            geom = tGraphic.geometry;
-            geom.setPoint(0, 0, start.offset(0, 0));
-            geom.setPoint(0, 1, start.offset(0, 0));
-            tGraphic.setGeometry(geom);
-          }
-          break;
-      }
+          var end = snappingPoint || evt.mapPoint;
 
-      this._setTooltipMessage(this._points.length);
-      if (this._points.length === 2 && this._geometryType === 'polyline') {
-        var tooltip = this._tooltip;
-        if (tooltip) {
-          tooltip.innerHTML = 'Click to finish drawing line';
-        }
-      }
-    },
+          var tGraphic = this._tGraphic;
+          var geom = tGraphic.geometry;
 
-    /**
-     *
-     **/
-    _onDblClickHandler: function (evt) {
-      var geometry,
-        _pts = this._points,
-        map = this.map,
-        spatialReference = map.spatialReference;
-
-      if (dojoHas("esri-touch") && evt) {
-        _pts.push(evt.mapPoint);
-      }
-
-      geometry = new EsriPolyLine({ paths: [[[_pts[0].x, _pts[0].y], [_pts[1].x, _pts[1].y]]], spatialReference: spatialReference });
-      //geometry = new EsriPolygon(spatialReference);
-      geometry.geodesicLength = esriGeometryEngine.geodesicLength(geometry, 9001);
-
-      connect.disconnect(this._onMouseMoveHandler_connect);
-
-      this._clear();
-      this._setTooltipMessage(0);
-      this._drawEnd(geometry);
-    },
-
-    /**
-     *
-     **/
-    _onMouseMoveHandler: function (evt) {
-      var snappingPoint;
-      if (this.map.snappingManager) {
-        snappingPoint = this.map.snappingManager._snappingPoint;
-      }
-      var start = (this._geometryType === esriDraw.POLYLINE) ? this._points[0] : this._points[this._points.length - 1],
-        end = snappingPoint || evt.mapPoint,
-        tGraphic = this._tGraphic,
-        geom = tGraphic.geometry;
-
-      switch (this._geometryType) {
-        case esriDraw.POLYLINE:
-        case esriDraw.POLYGON:
           //_tGraphic.setGeometry(dojo.mixin(_tGraphic.geometry, { paths:[[[start.x, start.y], [end.x, end.y]]] }));
           geom.setPoint(0, 0, { x: start.x, y: start.y });
           geom.setPoint(0, 1, { x: end.x, y: end.y });
 
-          if (this._points.length === 2) {
-            var majorAxisGeom = new EsriPolyLine({
-              paths: [
-                [[this._points[0].x, this._points[0].y], [this._points[1].x, this._points[1].y]]
-              ],
-              spatialReference: this.map.spatialReference
-            });
-            var majorAxisLength = esriGeometryEngine.geodesicLength(majorAxisGeom, 9001);
-            var minorAxisLength = esriGeometryEngine.geodesicLength(geom, 9001);
-            if (minorAxisLength > majorAxisLength) {
-              return;
-            }
-          }
+          var majorAxisLength = esriGeometryEngine.geodesicLength(geom, 9001);
+          var unitlength = this._utils.convertMetersToUnits(majorAxisLength, this.lengthUnit);
+          var ang = this.getAngle(start, end);
+
+          dojoTopic.publish('DD_LINE_LENGTH_DID_CHANGE', unitlength);
+          dojoTopic.publish('DD_LINE_ANGLE_DID_CHANGE', ang);
 
           tGraphic.setGeometry(geom);
-          break;
-      }
-    },
-
-  });
+        }
+      });
+      lf.drawnLineLengthDidChange = 'DD_LINE_LENGTH_DID_CHANGE';
+      lf.drawnLineAngleDidChange = 'DD_LINE_ANGLE_DID_CHANGE';
+      return lf;
 });
