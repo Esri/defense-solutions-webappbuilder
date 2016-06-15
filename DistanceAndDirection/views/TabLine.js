@@ -101,7 +101,8 @@ define([
          *
          **/
         lineLengthDidChange: function (r) {
-          dojoDomAttr.set(this.lengthInput, 'value', r);
+          var frmtdLength = dojoNumber.format(r,{places:2});
+          dojoDomAttr.set(this.lengthInput, 'value', frmtdLength);
         },
 
         /**

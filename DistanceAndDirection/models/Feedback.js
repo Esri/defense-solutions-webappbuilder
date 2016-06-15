@@ -39,7 +39,7 @@ define([
   'esri/symbols/Font',
   'esri/geometry/webMercatorUtils',
   'esri/units',
-  '../util',
+  '../util'
 ], function (
   dojoDeclare,
   dojoLang,

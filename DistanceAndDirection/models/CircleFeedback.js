@@ -46,13 +46,15 @@ define([
   DrawFeedBack,
   Utils
 ) {
-  var clz = dojoDeclare([DrawFeedBack, dojoStateful], {
+  var clz = dojoDeclare([DrawFeedBack], {
     /**
      *
      **/
     constructor: function () {
       this.inherited(arguments);
-      
+
+      this._utils = new Utils();
+
     },
 
     /**
