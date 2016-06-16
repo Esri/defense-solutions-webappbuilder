@@ -22,7 +22,6 @@ define([
   'dojo/has',
   'dojo/number',
   'dojo/string',
-  'dojo/Stateful',
   'dojo/topic',
   'esri/Color',
   'esri/toolbars/draw',
@@ -48,7 +47,6 @@ define([
   dojoHas,
   dojoNumber,
   dojoString,
-  dojoStateful,
   dojoTopic,
   EsriColor,
   esriDraw,
@@ -68,7 +66,7 @@ define([
   DrawFeedBack,
   Utils
 ) {
-      var lf = dojoDeclare([esriDraw, dojoStateful, DrawFeedBack], {
+      var lf = dojoDeclare([DrawFeedBack], {
 
         /**
          *
