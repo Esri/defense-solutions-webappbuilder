@@ -169,6 +169,9 @@ define([
       this._drawEnd(this.circleGraphic.geometry);
     },
 
+    /*
+     *
+     */
     cleanup: function (evt) {
       if (this.circleGraphic) {
         this.map.graphics.remove(this.circleGraphic);
