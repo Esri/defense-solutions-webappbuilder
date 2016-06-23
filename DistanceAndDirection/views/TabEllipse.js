@@ -35,7 +35,7 @@ define([
     'esri/graphic',
     'esri/units',
     'esri/geometry/webMercatorUtils',
-    '../models/Feedback',
+    '../models/EllipseFeedback',
     '../models/ShapeModel',
     'dojo/text!../templates/TabEllipse.html'
 ], function (
@@ -74,9 +74,9 @@ define([
           dojoDeclare.safeMixin(this, args);
         },
 
-        /**
-         * dijit post create
-         **/
+        /*
+         * widget is alive, initilize our stuff
+         */
         postCreate: function () {
           this.currentAngleUnit = this.angleUnitDD.get('value');
           this.currentLengthUnit = this.lengthUnitDD.get('value');
@@ -99,9 +99,35 @@ define([
          *
          **/
         syncEvents: function () {
-          dojoTopic.subscribe('DD_CLEAR_GRAPHICS', dojoLang.hitch(this, this.clearGraphics));
-          dojoTopic.subscribe('DD_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
-          dojoTopic.subscribe('DD_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
+
+          dojoTopic.subscribe(
+            'DD_CLEAR_GRAPHICS',
+            dojoLang.hitch(this, this.clearGraphics)
+          );
+
+          dojoTopic.subscribe(
+            'DD_WIDGET_OPEN',
+            dojoLang.hitch(this, this.setGraphicsShown));
+
+          dojoTopic.subscribe(
+            'DD_WIDGET_CLOSE',
+            dojoLang.hitch(this, this.setGraphicsHidden));
+
+          dojoTopic.subscribe(
+            DrawFeedBack.DD_ELLIPSE_MINOR_LENGTH_CHANGE,
+            dojoLang.hitch(
+              this,
+              this.minorLengthDidChange
+            )
+          );
+
+          dojoTopic.subscribe(
+            DrawFeedBack.DD_ELLIPSE_MAJOR_LENGTH_CHANGE,
+            dojoLang.hitch(
+              this,
+              this.majorLengthDidChange
+            )
+          );
 
           this.own(
             this.dt.on(
@@ -132,9 +158,33 @@ define([
 
         },
 
-        /**
+        /*
+         * update the gui with the major axis length
+         */
+        majorLengthDidChange: function (l) {
+          var fl = dojoNumber.format(l, {places: 2});
+          dojoDomAttr.set(
+            this.majorAxisInput,
+            'value',
+            fl
+          );
+        },
+
+        /*
+         * update the gui with the min axis length
+         */
+        minorLengthDidChange: function (l) {
+          var fl = dojoNumber.format(l, {places: 2});
+          dojoDomAttr.set(
+            this.minorAxisInput,
+            'value',
+            fl
+          );
+        },
+
+        /*
          * Button click event, activate feedback tool
-         **/
+         */
         pointButtonWasClicked: function () {
           this.map.disableMapNavigation();
           this.dt.activate('polyline');
@@ -252,28 +302,31 @@ define([
           }
         },
 
+        /*
+         *
+         */
         _getFormattedLength: function (length) {
           var convertedLength = length;
           switch (this.currentLengthUnit) {
-            case "meters":
+            case 'meters':
               convertedLength = length;
               break;
-            case "feet":
+            case 'feet':
               convertedLength = length * 3.28084;
               break;
-            case "kilometers":
+            case 'kilometers':
               convertedLength = length * 1000;
               break;
-            case "miles":
+            case 'miles':
               convertedLength = length * 0.00062137121212121;
               break;
-            case "nautical-miles":
+            case 'nautical-miles':
               convertedLength = length * 0.00053995682073433939625;
               break;
-            case "yards":
+            case 'yards':
               convertedLength = length * 1.0936133333333297735;
               break;
-            case "ussurveyfoot":
+            case 'ussurveyfoot':
               convertedLength = length * 3.2808333333465;
               break;
           }
