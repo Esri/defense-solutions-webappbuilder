@@ -3,13 +3,13 @@
     "lineSymbol": {
       "type": "esriSLS",
       "style": "esriSLSSolid",
-      "color": [255, 50, 50, 255],
+      "color": [50, 50, 250, 125],
       "width": 1.25
     },
     "circleSymbol": {
       "type": "esriSFS",
       "style": "esriSFSSolid",
-      "color": [255,0,0,125],
+      "color": [255,0,0,0],
       "outline": {
         "color": [255, 50, 50, 255],
         "width": 1.25,

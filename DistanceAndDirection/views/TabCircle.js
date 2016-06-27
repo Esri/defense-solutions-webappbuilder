@@ -473,8 +473,10 @@ define([
         results.calculatedDistance = parseInt(this.lengthInput.value, 10);
       }
 
-      results.calculatedDistance = this.dt.convertToMeters(
-        results.calculatedDistance, this.lengthUnitDD.get('value'));
+      results.calculatedDistance = this.utils.convertToMeters(
+        results.calculatedDistance,
+        this.lengthUnitDD.get('value')
+      );
 
       results.geometry = this.coordTool.inputCoordinate.coordinateEsriGeometry;
       this.currentCircle = new ShapeModel(results);
