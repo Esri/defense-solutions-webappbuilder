@@ -83,16 +83,16 @@ define([
     templateString: templateStr,
     baseClass: 'jimu-widget-TabCircle',
 
-    /**
+    /*
      * class constructor
-     **/
+     */
     constructor: function (args) {
       dojoDeclare.safeMixin(this, args);
     },
 
-    /**
+    /*
      * dijit post create
-     **/
+     */
     postCreate: function () {
 
       this.utils = new Util(this.appConfig.geometryService);
@@ -125,133 +125,112 @@ define([
       this.syncEvents();
     },
 
-    /**
+    /*
      * Start up event listeners
-     **/
+     */
     syncEvents: function () {
 
-      this.distCalcControl.watch('open', dojoLang.hitch(this, this.distCalcDidExpand));
+      this.distCalcControl.watch('open',
+        dojoLang.hitch(this, this.distCalcDidExpand)
+      );
 
-      dojoTopic.subscribe('DD_CLEAR_GRAPHICS', dojoLang.hitch(this, this.clearGraphics));
+      dojoTopic.subscribe('DD_CLEAR_GRAPHICS',
+        dojoLang.hitch(this, this.clearGraphics)
+      );
 
-      dojoTopic.subscribe(
-        DrawFeedBack.DD_CIRCLE_LENGTH_DID_CHANGE,
+      dojoTopic.subscribe(DrawFeedBack.DD_CIRCLE_LENGTH_DID_CHANGE,
         dojoLang.hitch(this, this.circleLengthDidChange)
       );
 
-      //dojoTopic.subscribe('DD_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
-      //dojoTopic.subscribe('DD_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
-      dojoTopic.subscribe('COORDINATE_INPUT_TYPE_CHANGE', dojoLang.hitch(this, this.setGraphic));
+      dojoTopic.subscribe('COORDINATE_INPUT_TYPE_CHANGE',
+        dojoLang.hitch(this, this.setGraphic)
+      );
 
-      dojoTopic.subscribe('COORDINATE_INPUT_FORMAT_CHANGE', dojoLang.hitch(this, function () {
-        console.log('TabCircle: Coordinate_Input_Format_Change', this.coordTool.inputCoordinate.outputString);
-        this.coordTool.inputCoordinate.validateOnInput = false;
-        this.coordTool.set('value', this.coordTool.inputCoordinate.outputString);
-      }));
+      dojoTopic.subscribe('COORDINATE_INPUT_FORMAT_CHANGE',
+        dojoLang.hitch(this, function () {
+          this.coordTool.inputCoordinate.validateOnInput = false;
+          this.coordTool.set('value', this.coordTool.inputCoordinate.outputString);
+        })
+      );
 
       this.own(
-        this.dt.on(
-          'draw-complete',
+        this.dt.on('draw-complete',
           dojoLang.hitch(this, this.feedbackDidComplete)
-        ));
+        ),
 
-      this.own(dojoOn(
-        this.coordinateFormatButton,
-        'click',
-        dojoLang.hitch(this, this.coordinateFormatButtonWasClicked)
-      ));
+        this.coordTool.on('blur',
+          dojoLang.hitch(this, this.coordToolDidLoseFocus)
+        ),
 
-      this.own(dojoOn(
-        this.addPointBtn,
-        'click',
-        dojoLang.hitch(this, this.pointButtonWasClicked)
-      ));
+        this.lengthUnitDD.on('change',
+          dojoLang.hitch(this, this.lengthUnitDDDidChange)
+        ),
 
-      this.own(this.coordTool.on(
-        'blur',
-        dojoLang.hitch(this, this.coordToolDidLoseFocus)
-      ));
+        this.creationType.on('change',
+          dojoLang.hitch(this, this.creationTypeDidChange)
+        ),
 
-      this.own(this.lengthUnitDD.on(
-        'change',
-        dojoLang.hitch(this, this.lengthUnitDDDidChange)
-      ));
+        this.distanceUnitDD.on('change',
+          dojoLang.hitch(this, this.distanceInputDidChange)
+        ),
 
-      this.own(this.creationType.on(
-        'change',
-        dojoLang.hitch(this, this.creationTypeDidChange)
-      ));
+        this.timeUnitDD.on('change',
+          dojoLang.hitch(this, this.timeInputDidChange)
+        ),
 
-      this.own(dojoOn(
-        this.timeInput,
-        'change',
-        dojoLang.hitch(this, this.timeInputDidChange)
-      ));
+        dojoOn(this.coordinateFormatButton, 'click',
+          dojoLang.hitch(this, this.coordinateFormatButtonWasClicked)
+        ),
 
-      this.own(dojoOn(
-        this.distanceInput,
-        'change',
-        dojoLang.hitch(this, this.distanceInputDidChange)
-      ));
+        dojoOn(this.addPointBtn, 'click',
+          dojoLang.hitch(this, this.pointButtonWasClicked)
+        ),
 
-      this.own(dojoOn(
-        this.distanceInput,
-        'keyup',
-        dojoLang.hitch(this, this.distanceInputKeyWasPressed)
-      ));
+        dojoOn(this.timeInput, 'change',
+          dojoLang.hitch(this, this.timeInputDidChange)
+        ),
 
-      this.own(this.distanceUnitDD.on(
-        'change',
-        dojoLang.hitch(this, this.distanceInputDidChange)
-      ));
+        dojoOn(this.distanceInput, 'change',
+          dojoLang.hitch(this, this.distanceInputDidChange)
+        ),
 
-      this.own(this.timeUnitDD.on(
-        'change',
-        dojoLang.hitch(this, this.timeInputDidChange)
-      ));
+        dojoOn(this.distanceInput, 'keyup',
+          dojoLang.hitch(this, this.distanceInputKeyWasPressed)
+        ),
 
-      this.own(dojoOn(
-        this.lengthInput,
-        'change',
-        dojoLang.hitch(
-          this,
-          this.lengthInputDidChange
-        )
-      ));
+        dojoOn(this.lengthInput, 'change',
+          dojoLang.hitch(this, this.lengthInputDidChange)
+        ),
 
-      this.own(dojoOn(
-        this.coordinateFormat.content.applyButton,
-        'click',
-        dojoLang.hitch(this, function () {
-          var fs = this.coordinateFormat.content.formats[this.coordinateFormat.content.ct];
-          var cfs = fs.defaultFormat;
-          var fv = this.coordinateFormat.content.frmtSelect.get('value');
-          if (fs.useCustom) {
-            cfs = fs.customFormat;
+        dojoOn(this.coordinateFormat.content.applyButton, 'click',
+          dojoLang.hitch(this, function () {
+            var fs = this.coordinateFormat.content.formats[this.coordinateFormat.content.ct];
+            var cfs = fs.defaultFormat;
+            var fv = this.coordinateFormat.content.frmtSelect.get('value');
+            if (fs.useCustom) {
+              cfs = fs.customFormat;
+            }
+            this.coordTool.inputCoordinate.set('formatPrefix', this.coordinateFormat.content.addSignChkBox.checked);
+            this.coordTool.inputCoordinate.set('formatString', cfs);
+            this.coordTool.inputCoordinate.set('formatType', fv);
+            this.setCoordLabel(fv);
+
+            DijitPopup.close(this.coordinateFormat);
           }
-          this.coordTool.inputCoordinate.set('formatPrefix', this.coordinateFormat.content.addSignChkBox.checked);
-          this.coordTool.inputCoordinate.set('formatString', cfs);
-          this.coordTool.inputCoordinate.set('formatType', fv);
-          this.setCoordLabel(fv);
+        )),
 
-          DijitPopup.close(this.coordinateFormat);
-        }
-      )));
-
-      this.own(dojoOn(
-        this.coordinateFormat.content.cancelButton,
-        'click',
-        dojoLang.hitch(this, function () {
-          DijitPopup.close(this.coordinateFormat);
-        }
-      )));
+        dojoOn(this.coordinateFormat.content.cancelButton, 'click',
+          dojoLang.hitch(this, function () {
+            DijitPopup.close(this.coordinateFormat);
+          }
+        ))
+      );
     },
 
-    /**
+    /*
      *
-     **/
+     */
     circleLengthDidChange: function (l) {
-
       var fl = dojoNumber.format(l, {places: 2});
       dojoDomAttr.set(
         this.lengthInput,
@@ -260,9 +239,9 @@ define([
       );
     },
 
-    /**
+    /*
      *
-     **/
+     */
     coordToolDidLoseFocus: function () {
       this.coordTool.inputCoordinate.isManual = true;
       //this.coordTool.set('validateOnInput', true);
@@ -271,9 +250,9 @@ define([
      }));
     },
 
-    /**
+    /*
      *
-     **/
+     */
     coordinateFormatButtonWasClicked: function () {
       this.coordinateFormat.content.set('ct', this.coordTool.inputCoordinate.formatType);
       DijitPopup.open({
@@ -282,9 +261,9 @@ define([
       });
     },
 
-    /**
+    /*
      *
-     **/
+     */
     distCalcDidExpand: function () {
       if (this.distCalcControl.get('open')) {
         this.lengthInput.disabled = 'disabled';
@@ -293,9 +272,9 @@ define([
       }
     },
 
-    /**
+    /*
      *
-     **/
+     */
     lengthInputDidChange: function () {
       if (this.lengthInput.value && this.lengthInput.value <= 0){
         this.useCalculatedDistance = false;
@@ -306,26 +285,26 @@ define([
       }
     },
 
-    /**
+    /*
      *
-     **/
+     */
     timeInputDidChange: function () {
       this.currentTimeInSeconds = this.timeInput.value  * this.timeUnitDD.value;
       this.getCalculatedDistance();
     },
 
-    /**
+    /*
      * Rate Input key up event handler
-     **/
+     */
     distanceInputKeyWasPressed: function (evt) {
       if (evt.keyCode === dojoKeys.ENTER) {
         this.setGraphic();
       }
     },
 
-    /**
+    /*
      *
-     **/
+     */
     distanceInputDidChange: function () {
 
       var currentRateInMetersPerSecond = (
@@ -337,9 +316,9 @@ define([
       this.getCalculatedDistance();
     },
 
-    /**
+    /*
      *
-     **/
+     */
     getCalculatedDistance: function () {
       if ((this.currentTimeInSeconds && this.currentTimeInSeconds > 0) &&
         (this.currentDistanceInMeters && this.currentDistanceInMeters > 0)) {
@@ -379,9 +358,9 @@ define([
 
     },
 
-    /**
+    /*
      * Button click event, activate feedback tool
-     **/
+     */
     pointButtonWasClicked: function () {
       this.map.disableMapNavigation();
       this.dt.set('isDiameter', this.creationType.get('value') === 'Diameter');
@@ -394,9 +373,9 @@ define([
       dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
     },
 
-    /**
+    /*
      *
-     **/
+     */
     lengthUnitDDDidChange: function () {
       this.currentLengthUnit = this.lengthUnitDD.get('value');
       this.dt.set('lengthUnit', this.currentLengthUnit);
@@ -412,17 +391,17 @@ define([
       }
     },
 
-    /**
+    /*
      *
-     **/
+     */
     creationTypeDidChange: function() {
       this.lengthUnitDDDidChange();
       this.radiusDiameterLabel.innerHTML = this.creationType.get('value');
     },
 
-    /**
+    /*
      *
-     **/
+     */
     feedbackDidComplete: function (results) {
       var centerPoint = results.geometry.center;
       if (!centerPoint) {
@@ -440,19 +419,28 @@ define([
 
     },
 
-    /**
+    /*
      *
-     **/
+     */
     setCoordLabel: function (toType) {
-      this.coordInputLabel.innerHTML = dojoString.substitute('Center Point (${crdType})', {crdType: toType});
+      this.coordInputLabel.innerHTML = dojoString.substitute(
+        'Center Point (${crdType})', {
+          crdType: toType
+        }
+      );
     },
-    /**
+
+    /*
      *
-     **/
+     */
     setGraphic: function (isManual) {
+
       var results = {};
+
       this.map.enableMapNavigation();
+
       this.dt.deactivate();
+
       dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
 
       if (this.coordTool.inputCoordinate.hasError) {
@@ -503,9 +491,9 @@ define([
       this.clearUI(true);
     },
 
-    /**
+    /*
      * Remove graphics and reset values
-     **/
+     */
     clearGraphics: function () {
       if (this._gl) {
         // graphic layers
@@ -517,9 +505,9 @@ define([
       }
     },
 
-    /**
+    /*
      * reset ui controls
-     **/
+     */
     clearUI: function (keepCoords) {
       this.useCalculatedDistance = false;
       this.currentCircle = null;
@@ -534,18 +522,18 @@ define([
       dojoDomAttr.set(this.distanceInput, 'value', '');
     },
 
-    /**
+    /*
      *
-     **/
+     */
     setGraphicsHidden: function () {
       if (this._gl) {
         this._gl.hide();
       }
     },
 
-    /**
+    /*
      *
-     **/
+     */
     setGraphicsShown: function () {
       if (this._gl) {
         this._gl.show();

@@ -174,11 +174,17 @@ define([
          */
         numRadialsInputKeyWasPressed: function (evt) {
           // validate input
-          if (evt.keyCode === dojoKeys.ENTER) {
+          if (evt.keyCode === dojoKeys.ENTER && this.getInputsValid()) {
             this.createRangeRings();
           }
         },
 
+        getInputsValid: function () {
+          return this.coordTool.isValid() &&
+            this.numRingsInput.isValid() &&
+            this.ringIntervalInput.isValid() &&
+            this.numRadialsInput.isValid();
+        },
         /*
          *
          */
@@ -197,9 +203,8 @@ define([
           };
 
           if (params.centerPoint.spatialReference !== this.map.spatialReference) {
-            params.centerPoint = EsriWMUtils.project(
-              params.centerPoint,
-              this.map
+            params.centerPoint = EsriWMUtils.geographicToWebMercator(
+              params.centerPoint
             );
           }
 
