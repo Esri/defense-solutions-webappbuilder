@@ -121,8 +121,9 @@ In order to develop and test widgets you need to deploy the DistanceAndDirection
 
 ### Create Range Rings Manually
 	* Choose the Range Rings tab on the Distance and Directions Widget
-	* Fill in the associated parameters for “Number of Rings”, “Ring Interval”, “Distance Units”, and “Number of Radials”
-	* Input the coordinates for the Range Rings center in the “Center Point” text box and select the Enter key on the keyboard
+	* Input the coordinates for the Range Rings center in the “Center Point” text box
+	* Fill in the associated parameters for Number of Rings, Ring Interval, Distance Units
+	* Fill in the parameter for Number of Radials and press the Enter Key
 	* Graphic(s) will then be displayed on the map showing the Range Rings you created based on the values of the parameters that were set
 	* If desired you can clear all graphics with the clear graphics button
 
