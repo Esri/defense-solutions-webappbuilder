@@ -458,6 +458,34 @@ define([
               break;
           }
           return convLength;
+        },
+
+        /**
+         *
+         **/
+        convertToMeters: function (length, inputUnit) {
+          var convertedLength = length;
+          switch (inputUnit) {
+            case 'meters':
+              convertedLength = length;
+              break;
+            case 'feet':
+              convertedLength = length * 0.3048;
+              break;
+            case 'kilometers':
+              convertedLength = length * 1000;
+              break;
+            case 'miles':
+              convertedLength = length * 1609.34;
+              break;
+            case 'nautical-miles':
+              convertedLength = length * 1852.001376036;
+              break;
+            case 'yards':
+              convertedLength = length * 0.9144;
+              break;
+          }
+          return convertedLength;
         }
     });
 });
