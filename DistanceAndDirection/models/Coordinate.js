@@ -6,6 +6,7 @@ define([
   'dojo/Deferred',
   'esri/geometry/Point',
   'esri/SpatialReference',
+  'esri/geometry/webMercatorUtils',
   '../util'
 ], function (
   dojoDeclare,
@@ -15,6 +16,7 @@ define([
   DojoDeferred,
   EsriPoint,
   EsriSpatialReference,
+  EsriWMUtils,
   CoordinateUtilities
 ) {
 
@@ -48,7 +50,13 @@ define([
 
     coordinateEsriGeometry: null,
     _coordinateEsriGeometrySetter: function (value) {
-      this.coordinateEsriGeometry = value;
+      var pt;
+      if (value.spatialReference.wkid !== 4326) {
+        pt = EsriWMUtils.webMercatorToGeographic(value);
+      } else {
+        pt = value;
+      }
+      this.coordinateEsriGeometry = pt;
       this.getFormattedValue();
       dojoTopic.publish('COORDINATE_INPUT_TYPE_CHANGE', this);
     },

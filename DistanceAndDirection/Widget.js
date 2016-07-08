@@ -98,6 +98,27 @@ define([
         this.ellipseTabNode
       );
 
+     this.rangeTab = new TabRange({
+        map: this.map,
+        appConfig: this.appConfig,
+        circleSymbol: this.config.feedback.circleSymbol || {
+          type: 'esriSFS',
+          style: 'esriSFSNull',
+          color: [255,0,0,0],
+          outline: {
+            color: [255, 50, 50, 255],
+            width: 1.25,
+            type: 'esriSLS',
+            style: 'esriSLSSolid'
+          }},
+          lineSymbol: this.config.feedback.lineSymbol || {
+            type: 'esriSLS',
+            style: 'esriSLSSolid',
+            color: [255, 50, 50, 255],
+            width: 1.25
+          }
+      }, this.RangeTabContainer);
+
       /**
        *
        **/
@@ -121,7 +142,7 @@ define([
           },
           {
             title: 'Range',
-            content: new TabRange({}, this.RangeTabContainer)
+            content: this.rangeTab
           }
         ]
       }, this.tabContainer);
