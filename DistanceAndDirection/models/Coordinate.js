@@ -137,7 +137,7 @@ define([
         x: this.coordinateEsriGeometry.x,
         y: this.coordinateEsriGeometry.y
       }, this.formatType, 4).then(dojoLang.hitch(this, function (r) {
-        this.outputString = this.getCoordUI(r);
+        this.set('outputString', this.getCoordUI(r));
         dojoTopic.publish('COORDINATE_INPUT_FORMAT_CHANGE', this);
       }));
     },

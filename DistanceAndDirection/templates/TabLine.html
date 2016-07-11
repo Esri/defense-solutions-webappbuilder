@@ -44,7 +44,7 @@
       <input
         data-dojo-type='dijit/form/NumberTextBox'
         required="true" value="1" data-dojo-props="
-        constraints: {min: 1, max: 1000000},
+        constraints: {min: 1, max: 40030000},
         invalidMessage: 'Please enter a numeric value.',
         rangeMessage: 'Invalid Line Length'"
         data-dojo-attach-point="lengthInput"></input>
@@ -66,9 +66,9 @@
         required="true"
         value="1"
         data-dojo-props="
-          constraints: {min: 1, max: 6283},
+          constraints: {min: 0, max: 6283},
           invalidMessage: 'Please enter a numeric value.',
-          rangeMessage: 'Invalid Line Length'"
+          rangeMessage: 'Invalid Angle'"
         data-dojo-attach-point="angleInput">
       </input>
       <select style="width: 100px" class="controlSpace" data-dojo-type="dijit/form/Select" data-dojo-attach-point="angleUnitDD">

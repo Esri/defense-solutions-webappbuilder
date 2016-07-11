@@ -104,20 +104,17 @@ define([
 
           this.currentAngleUnit = this.angleUnitDD.get('value');
 
-          this._lengthLayer = new EsriGraphicsLayer();
-
           this._gl = new EsriGraphicsLayer();
 
           this._lineSym = new EsriSimpleLineSymbol(this.lineSymbol);
 
           this._ptSym = new EsriSimpleMarkerSymbol(this.pointSymbol);
 
-          this.map.addLayers([this._gl, this._lengthLayer]);
+          this.map.addLayer(this._gl);
 
           // add extended toolbar
           this.dt = new DrawFeedBack(this.map);
           this.dt.setLineSymbol(this._lineSym);
-          this.dt.set('lengthLayer', this._lengthLayer);
 
           this.coordToolStart = new CoordInput({
             appConfig: this.appConfig}, this.startPointCoordsLine);
@@ -157,13 +154,20 @@ define([
         syncEvents: function () {
           this.dt.watch('startPoint' , dojoLang.hitch(this, function (r, ov, nv) {
             this.coordToolStart.inputCoordinate.set('coordinateEsriGeometry', nv);
-            this.coordToolStart.set('value', this.coordToolStart.inputCoordinate.outputString);
+          }));
+
+          this.coordToolStart.inputCoordinate.watch('outputString', dojoLang.hitch(this, function (r, ov, nv){
+            this.coordToolStart.set('value', nv);
           }));
 
           this.dt.watch('endPoint' , dojoLang.hitch(this, function (r, ov, nv) {
             this.coordToolEnd.inputCoordinate.set('coordinateEsriGeometry',  nv);
-            this.coordToolEnd.set('value', this.coordToolEnd.inputCoordinate.outputString);
           }));
+
+          this.coordToolEnd.inputCoordinate.watch('outputString', dojoLang.hitch(this, function (r, ov, nv){
+            this.coordToolEnd.set('value', nv);
+          }));
+
 
 
           dojoTopic.subscribe('DD_CLEAR_GRAPHICS', dojoLang.hitch(this, this.clearGraphics));
@@ -332,13 +336,8 @@ define([
           this.currentLengthUnit = this.lengthUnitDD.get('value');
           this.dt.set('lengthUnit', this.currentLengthUnit);
           if (this.currentLine) {
-            dojoDomAttr.set(
-              this.lengthInput,
-              'value',
-              this.currentLine.getFormattedLength(this.currentLengthUnit)
-            );
+            this.lengthInput.set('value',this.currentLine.getFormattedLength(this.currentLengthUnit));
           }
-
         },
 
         /*
@@ -347,12 +346,8 @@ define([
         angleUnitDDDidChange: function () {
           this.currentAngleUnit = this.angleUnitDD.get('value');
           this.dt.set('angleUnit', this.currentAngleUnit);
-
           if (this.currentLine) {
-            dojoDomAttr.set(
-              this.angleInput,
-              'value',
-              this.currentLine.getAngle(this.currentAngleUnit));
+            this.angleInput.set('value', this.currentLine.getAngle(this.currentAngleUnit));
           }
         },
 
@@ -367,29 +362,10 @@ define([
             this._lineSym
           );
 
-          dojoDomAttr.set(
-            this.startPointCoordsLine,
-            'value',
-            this.currentLine.formattedStartPoint
-          );
-
-          dojoDomAttr.set(
-            this.endPointCoordsLine,
-            'value',
-            this.currentLine.formattedEndPoint
-          );
-
-          this.lengthUnitDDDidChange();
-
-          this.angleUnitDDDidChange();
+          //this.lengthUnitDDDidChange();
+          //this.angleUnitDDDidChange();
 
           this._gl.add(this.currentLine.graphic);
-          if (this._lengthLayer.graphics.length > 0) {
-            var tg = dojoLang.clone(this._lengthLayer.graphics[0].geometry);
-            var ts = dojoLang.clone(this._lengthLayer.graphics[0].symbol);
-            this._gl.add(new EsriGraphic(tg, ts));
-            this._lengthLayer.clear();
-          }
 
           this.emit('graphic_created', this.currentLine);
 
@@ -460,11 +436,10 @@ define([
         clearGraphics: function () {
           if (this._gl) {
             this._gl.clear();
-            this._lengthLayer.clear();
-            dojoDomAttr.set(this.startPointCoordsLine, 'value', '');
-            dojoDomAttr.set(this.endPointCoordsLine, 'value', '');
-            dojoDomAttr.set(this.lengthInput, 'value', '');
-            dojoDomAttr.set(this.angleInput, 'value', '');
+            this.coordToolStart.clear();
+            this.coordToolEnd.clear();
+            this.lengthInput.set('value', 0);
+            this.angleInput.set('value', 0);
           }
         },
 
