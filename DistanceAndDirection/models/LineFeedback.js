@@ -208,14 +208,17 @@ define([
           geom.setPoint(0, 0, { x: start.x, y: start.y });
           geom.setPoint(0, 1, { x: end.x, y: end.y });
 
+          var geogeom = esriGeometryEngine.geodesicDensify(geom, 10001);
+
           var majorAxisLength = esriGeometryEngine.geodesicLength(geom, 9001);
+
+          this._graphic.setGeometry(geogeom);
+
           var unitlength = this._utils.convertMetersToUnits(majorAxisLength, this.lengthUnit);
           var ang = this.getAngle(start, end);
 
           dojoTopic.publish('DD_LINE_LENGTH_DID_CHANGE', unitlength);
           dojoTopic.publish('DD_LINE_ANGLE_DID_CHANGE', ang);
-
-          tGraphic.setGeometry(geom);
         }
       });
       lf.drawnLineLengthDidChange = 'DD_LINE_LENGTH_DID_CHANGE';

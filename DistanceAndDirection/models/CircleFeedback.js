@@ -47,9 +47,9 @@ define([
   Utils
 ) {
   var clz = dojoDeclare([DrawFeedBack], {
-    /**
+    /*
      *
-     **/
+     */
     constructor: function () {
       this.inherited(arguments);
 
@@ -57,16 +57,16 @@ define([
 
     },
 
-    /**
+    /*
      *
-     **/
+     */
     clearGraphics: function (evt) {
       this.map.graphics.clear();
     },
 
-    /**
+    /*
      *
-     **/
+     */
     _onClickHandler: function (evt) {
       var snapPoint;
       if (this.map.snappingManager) {
@@ -121,9 +121,9 @@ define([
       }
     },
 
-    /**
+    /*
      *
-     **/
+     */
     _onMouseMoveHandler: function (evt) {
       var snapPoint;
       if (this.map.snappingManager) {

@@ -54,7 +54,9 @@ define([
          *
          **/
         getCleanInput: function (fromstr) {
-            return fromstr.replace(/\s+/g, ' ').trim();
+          if (fromstr) {
+              return fromstr.replace(/\s+/g, ' ').trim();
+          }
         },
 
         /**
@@ -155,7 +157,9 @@ define([
          * Figure out what type of coordinate this string rep
          **/
         getCoordinateType: function (fromInput) {
-
+            if (!fromInput) {
+              return;
+            }
             var clnInput = this.getCleanInput(fromInput);
             //regexr.com
             var strs = [{

@@ -106,6 +106,10 @@
     background-color: #c0c0c0;
 }
 
+.hidden {
+  display: none;
+}
+
 /**
  * Coordinate Format Dialog
  **/

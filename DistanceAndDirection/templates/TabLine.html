@@ -15,7 +15,7 @@
   <div class="controlGroup">
       <label>From</label>
       <div class="controlItem">
-        <select disabled="disabled" style="width: 225px" data-dojo-type="dijit/form/Select">
+        <select data-dojo-attach-point="lineTypeDD" style="width: 225px" data-dojo-type="dijit/form/Select">
           <option value="DistAndBearing">Distance and Bearing</option>
           <option selected="selected" value="Points">Points</option>
         </select>
@@ -23,25 +23,31 @@
   </div>
 
   <div class="controlGroup">
-      <label>Start Point</label>
+      <label data-dojo-attach-point="lineStartPointLabel">Start Point</label>
       <div class="controlItem">
-        <input class="jimu-input coordInput" data-dojo-attach-point="startPointCoords">
-        </input><!---->
-        <div class="addPointBtn" data-dojo-attach-point="addPointBtn"></div>
+        <input class="jimu-input coordInput" data-dojo-attach-point="startPointCoordsLine" placeholder="Enter Coordinates" />
+        <span class="frmtBtn" data-dojo-attach-point="coordinateFormatButtonLine"></span>
+        <div class="addPointBtn" data-dojo-attach-point="addPointBtnLine"></div>
     </div>
   </div>
 
-  <div class="controlGroup">
-    <label>End Point</label>
+  <div class="controlGroup endPt">
+    <label data-dojo-attach-point="lineEndPointLabel">End Point</label>
     <div class="controlItem">
-      <input class="jimu-input coordInput" data-dojo-attach-point="endPointCoords"></input>
+      <input class="jimu-input coordInput" data-dojo-attach-point="endPointCoordsLine"></input>
     </div>
   </div>
 
   <div class="controlGroup">
     <label>Length</label>
     <div class="controlItem">
-      <input class="jimu-input selectInput" data-dojo-attach-point="lengthInput"></input>
+      <input
+        data-dojo-type='dijit/form/NumberTextBox'
+        required="true" value="1" data-dojo-props="
+        constraints: {min: 1, max: 1000000},
+        invalidMessage: 'Please enter a numeric value.',
+        rangeMessage: 'Invalid Line Length'"
+        data-dojo-attach-point="lengthInput"></input>
       <select style="width: 100px" class="controlSpace" data-dojo-type="dijit/form/Select" data-dojo-attach-point="lengthUnitDD" >
         <option value="feet">Feet</option>
         <option value="kilometers">Kilometers</option>
@@ -56,7 +62,15 @@
   <div class="controlGroup">
     <label>Angle</label>
     <div class="controlItem">
-      <input class="jimu-input selectInput" data-dojo-attach-point="angleInput"></input>
+      <input data-dojo-type="dijit/form/NumberTextBox"
+        required="true"
+        value="1"
+        data-dojo-props="
+          constraints: {min: 1, max: 6283},
+          invalidMessage: 'Please enter a numeric value.',
+          rangeMessage: 'Invalid Line Length'"
+        data-dojo-attach-point="angleInput">
+      </input>
       <select style="width: 100px" class="controlSpace" data-dojo-type="dijit/form/Select" data-dojo-attach-point="angleUnitDD">
         <option value="degrees">Degrees</option>
         <option value="mils">Mils</option>

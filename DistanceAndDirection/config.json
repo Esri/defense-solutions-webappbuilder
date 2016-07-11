@@ -3,8 +3,8 @@
     "lineSymbol": {
       "type": "esriSLS",
       "style": "esriSLSSolid",
-      "color": [50, 50, 250, 125],
-      "width": 1.25
+      "color": [255, 50, 50, 125],
+      "width": 3
     },
     "circleSymbol": {
       "type": "esriSFS",
@@ -35,6 +35,18 @@
       "outline": {
         "color": [255, 50, 50, 255],
         "width": 1.25,
+        "type": "esriSLS",
+        "style": "esriSLSSolid"
+      }
+    },
+    "pointSymbol": {
+      "color": [0, 255, 0, 125],
+      "size": 12,
+      "type": "esriSMS",
+      "style": "esriSMSCircle",
+      "outline": {
+        "color": [0,125,0,255],
+        "width": 2,
         "type": "esriSLS",
         "style": "esriSLSSolid"
       }
