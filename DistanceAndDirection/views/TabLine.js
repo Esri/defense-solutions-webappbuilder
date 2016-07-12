@@ -166,9 +166,15 @@ define([
             this.coordToolEnd.inputCoordinate.set('coordinateEsriGeometry', nv);
           }));
 
-          this.coordToolStart.inputCoordinate.watch('outputString', dojoLang.hitch(this, function (r, ov, nv){
-            this.coordToolStart.set('value', nv);
-          }));
+          this.coordToolStart.inputCoordinate.watch(
+            'outputString',
+            dojoLang.hitch(
+              this,
+              function (r, ov, nv) {
+                this.coordToolStart.set('value', nv);
+              }
+            )
+          );
 
           this.coordToolEnd.inputCoordinate.watch(
             'outputString',
@@ -221,7 +227,7 @@ define([
               dojoLang.hitch(
                 this,
                 function () {
-                  var fs = this.coordinateFormatStart.content.formats[this.coordinateFormat.content.ct];
+                  var fs = this.coordinateFormatStart.content.formats[this.coordinateFormatStart.content.ct];
                   var cfs = fs.defaultFormat;
                   var fv = this.coordinateFormatStart.content.frmtSelect.get('value');
                   if (fs.useCustom) {cfs = fs.customFormat;}
@@ -231,7 +237,14 @@ define([
                   );
                   this.coordToolStart.inputCoordinate.set('formatString', cfs);
                   this.coordToolStart.inputCoordinate.set('formatType', fv);
+                  this.coordToolEnd.inputCoordinate.set(
+                    'formatPrefix',
+                    this.coordinateFormatStart.content.addSignChkBox.checked
+                  );
+                  this.coordToolEnd.inputCoordinate.set('formatString', cfs);
+                  this.coordToolEnd.inputCoordinate.set('formatType', fv);
                   this.setCoordLabelStart(fv);
+                  this.setCoordLabelEnd(fv);
                   DijitPopup.close(this.coordinateFormatStart);
                 }
               )
