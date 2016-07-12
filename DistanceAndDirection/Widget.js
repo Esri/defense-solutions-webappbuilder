@@ -56,11 +56,24 @@ define([
 
       this.lineTab = new TabLine({
         map: this.map,
+        appConfig: this.appConfig,
         lineSymbol: this.config.feedback.lineSymbol || {
           type: 'esriSLS',
           style: 'esriSLSSolid',
           color: [255, 50, 50, 255],
           width: 1.25
+        },
+        pointSymbol: this.config.feedback.pointSymbol || {
+          'color': [255,255,255,64],
+          'size': 12,
+          'type': 'esriSMS',
+          'style': 'esriSMSCircle',
+          'outline': {
+            'color': [0,0,0,255],
+            'width': 1,
+            'type': 'esriSLS',
+            'style': 'esriSLSSolid'
+          }
         }},
         this.lineTabNode
       );
