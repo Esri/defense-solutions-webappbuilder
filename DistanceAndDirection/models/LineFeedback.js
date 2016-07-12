@@ -201,6 +201,8 @@ define([
 
           var end = snappingPoint || evt.mapPoint;
 
+          this.set('currentEndPoint', end);
+          
           var tGraphic = this._tGraphic;
           var geom = tGraphic.geometry;
 

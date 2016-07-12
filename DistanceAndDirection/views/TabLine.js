@@ -32,6 +32,7 @@ define([
     'dijit/_TemplatedMixin',
     'dijit/_WidgetsInTemplateMixin',
     'dijit/TooltipDialog',
+    'dijit/popup',
     'esri/layers/GraphicsLayer',
     'esri/geometry/geometryEngine',
     'esri/geometry/Polyline',
@@ -66,6 +67,7 @@ define([
     dijitTemplatedMixin,
     dijitWidgetsInTemplate,
     DijitTooltipDialog,
+    DijitPopup,
     EsriGraphicsLayer,
     esriGeometryEngine,
     EsriPolyline,
@@ -134,7 +136,7 @@ define([
         },
 
         /*
-         *
+         * length value change
          */
         lineLengthDidChange: function (r) {
           var frmtdLength = dojoNumber.format(r,{places:2});
@@ -142,41 +144,62 @@ define([
         },
 
         /*
-         *
+         * angle value change
          */
         lineAngleDidChange: function (r) {
           this.angleInput.set('value', r);
         },
 
         /*
-         *
+         * start listening for events
          */
         syncEvents: function () {
           this.dt.watch('startPoint' , dojoLang.hitch(this, function (r, ov, nv) {
             this.coordToolStart.inputCoordinate.set('coordinateEsriGeometry', nv);
           }));
 
-          this.coordToolStart.inputCoordinate.watch('outputString', dojoLang.hitch(this, function (r, ov, nv){
-            this.coordToolStart.set('value', nv);
-          }));
-
           this.dt.watch('endPoint' , dojoLang.hitch(this, function (r, ov, nv) {
             this.coordToolEnd.inputCoordinate.set('coordinateEsriGeometry',  nv);
           }));
 
-          this.coordToolEnd.inputCoordinate.watch('outputString', dojoLang.hitch(this, function (r, ov, nv){
-            this.coordToolEnd.set('value', nv);
+          this.dt.watch('currentEndPoint', dojoLang.hitch(this, function (r, ov, nv) {
+            this.coordToolEnd.inputCoordinate.set('coordinateEsriGeometry', nv);
           }));
 
+          this.coordToolStart.inputCoordinate.watch('outputString', dojoLang.hitch(this, function (r, ov, nv){
+            this.coordToolStart.set('value', nv);
+          }));
 
+          this.coordToolEnd.inputCoordinate.watch(
+            'outputString',
+            dojoLang.hitch(
+              this,
+              function (r, ov, nv) {
+                this.coordToolEnd.set('value', nv);
+              }
+            )
+          );
 
-          dojoTopic.subscribe('DD_CLEAR_GRAPHICS', dojoLang.hitch(this, this.clearGraphics));
-          dojoTopic.subscribe('DD_WIDGET_OPEN', dojoLang.hitch(this, this.setGraphicsShown));
-          dojoTopic.subscribe('DD_WIDGET_CLOSE', dojoLang.hitch(this, this.setGraphicsHidden));
+          dojoTopic.subscribe(
+            'DD_CLEAR_GRAPHICS',
+            dojoLang.hitch(this, this.clearGraphics)
+          );
+
+          dojoTopic.subscribe(
+            'DD_WIDGET_OPEN',
+            dojoLang.hitch(this, this.setGraphicsShown)
+          );
+
+          dojoTopic.subscribe(
+            'DD_WIDGET_CLOSE',
+            dojoLang.hitch(this, this.setGraphicsHidden)
+          );
+
           dojoTopic.subscribe(
             DrawFeedBack.drawnLineLengthDidChange,
             dojoLang.hitch(this, this.lineLengthDidChange)
           );
+
           dojoTopic.subscribe(
             DrawFeedBack.drawnLineAngleDidChange,
             dojoLang.hitch(this, this.lineAngleDidChange)
@@ -186,6 +209,43 @@ define([
             this.dt.on(
               'draw-complete',
               dojoLang.hitch(this, this.feedbackDidComplete)
+            ),
+
+            dojoOn(this.coordinateFormatButtonLine, 'click',
+              dojoLang.hitch(this, this.coordinateFormatButtonLineWasClicked)
+            ),
+
+            dojoOn(
+              this.coordinateFormatStart.content.applyButton,
+              'click',
+              dojoLang.hitch(
+                this,
+                function () {
+                  var fs = this.coordinateFormatStart.content.formats[this.coordinateFormat.content.ct];
+                  var cfs = fs.defaultFormat;
+                  var fv = this.coordinateFormatStart.content.frmtSelect.get('value');
+                  if (fs.useCustom) {cfs = fs.customFormat;}
+                  this.coordToolStart.inputCoordinate.set(
+                    'formatPrefix',
+                    this.coordinateFormatStart.content.addSignChkBox.checked
+                  );
+                  this.coordToolStart.inputCoordinate.set('formatString', cfs);
+                  this.coordToolStart.inputCoordinate.set('formatType', fv);
+                  this.setCoordLabelStart(fv);
+                  DijitPopup.close(this.coordinateFormatStart);
+                }
+              )
+            ),
+
+            dojoOn(
+              this.coordinateFormatStart.content.cancelButton,
+              'click',
+              dojoLang.hitch(
+                this,
+                function () {
+                  DijitPopup.close(this.coordinateFormatStart);
+                }
+              )
             ),
 
             dojoOn(
@@ -234,6 +294,17 @@ define([
         /*
          *
          */
+        coordinateFormatButtonLineWasClicked: function () {
+          this.coordinateFormatStart.content.set('ct', this.coordToolStart.inputCoordinate.formatType);
+          DijitPopup.open({
+            popup: this.coordinateFormatStart,
+            around: this.coordinateFormatButtonLine
+          });
+        },
+
+        /*
+         * catch key press in start point
+         */
         coordToolEndKeyWasPressed: function (evt) {
 
           if (this.lineTypeDD.get('value') !== 'Points') {
@@ -248,7 +319,7 @@ define([
         },
 
         /*
-         *
+         * get formatted coordinate type
          */
         coordToolStartDidLoseFocus: function () {
           this.coordToolStart.inputCoordinate.isManual = true;
@@ -259,7 +330,7 @@ define([
         },
 
         /*
-         *
+         *   add a temporary start point graphic to the map
          */
         addStartGraphic: function (fromGeometry) {
           if (this.startGraphic) {
@@ -352,7 +423,7 @@ define([
         },
 
         /*
-         *
+         * pass results of feedback to the shapemodel
          */
         feedbackDidComplete: function (results) {
 
@@ -381,10 +452,9 @@ define([
          *
          */
          createManualGraphic: function () {
-          this._gl.remove(this.startGraphic);
+           this._gl.remove(this.startGraphic);
 
            var stPt = this.coordToolStart.inputCoordinate.coordinateEsriGeometry;
-
            var endPt = this.coordToolEnd.inputCoordinate.coordinateEsriGeometry;
 
            var newLine = new EsriPolyline();
