@@ -80,6 +80,16 @@
 
 }
 
+.jimu-widget-DistanceAndDirection .interactive-checkbox {
+    padding: 5px 0px 0px 10px;
+}
+
+.jimu-checkbox .label {
+    font-size: 12px;
+    margin: auto 5px;
+    cursor: default;
+}
+
 .jimu-widget-DistanceAndDirection .frmtBtn {
     background: url(../images/setting_disabled.png) no-repeat;
     width: 32px;
@@ -104,10 +114,6 @@
 
 .jimu-widget-DistanceAndDirection .addPointBtn.jimu-state-active {
     background-color: #c0c0c0;
-}
-
-.hidden {
-  display: none;
 }
 
 /**
