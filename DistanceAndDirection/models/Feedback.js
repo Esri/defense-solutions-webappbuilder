@@ -134,7 +134,24 @@ define([
             break;
         }
         return selectedUnit;
+      },
+
+      /*
+       *   add a temporary start point graphic to the map
+       */
+      addStartGraphic: function (fromGeometry, withSym) {
+        this.removeStartGraphic();
+        this.startGraphic = new EsriGraphic(fromGeometry, withSym);
+        this.map.graphics.add(this.startGraphic);
+      },
+
+
+      removeStartGraphic: function () {
+        if (this.startGraphic) {
+          this.map.graphics.remove(this.startGraphic);
+        }
       }
+
   });
 
   return w;

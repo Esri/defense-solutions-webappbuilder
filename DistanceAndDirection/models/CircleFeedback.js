@@ -74,9 +74,8 @@ define([
       }
 
       var start = snapPoint || evt.mapPoint;
-      var map = this.map;
+      this._points.push(start);
 
-      this._points.push(start.offset(0, 0));
       switch (this._geometryType) {
         case esriDraw.POINT:
           this._drawEnd(start.offset(0,0));
@@ -84,41 +83,27 @@ define([
           break;
         case esriDraw.POLYLINE:
           // Finish Drawing
-          if (this._points.length === 2) {
-            this.set('endPoint', this._points[1]);
+          if (this.get('startPoint') !== null) {
+            this.set('endPoint', start);
             this._onDoubleClickHandler();
             return;
+          } else {
+            this.set('startPoint', start);
+            this._onMouseMoveHandlerConnect = dojoConnect.connect(
+              this.map,
+              'onMouseMove',
+              this._onMouseMoveHandler
+            );
           }
-
-          // start
-          if (this._points.length === 1) {
-            this.set('startPoint', this._points[0]);
-
-            var pline = new EsriPolyline({
-              paths: [[[start.x, start.y], [start.x, start.y]]],
-              spatialReference: map.spatialReference
-            });
-
-            //var tgra = new EsriGraphic(pline, this.lineSymbol);
-            this.lgraphic = new EsriGraphic(pline, this.lineSymbol);
-
-            if (map.snappingManager) {
-              map.snappingManager._setGraphic(this._graphic);
-            }
-
-            this._onMouseMoveHandler_connect = dojoConnect.connect(map, 'onMouseMove', this._onMouseMoveHandler);
-
-            break;
-          }
-      }
+        }
 
       this._setTooltipMessage(this._points.length);
-      if (this._points.length === 2 && this._geometryType === 'circle') {
+      /*if (this._points.length === 2 && this._geometryType === 'circle') {
         var tooltip = this._tooltip;
         if (tooltip) {
           tooltip.innerHTML = 'Click to finish drawing circle';
         }
-      }
+      }*/
     },
 
     /*
@@ -130,39 +115,20 @@ define([
         snapPoint = this.map.snappingManager._snappingPoint;
       }
 
-      var start = this._points[0];
-
-      var end = snapPoint || evt.mapPoint;
-      var tGraphic = this.lgraphic;
-      var geom = tGraphic.geometry;
-
-      geom.setPoint(0, 0, {x: start.x, y: start.y});
-      geom.setPoint(0, 1, {x: end.x, y: end.y});
-
-      var length = EsriGeometryEngine.geodesicLength(geom, 9001);
-      var unitLength = this._utils.convertMetersToUnits(length, this.lengthUnit);
-      dojoTopic.publish('DD_CIRCLE_LENGTH_DID_CHANGE', unitLength);
-
-      if (this.isDiameter) {
-        length = length / 2;
-      }
-
-      var circleGeometry = new EsriCircle(this.get('startPoint'), {
-        radius: length,
-        geodesic: true
-      });
+      var current = snapPoint || evt.mapPoint;
+      var circleGeometry = this.setCircleGeometry(this.get('startPoint'), current);
 
       this.cleanup();
       this.circleGraphic = new EsriGraphic(circleGeometry, this.fillSymbol);
       this.map.graphics.add(this.circleGraphic);
-      //this.lgraphic.setGeometry(geom);
+
     },
 
     /**
      *
      **/
     _onDoubleClickHandler: function (evt) {
-      dojoConnect.disconnect(this._onMouseMoveHandler_connect);
+      dojoConnect.disconnect(this._onMouseMoveHandlerConnect);
       this.cleanup();
       this._clear();
       this._setTooltipMessage(0);
@@ -176,8 +142,31 @@ define([
       if (this.circleGraphic) {
         this.map.graphics.remove(this.circleGraphic);
       }
-    }
+    },
 
+    /*
+     *
+     */
+    setCircleGeometry: function (stPt, endPt) {
+
+      var geom = new EsriPolyline(this.map.spatialReference);
+      geom.addPath([stPt, endPt]);
+
+      var length = EsriGeometryEngine.geodesicLength(geom, 9001);
+      var unitLength = this._utils.convertMetersToUnits(length, this.lengthUnit);
+      this.set('length', unitLength);
+
+      if (this.isDiameter) {
+        unitLength = unitLength / 2;
+      }
+
+      var circleGeometry = new EsriCircle(stPt, {
+        radius: unitLength,
+        geodesic: true
+      });
+
+      return circleGeometry;
+    }
   });
   clz.DD_CIRCLE_LENGTH_DID_CHANGE = 'DD_CIRCLE_LENGTH_DID_CHANGE';
   return clz;

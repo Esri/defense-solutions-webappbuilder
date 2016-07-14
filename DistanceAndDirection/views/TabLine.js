@@ -156,6 +156,7 @@ define([
         syncEvents: function () {
           this.dt.watch('startPoint' , dojoLang.hitch(this, function (r, ov, nv) {
             this.coordToolStart.inputCoordinate.set('coordinateEsriGeometry', nv);
+            this.dt.addStartGraphic(nv, this._ptSym);
           }));
 
           this.dt.watch('endPoint' , dojoLang.hitch(this, function (r, ov, nv) {
@@ -338,20 +339,11 @@ define([
           this.coordToolStart.inputCoordinate.isManual = true;
           this.coordToolStart.inputCoordinate.getInputType().then(dojoLang.hitch(this, function (r){
            this.setCoordLabelStart(r.inputType);
-           this.addStartGraphic(r.coordinateEsriGeometry);
+           this.dt.addStartGraphic(r.coordinateEsriGeometry, this._ptSym);
          }));
         },
 
-        /*
-         *   add a temporary start point graphic to the map
-         */
-        addStartGraphic: function (fromGeometry) {
-          if (this.startGraphic) {
-            this._gl.remove(this.startGraphic);
-          }
-          this.startGraphic = new EsriGraphic(fromGeometry, this._ptSym);
-          this._gl.add(this.startGraphic);
-        },
+
 
         /*
          *
@@ -456,6 +448,7 @@ define([
           this.map.enableMapNavigation();
 
           this.dt.deactivate();
+          this.dt.removeStartGraphic();
 
           dojoDomClass.toggle(this.addPointBtnLine, 'jimu-state-active');
 
@@ -472,6 +465,8 @@ define([
 
            var newLine = new EsriPolyline();
            newLine.addPath([stPt, endPt]);
+
+           this.map.setExtent(newLine.getExtent().expand(3));
 
            this.feedbackDidComplete({geometry: newLine, geographicGeometry: newLine});
          },
@@ -519,6 +514,7 @@ define([
         clearGraphics: function () {
           if (this._gl) {
             this._gl.clear();
+            this.dt.removeStartGraphic();
             this.coordToolStart.clear();
             this.coordToolEnd.clear();
             this.lengthInput.set('value', 0);
