@@ -119,6 +119,16 @@ In order to develop and test widgets you need to deploy the DistanceAndDirection
 	* Graphic(s) will then be displayed on the map showing the Range Rings you created based on the values of the parameters that were set
 	* If desired you can clear all graphics with the clear graphics button
 
+### Create Range Rings Interactively
+	* Choose the Range Rings tab on the Distance and Directions Widget
+	* Check the "Interactive" check box
+	* Click the "Map Point" tool
+	* Fill in the parameter for "Number of Radials"
+	* Start clicking on the map to create range rings
+	* Double-click to finish creating range rings
+	* Graphic(s) will then be displayed on the map showing range rings and radials
+	* If desired you can clear all graphics with the clear graphics button	 
+
 ## General Help
 
   * [New to Github? Get started here.](http://htmlpreview.github.com/?https://github.com/Esri/esri.github.com/blob/master/help/esri-getting-to-know-github.html)
