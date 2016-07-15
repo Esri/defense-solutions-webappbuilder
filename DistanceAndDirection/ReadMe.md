@@ -48,7 +48,7 @@ In order to develop and test widgets you need to deploy the DistanceAndDirection
 	* Enter a starting and ending point on the map by clicking on the map
 	* Repeat until all desired graphics have been included
 
-### Create Lines from Known Coordinates
+### Create Lines Manually
 	* Choose the type of line that is needed to be created
 	* Input the first coordinate of where your line is going to start
 	* Input the second coordinate of where your line is going to end
