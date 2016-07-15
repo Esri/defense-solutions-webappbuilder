@@ -44,7 +44,7 @@ define([
     '../views/CoordinateInput',
     '../views/EditOutputCoordinate',
     '../util',
-      '../models/RangRingFeedback',
+    '../models/RangeRingFeedback',
     'dijit/form/NumberTextBox'
 ], function (
     dojoDeclare,
@@ -137,6 +137,10 @@ define([
 
             this.dt.watch('startPoint', dojoLang.hitch(this, function (r, ov, nv) {
                 this.coordTool.inputCoordinate.set('coordinateEsriGeometry', nv);
+            }));
+
+            this.coordTool.inputCoordinate.watch('outputString', dojoLang.hitch(this, function (r, ov, nv) {
+                this.coordTool.set('value', nv);
             }));
 
             this.own(this.coordTool.on(
@@ -273,7 +277,7 @@ define([
             // validate input
             if (evt.keyCode === dojoKeys.ENTER && this.getInputsValid()) {
                 var params = {
-                    centerPoint: this.get('startPoint'),
+                    centerPoint: this.dt.get('startPoint'),
                     numRings: this.numRingsInput.get('value'),
                     numRadials: this.numRadialsInput.get('value'),
                     radius: 0,
@@ -406,6 +410,7 @@ define([
             if (this._gl) {
                 // graphic layers
                 this._gl.clear();
+                this.coordTool.clear();
             }
         }
     });
