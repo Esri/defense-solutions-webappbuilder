@@ -36,6 +36,7 @@ define([
   'esri/graphicsUtils',
   'esri/geometry/geometryEngine',
   'esri/symbols/SimpleFillSymbol',
+  'esri/symbols/SimpleMarkerSymbol',
   'esri/graphic',
   'esri/units',
   'esri/geometry/webMercatorUtils',
@@ -67,6 +68,7 @@ define([
   esriGraphicsUtils,
   esriGeometryEngine,
   EsriSimpleFillSymbol,
+  EsriSimpleMarkerSymbol,
   EsriGraphic,
   esriUnits,
   esriWMUtils,
@@ -107,6 +109,8 @@ define([
 
       this._circleSym = new EsriSimpleFillSymbol(this.circleSymbol);
 
+      this._ptSym = new EsriSimpleMarkerSymbol(this.pointSymbol);
+
       this.map.addLayers([this._gl, this._lengthLayer]);
 
       // add extended toolbar
@@ -142,7 +146,8 @@ define([
         'startPoint',
         dojoLang.hitch(this, function (n, ov, nv) {
           if (nv !== null) {
-            this.coordTool.inputCoordinate.set('coordinateEsriGeometry', nv);
+              this.coordTool.inputCoordinate.set('coordinateEsriGeometry', nv);
+              this.dt.addStartGraphic(nv, this._ptSym);
           }
       }));
 
@@ -415,7 +420,9 @@ define([
      *
      */
     feedbackDidComplete: function (results) {
-      this.setGraphic(false);
+        this.setGraphic(false);
+
+        this.dt.removeStartGraphic();
     },
 
     /*
