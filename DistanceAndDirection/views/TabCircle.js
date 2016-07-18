@@ -149,6 +149,9 @@ define([
               this.coordTool.inputCoordinate.set('coordinateEsriGeometry', nv);
               this.dt.addStartGraphic(nv, this._ptSym);
           }
+          else {
+              this.coordTool.inputCoordinate.set('coordinateEsriGeometry', null);
+          }
       }));
 
       this.coordTool.inputCoordinate.watch(
@@ -161,12 +164,14 @@ define([
         )
       );
 
+      dojoOn(
+        this.coordTool,
+        'keyup',
+        dojoLang.hitch(this, this.startInputKeyPressed)
+        ),
+
       dojoTopic.subscribe('DD_CLEAR_GRAPHICS',
         dojoLang.hitch(this, this.clearGraphics)
-      );
-
-      dojoTopic.subscribe(DrawFeedBack.DD_CIRCLE_LENGTH_DID_CHANGE,
-        dojoLang.hitch(this, this.circleLengthDidChange)
       );
 
 
@@ -314,10 +319,30 @@ define([
      * Rate Input key up event handler
      */
     distanceInputKeyWasPressed: function (evt) {
-      if (evt.keyCode === dojoKeys.ENTER) {
-        this.setGraphic();
+      if (evt.keyCode === dojoKeys.ENTER) {          
+          this.removeManualGraphic();
+          
+          dojoTopic.publish('MANUAL_CIRCLE_RADIUS_INPUT_COMPLETE', this.lengthInput.value);
+      }
+      else {
+          if (this.lengthInput.value != '') {
+
+              dojoTopic.publish('MANUAL_CIRCLE_RADIUS_INPUT', this);
+              this.createManualGraphic();
+          }
+          
       }
     },
+
+     /*
+     * 
+     */
+      startInputKeyPressed: function (evt) {
+            if (evt.keyCode === dojoKeys.ENTER) {
+                this.dt.addStartGraphic(this.coordTool.inputCoordinate, this._ptSym);
+            }
+            
+        },
 
     /*
      *
@@ -421,8 +446,6 @@ define([
      */
     feedbackDidComplete: function (results) {
         this.setGraphic(false);
-
-        this.dt.removeStartGraphic();
     },
 
     /*
@@ -437,6 +460,45 @@ define([
     },
 
     /*
+    *
+    */
+    createManualGraphic: function () {
+        if (this.tempGraphic != null) {
+            this._gl.remove(this.tempGraphic);
+        }
+        
+
+        var stPt = this.coordTool.inputCoordinate.coordinateEsriGeometry;
+        
+        var tempCircle = new EsriCircle(stPt, {
+            radius: this.lengthInput.value,
+            geodesic: true
+        });
+
+        this.tempGraphic = new EsriGraphic(
+          tempCircle,
+          this._circleSym
+        );
+
+        this._gl.add(this.tempGraphic);
+
+        //this.map.setExtent(newLine.getExtent().expand(3));
+
+    },
+
+    /*
+    *
+    */
+    removeManualGraphic: function () {
+        if (this.tempGraphic != null) {
+            this._gl.remove(this.tempGraphic);
+        }
+        
+        this.dt.removeStartGraphic();
+    },
+
+
+    /*
      *
      */
     setGraphic: function (isManual) {
@@ -445,8 +507,8 @@ define([
 
       this.map.enableMapNavigation();
 
-
       this.dt.deactivate();
+      this.dt.removeStartGraphic();
 
       dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
 
@@ -465,7 +527,7 @@ define([
       if (this.coordTool.inputCoordinate.isManual && this.creationType.get('value') === 'Diameter') {
         results.calculatedDistance = dojoNumber.parse(this.lengthInput.value*2, {places:2});
       } else {
-        results.calculatedDistance = dojoNumber.parse(this.lengthInput.value, {places:2});
+          results.calculatedDistance = dojoNumber.parse(this.lengthInput.value, { places: "0,99" });
       }
 
       results.calculatedDistance = this.utils.convertToMeters(
@@ -495,7 +557,7 @@ define([
       }
 
       this.emit('graphic_created', this.currentCircle);
-      this.clearUI(true);
+      this.clearUI(false);
     },
 
     /*
@@ -516,12 +578,13 @@ define([
      * reset ui controls
      */
     clearUI: function (keepCoords) {
-      this.dt.set('startPoint', null);
-      this.useCalculatedDistance = false;
-      this.currentCircle = null;
+      
       if (!keepCoords){
         this.coordTool.clear();
       }
+      this.dt.set('startPoint', null);
+      this.useCalculatedDistance = false;
+      this.currentCircle = null;
 
       dojoDomClass.remove(this.addPointBtn, 'jimu-state-active');
       dojoDomAttr.set(this.startPointCoords, 'value', '');

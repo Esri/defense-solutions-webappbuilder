@@ -50,7 +50,8 @@ define([
 
     coordinateEsriGeometry: null,
     _coordinateEsriGeometrySetter: function (value) {
-      var pt;
+        var pt;
+        if (value == null) return;
       if (value.spatialReference.wkid !== 4326) {
         pt = EsriWMUtils.webMercatorToGeographic(value);
       } else {
