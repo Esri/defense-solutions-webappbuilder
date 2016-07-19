@@ -55,6 +55,8 @@ define([
 
       this._utils = new Utils();
 
+      this.syncEvents();
+
     },
 
     /*
@@ -62,6 +64,55 @@ define([
      */
     clearGraphics: function (evt) {
       this.map.graphics.clear();
+    },
+
+    /*
+    * Start up event listeners
+    */
+    syncEvents: function () {
+
+        dojoTopic.subscribe('MANUAL_CIRCLE_RADIUS_INPUT',
+           dojoLang.hitch(this, this.manualRadiusUpdate)
+        );
+
+        dojoTopic.subscribe('MANUAL_CIRCLE_RADIUS_INPUT_COMPLETE',
+           dojoLang.hitch(this, this.manualRadiusUpdateComplete)
+        );
+    },
+
+    /*
+    * Remove circle graphic since the radius is being manually entered
+    */
+    manualRadiusUpdate: function () {
+        if (this.circleGraphic) {
+            this.map.graphics.remove(this.circleGraphic);
+        }
+    },
+
+    /*
+    * Draw graphic
+    */
+    manualRadiusUpdateComplete: function (radius) {
+        
+        var stPt = this.get('startPoint');
+        var circleGeometry = new EsriCircle(stPt, {
+            radius: radius,
+            geodesic: true
+        });
+
+        this.tempGraphic = new EsriGraphic(
+          circleGeometry,
+          this._circleSym
+        );
+
+        this.circleGraphic = new EsriGraphic(circleGeometry, this.fillSymbol);
+        this.map.graphics.add(this.circleGraphic);
+
+        dojoConnect.disconnect(this._onMouseMoveHandlerConnect);
+        //this.cleanup();
+        this._clear();
+        this._setTooltipMessage(0);
+        this._drawEnd(this.circleGraphic.geometry);
     },
 
     /*
