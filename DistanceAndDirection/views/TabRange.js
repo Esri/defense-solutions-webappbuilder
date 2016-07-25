@@ -198,7 +198,7 @@ define([
                     }
                 ))
             );
-            
+
             this.own(
                 dojoOn(this.coordinateFormat.content.cancelButton, 'click',
                   dojoLang.hitch(this, function () {
@@ -260,7 +260,7 @@ define([
                 this.dt.activate('polyline');
             } else {
                 this.dt.activate('point');
-            }            
+            }
             dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
         },
 
@@ -292,6 +292,7 @@ define([
                     circleSym: this._circleSym
                 };
                 this.createRangeRings(params);
+                this.coordTool.clear();
             }
         },
 
@@ -355,16 +356,23 @@ define([
               params.pLine, 9001
             );
 
+            //Create the cut geometry
+            params.cutGeom = new EsriPolyline(params.centerPoint.spatialReference);
+            params.cutGeom.paths = params.lastCircle.rings;
+
+            //Clone the geodesic radial
+            params.lineCopy = dojoLang.clone(params.geoPLine);
+
             for (params.radials = 0; params.radials < params.numRadials; params.radials++) {
-                params.lineCopy = dojoLang.clone(params.geoPLine);
                 params.rotatedRadial = EsriGeometryEngine.rotate(
                   params.lineCopy, params.azimuth, params.centerPoint);
-                this._gl.add(new EsriGraphic(params.rotatedRadial, this._lineSym));
+                //Cut the radial to the last range ring
+                params.cutRadial = EsriGeometryEngine.cut(params.rotatedRadial, params.cutGeom);
+                this._gl.add(new EsriGraphic(params.cutRadial.length === 1 ?
+                    params.cutRadial[0] : params.cutRadial[1], this._lineSym));
                 params.azimuth += params.interval;
             }
-
             this.map.setExtent(params.lastCircle.getExtent().expand(3));
-
         },
 
         /*
@@ -373,6 +381,7 @@ define([
         feedbackDidComplete: function (results) {
             var centerPoint = null;
             if (results.geometry.hasOwnProperty('circlePoints')) {
+
                 centerPoint = results.geometry.circlePoints[0];
                 var params = {
                     centerPoint: centerPoint,
@@ -393,12 +402,14 @@ define([
                     });
                     params.circles.push(circle);
                 }
+
                 this.createRangeRings(params);
             } else {
                 centerPoint = results.geometry;
             }
 
             dojoDomClass.remove(this.addPointBtn, 'jimu-state-active');
+            this.coordTool.clear();
             this.dt.deactivate();
             this.map.enableMapNavigation();
         },
