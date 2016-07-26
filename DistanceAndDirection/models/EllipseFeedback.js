@@ -72,6 +72,11 @@ define([
                 'manual-ellipse-orientation-angle-input',
                 dojoLang.hitch(this, this.onOrientationAngleManulInputHandler)
             );
+
+            dojoTopic.subscribe(
+                'manual-ellipse-center-point-input',
+                dojoLang.hitch(this, this.onCenterPointManualInputHandler)
+            );
         },
 
         /*
@@ -149,6 +154,14 @@ define([
             if (this._points.length >= 3) {
                 this._onDoubleClickHandler();
             }
+        },
+
+        /*
+        Handler for the manual input of a center point
+        */
+        onCenterPointManualInputHandler: function (centerPoint) {
+            this._points = [];
+            this._points.push(centerPoint.offset(0, 0));
         },
 
         /*
@@ -368,7 +381,8 @@ define([
             elipseGeom = dojoLang.mixin(elipseGeom, {
                 majorAxisLength: majorAxisLength,
                 minorAxisLength: minorAxisLength,
-                angle: angleDegrees.toFixed(2),
+                angle: this.orientationAngle !== null ?
+                    this.orientationAngle.toFixed(2) : angleDegrees.toFixed(2),
                 drawType: 'ellipse',
                 center: this._points[0]
             });

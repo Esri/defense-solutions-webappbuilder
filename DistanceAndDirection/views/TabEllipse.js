@@ -208,6 +208,13 @@ define([
                 ))
             );
 
+
+            dojoOn(
+              this.coordTool,
+              'keyup',
+              dojoLang.hitch(this, this.coordToolKeyWasPressed)
+            )
+
             dojoOn(this.majorAxisInput, 'keyup',
               dojoLang.hitch(this, this.onMajorAxisInputKeyupHandler)
             )
@@ -257,6 +264,19 @@ define([
               'value',
               fl
             );
+        },
+
+        /*
+         * catch key press in start point
+         */
+        coordToolKeyWasPressed: function (evt) {
+
+            if (evt.keyCode === dojoKeys.ENTER) {
+                this.coordTool.inputCoordinate.getInputType().then(dojoLang.hitch(this, function (r) {
+                    dojoTopic.publish('manual-ellipse-center-point-input', this.coordTool.inputCoordinate.coordinateEsriGeometry);
+                    this.createCenterPointGraphic();
+                }));
+            }
         },
 
         /*
@@ -355,6 +375,7 @@ define([
             if (this._gl) {
                 this._gl.clear();
                 this._lengthLayer.clear();
+                this.coordTool.clear();
                 dojoDomAttr.set(this.startPointCoords, 'value', '');
                 dojoDomAttr.set(this.majorAxisInput, 'value', '');
                 dojoDomAttr.set(this.minorAxisInput, 'value', '');
