@@ -115,6 +115,7 @@ define([
             this.dt = new DrawFeedBack(this.map);
             this.dt.setLineSymbol(this._ellipseSym);
             this.dt.set('lengthLayer', this._lengthLayer);
+            this.dt.set('lengthUnit', 'feet');
 
             this.syncEvents();
         },
@@ -250,7 +251,7 @@ define([
             dojoDomAttr.set(
               this.majorAxisInput,
               'value',
-              fl
+              fl //this._getFormattedLength(l)
             );
         },
 
@@ -262,7 +263,7 @@ define([
             dojoDomAttr.set(
               this.minorAxisInput,
               'value',
-              fl
+              fl //this._getFormattedLength(l)
             );
         },
 
