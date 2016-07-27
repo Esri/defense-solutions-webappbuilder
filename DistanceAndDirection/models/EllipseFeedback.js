@@ -89,9 +89,14 @@ define([
             var map = this.map;
             //Check if we have a center point
             var centerPoint = this._points[0];
+            if (centerPoint.spatialReference.wkid === 4326) {
+                centerPoint = EsriWebMercatorUtils.geographicToWebMercator(centerPoint);
+            }
             if (this._points.length >= 1) {
+                //Convert to meters
+                var lengthInMeters = this._utils.convertToMeters(Number(majorLength), this.lengthUnit);
                 //We do have a center point. Get the end point
-                var endPoint = this.getEndPoint(centerPoint, 1, Number(majorLength));
+                var endPoint = this.getEndPoint(centerPoint, 1, lengthInMeters);
                 //Add major length point to array
                 this._points.splice(1, 0, endPoint);
                 //Clear major length graphic first
@@ -122,9 +127,14 @@ define([
             var map = this.map;
             //Check if we have a center point
             var centerPoint = this._points[0];
+            if (centerPoint.spatialReference.wkid === 4326) {
+                centerPoint = EsriWebMercatorUtils.geographicToWebMercator(centerPoint);
+            }
             if (this._points.length >= 2) {
+                //Convert to meters
+                var lengthInMeters = this._utils.convertToMeters(Number(minorLength), this.lengthUnit);
                 //We do have a center point. Get the end point
-                var endPoint = this.getEndPoint(centerPoint, 90, Number(minorLength));
+                var endPoint = this.getEndPoint(centerPoint, 90, lengthInMeters);
                 //Add major length point to array
                 this._points.splice(2, 0, endPoint);
                 //Clear major length graphic first
@@ -162,6 +172,7 @@ define([
         onCenterPointManualInputHandler: function (centerPoint) {
             this._points = [];
             this._points.push(centerPoint.offset(0, 0));
+            this.set('startPoint', this._points[0]);
         },
 
         /*
@@ -283,6 +294,43 @@ define([
         },
 
         /*
+        Gets length of line based on two points
+        */
+        getLineLength: function (x, y, x0, y0) {
+            return Math.sqrt((x -= x0) * x + (y -= y0) * y);
+        },
+
+        /*
+        Gets angle based on two points
+        */
+        getAngle: function (pointA, pointB) {
+            var deltaX = pointB.y - pointA.y;
+            var deltaY = pointB.x - pointA.x;
+            var azi = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+            return ((azi + 360) % 360);
+        },
+
+        /*
+        Convert normal angle to esri angle so geometryEngine
+        can rotate accordingly
+        */
+        convertAngle: function (angle) {
+            if (0 <= angle && angle < 90) {
+                return 90 - angle;
+            }
+            if (90 <= angle && angle < 180) {
+                return (180 - angle) + 270;
+            }
+            if (180 <= angle && angle < 270) {
+                return (angle - 180) + 270;
+            }
+            if (270 <= angle && angle < 360) {
+                return 180 - (angle - 270);
+            }
+            return angle;
+        },
+
+        /*
          *
          */
         _onDoubleClickHandler: function (evt) {
@@ -327,40 +375,15 @@ define([
 
             var majorAxisLength = esriGeometryEngine.geodesicLength(this._majGraphic.geometry, 9001);
             var minorAxisLength = esriGeometryEngine.geodesicLength(this._minGraphic.geometry, 9001);
-            var lineLength = function (x, y, x0, y0) {
-                return Math.sqrt((x -= x0) * x + (y -= y0) * y);
-            };
-            var computeAngle = function (pointA, pointB) {
-                var deltaX = pointB.y - pointA.y;
-                var deltaY = pointB.x - pointA.x;
-                var azi = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
-                return ((azi + 360) % 360);
-            };
-
-            var convertAngle = function (angle) {
-                if (0 <= angle && angle < 90) {
-                    return 90 - angle;
-                }
-                if (90 <= angle && angle < 180) {
-                    return (180 - angle) + 270;
-                }
-                if (180 <= angle && angle < 270) {
-                    return (angle - 180) + 270;
-                }
-                if (270 <= angle && angle < 360) {
-                    return 180 - (angle - 270);
-                }
-                return angle;
-            };
 
             var centerScreen = this.map.toScreen(this._points[0]);
             var majorScreen = this.map.toScreen(this._points[1]);
             var minorScreen = this.map.toScreen(this._points[2]);
 
-            var majorRadius = lineLength(centerScreen.x, centerScreen.y, majorScreen.x, majorScreen.y);
-            var minorRadius = lineLength(centerScreen.x, centerScreen.y, minorScreen.x, minorScreen.y);
+            var majorRadius = this.getLineLength(centerScreen.x, centerScreen.y, majorScreen.x, majorScreen.y);
+            var minorRadius = this.getLineLength(centerScreen.x, centerScreen.y, minorScreen.x, minorScreen.y);
 
-            var angleDegrees = computeAngle(
+            var angleDegrees = this.getAngle(
               EsriWebMercatorUtils.webMercatorToGeographic(this._points[0]),
               EsriWebMercatorUtils.webMercatorToGeographic(this._points[1])
             );
@@ -376,7 +399,7 @@ define([
             var ellipse = EsriPolygon.createEllipse(ellipseParams);
             elipseGeom.geometry = esriGeometryEngine.rotate(ellipse,
                 this.orientationAngle !== null ?
-                this.orientationAngle : convertAngle(angleDegrees));
+                this.orientationAngle : this.convertAngle(angleDegrees));
 
             elipseGeom = dojoLang.mixin(elipseGeom, {
                 majorAxisLength: majorAxisLength,
