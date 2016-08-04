@@ -92,6 +92,18 @@ define([
                         type: 'esriSLS',
                         style: 'esriSLSSolid'
                     }
+                },
+                pointSymbol: this.config.feedback.pointSymbol || {
+                    'color': [255, 255, 255, 64],
+                    'size': 12,
+                    'type': 'esriSMS',
+                    'style': 'esriSMSCircle',
+                    'outline': {
+                        'color': [0, 0, 0, 255],
+                        'width': 1,
+                        'type': 'esriSLS',
+                        'style': 'esriSLSSolid'
+                    }
                 }
             },
               this.circleTabNode
