@@ -368,7 +368,7 @@ define([
       else {
           if (this.lengthInput.value !== '') {
               dojoTopic.publish('MANUAL_CIRCLE_RADIUS_INPUT', this);
-              this.setGraphic(true);
+              this.createManualGraphic();
           }
 
       }
