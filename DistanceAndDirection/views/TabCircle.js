@@ -362,12 +362,13 @@ define([
     distanceInputKeyWasPressed: function (evt) {
       if (evt.keyCode === dojoKeys.ENTER) {
           this.removeManualGraphic();
-          dojoTopic.publish('MANUAL_CIRCLE_RADIUS_INPUT_COMPLETE', this.lengthInput.value);
+          this.setGraphic(true);
+          //dojoTopic.publish('MANUAL_CIRCLE_RADIUS_INPUT_COMPLETE', this.lengthInput.value);
       }
       else {
           if (this.lengthInput.value !== '') {
               dojoTopic.publish('MANUAL_CIRCLE_RADIUS_INPUT', this);
-              this.createManualGraphic();
+              this.setGraphic(true);
           }
 
       }
@@ -508,8 +509,13 @@ define([
 
         var stPt = this.coordTool.inputCoordinate.coordinateEsriGeometry;
 
+        var distInMeters = this.utils.convertToMeters(
+          this.lengthInput.value,
+          this.lengthUnitDD.get('value')
+        );
+
         var tempCircle = new EsriCircle(stPt, {
-            radius: this.lengthInput.value,
+            radius: distInMeters,
             geodesic: true
         });
 
@@ -521,10 +527,9 @@ define([
           }
         );
 
-        this._gl._add(this.tempGraphic);
+        this._gl.add(this.tempGraphic);
 
-        //this.map.setExtent(newLine.getExtent().expand(3));
-
+        this._gl.refresh();
     },
 
     /*
