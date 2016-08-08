@@ -51,8 +51,30 @@
                         <div class="distance-and-direction-setting-line-size" data-dojo-attach-point="rangeRingSize" data-dojo-type="dijit/form/NumberSpinner"
                              data-dojo-props="intermediateChanges:true, smallDelta:1, constraints:{min:1,max:10,places:0}, value:2"></div>
                     </td>
+
                 </tr>
                 </tbody>
+            </table>
+            <table>
+              <thead>
+                  <tr>
+                      <th>Feedback Label</th>
+                      <th>Text Color</th>
+                      <th>Text Size</th>
+                  </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Labels</td>
+                  <td>
+                      <div data-dojo-attach-point="labelColorPicker" class="distance-and-direction-setting-color-picker" data-dojo-type="jimu/dijit/ColorPicker"></div>
+                  </td>
+                  <td>
+                      <div class="distance-and-direction-setting-line-size" data-dojo-attach-point="labelSize" data-dojo-type="dijit/form/NumberSpinner"
+                           data-dojo-props="intermediateChanges:true, smallDelta:1, constraints:{min:1,max:72,places:0}, value:12"></div>
+                  </td>
+                </tr>
+              </tbody>
             </table>
         </div>
     </div>

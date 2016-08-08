@@ -109,13 +109,13 @@ define([
 
       this.currentLengthUnit = this.lengthUnitDD.get('value');
 
-      this.getLayer();
-
       this._circleSym = new EsriSimpleFillSymbol(this.circleSymbol);
 
       this._ptSym = new EsriSimpleMarkerSymbol(this.pointSymbol);
 
-      this.map.addLayer(this._gl);
+      this._labelSym = new EsriTextSymbol(this.labelSymbol);
+
+      this.map.addLayer(this.getLayer());
 
       // add extended toolbar
       this.dt = new DrawFeedBack(this.map);
@@ -146,13 +146,9 @@ define([
             }]
           };
 
-          //get these from config
-          var lbl = new EsriTextSymbol().setColor('#FFFFFF');
-          lbl.font.setSize('12pt');
-          lbl.font.setFamily('arial');
           var lblexp = {'labelExpressionInfo': {'value': 'Radius: {RADIUS}'}};
           var lblClass = new EsriLabelClass(lblexp);
-          lblClass.symbol = lbl;
+          lblClass.symbol = this._labelSym;
 
           var featureCollection = {
             layerDefinition: layerDefinition,
@@ -165,6 +161,7 @@ define([
 
           this._gl.setLabelingInfo([lblClass]);
 
+          return this._gl;
       }
     },
 

@@ -50,6 +50,22 @@
         "type": "esriSLS",
         "style": "esriSLSSolid"
       }
+    },
+    "labelSymbol" : {
+        "type" : "esriTS",
+        "color" : [51, 51, 255, 255],
+        "verticalAlignment" : "middle",
+        "horizontalAlignment" : "center",
+        "xoffset" : 0,
+        "yoffset" : 0,
+        "kerning" : true,
+        "font" : {
+          "family" : "arial",
+          "size" : 23,
+          "style" : "normal",
+          "weight" : "normal",
+          "decoration" : "none"
+        }
     }
   }
 }
