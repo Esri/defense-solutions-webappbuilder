@@ -78,7 +78,7 @@ define([
                 coordinates: [[fromInput.x, fromInput.y]],
                 conversionType: tt,
                 numOfDigits: nd,
-                rounding: false,
+                rounding: true,
                 addSpaces: false
             };
 
@@ -122,6 +122,7 @@ define([
             var params = {
                 sr: 4326,
                 conversionType: tt,
+
                 strings: []
             };
 
@@ -129,6 +130,7 @@ define([
             case 'DD':
             case 'DDM':
             case 'DMS':
+                params.numOfDigits = 1;
                 a = fromStr.replace(/['°"]/g, '');
                 params.strings.push(a);
                 break;
@@ -243,20 +245,21 @@ define([
          *
          **/
         getFormattedDDMStr: function (fromValue, withFormatStr, addSignPrefix) {
+
             var r = {};
             r.sourceValue = fromValue;
             r.sourceFormatString = withFormatStr;
 
-            var parts = fromValue[0].split(/[ ,]+/);
+            r.parts = fromValue[0].split(/[ ,]+/);
 
-            var latdeg = parts[0];
-            r.latdegvalue = latdeg;
+            r.latdeg = r.parts[0];
+            r.latdegvalue = this.stripDecimalPlaces(parseFloat(r.latdeg, 1), 1);
 
-            var latmin = parts[1].replace(/[nNsS]/, '');
-            r.yvalue = latmin;
+            r.latmin = r.parts[1].replace(/[nNsS]/, '');
+            r.yvalue = this.stripDecimalPlaces(parseFloat(r.latmin,1), 1);
 
-            var latdegdir = parts[1].slice(-1);
-            r.ydir = latdegdir;
+            r.latdegdir = r.parts[1].slice(-1);
+            r.ydir = r.latdegdir;
             if (addSignPrefix) {
                 if (r.ydir === 'N') {
                     r.yvalue = '+' + r.yvalue;
@@ -265,19 +268,19 @@ define([
                 }
             }
 
-            var londeg = parts[2];
-            r.londegvalue = londeg;
+            r.londeg = r.parts[2];
+            r.londegvalue =  this.stripDecimalPlaces(parseFloat(r.londeg, 1), 1);
 
-            var lonmin = parts[3].replace(/[eEwW]/, '');
-            r.xvalue = lonmin;
+            r.lonmin = r.parts[3].replace(/[eEwW]/, '');
+            r.xvalue =  this.stripDecimalPlaces(parseFloat(r.lonmin, 1), 1);
 
-            var londegdir = parts[3].slice(-1);
-            r.xdir = londegdir;
+            r.londegdir = r.parts[3].slice(-1);
+            r.xdir = r.londegdir;
             if (addSignPrefix) {
                 if (r.xdir === 'W') {
-                    r.xvalue = '-' + lonmin;
+                    r.xvalue = '-' + r.lonmin;
                 } else {
-                    r.xvalue = '+' + lonmin;
+                    r.xvalue = '+' + r.lonmin;
                 }
             }
 
@@ -304,16 +307,16 @@ define([
 
             var parts = fromValue[0].split(/[ ,]+/);
 
-            r.latdeg = parts[0];
-            r.latmin = parts[1];
-            r.latsec = parts[2].replace(/[NnSs]/, '');
+            r.latdeg =  this.stripDecimalPlaces(parseFloat(parts[0]).toFixed(1), 1);
+            r.latmin =  this.stripDecimalPlaces(parseFloat(parts[1]).toFixed(1), 1);
+            r.latsec =  this.stripDecimalPlaces(parseFloat(parts[2].replace(/[NnSs]/, '')).toFixed(1), 1);
 
             var latdegdir = parts[2].slice(-1);
             r.ydir = latdegdir;
 
-            r.londeg = parts[3];
-            r.lonmin = parts[4];
-            r.lonsec = parts[5].replace(/[EWew]/, '');
+            r.londeg = this.stripDecimalPlaces(parseFloat(parts[3]).toFixed(1), 1);
+            r.lonmin = this.stripDecimalPlaces(parseFloat(parts[4]).toFixed(1), 1);
+            r.lonsec = this.stripDecimalPlaces(parseFloat(parts[5].replace(/[EWew]/, '')).toFixed(1), 1);
 
             var londegdir = parts[5].slice(-1);
             r.xdir = londegdir;
@@ -331,6 +334,22 @@ define([
             r.formatResult = s;
             return r;
 
+        },
+
+        /*
+         *
+         */
+        stripDecimalPlaces: function (num, dplaces) {
+          var v = '';
+          var tString = num.toString();
+          var tStrings = tString.split('.');
+          if (tStrings.length === 2) {
+            if (tStrings[1] === '0') {
+              v += tStrings[0];
+              return v;
+            }
+          }
+          return tString;
         },
 
         /**
