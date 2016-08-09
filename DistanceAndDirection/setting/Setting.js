@@ -22,6 +22,8 @@ define([
   'dijit/_WidgetsInTemplateMixin',
   'dojo/_base/Color',
   'dojo/dom-geometry',
+  'jimu/dijit/SymbolPicker',
+  'esri/symbols/TextSymbol',
   'dijit/form/HorizontalSlider',
   'dijit/ColorPalette',
   'dijit/form/NumberSpinner',
@@ -34,27 +36,33 @@ define([
     array,
     _WidgetsInTemplateMixin,
     Color,
-    domGeometry
+    domGeometry,
+    JimuSymbolPicker,
+    EsriTextSymbol
     ) {
 
     return declare([BaseWidgetSetting, _WidgetsInTemplateMixin], {
-      baseClass: 'distance-and-direction-setting',      
+      baseClass: 'distance-and-direction-setting',
 
       postCreate: function(){
         this.setConfig(this.config);
 
         this.lineColorPicker.onChange = lang.hitch(this, function(val) {
-          this.setColorText(this.lineColorPicker.domNode, val); 
+          this.setColorText(this.lineColorPicker.domNode, val);
         });
         this.circleColorPicker.onChange = lang.hitch(this, function(val) {
-          this.setColorText(this.circleColorPicker.domNode, val); 
+          this.setColorText(this.circleColorPicker.domNode, val);
         });
         this.ellipseColorPicker.onChange = lang.hitch(this, function(val) {
-          this.setColorText(this.ellipseColorPicker.domNode, val); 
+          this.setColorText(this.ellipseColorPicker.domNode, val);
         });
         this.rangeRingColorPicker.onChange = lang.hitch(this, function(val) {
-          this.setColorText(this.rangeRingColorPicker.domNode, val); 
+          this.setColorText(this.rangeRingColorPicker.domNode, val);
         });
+      },
+
+      setTextSymbol: function () {
+        console.log('Set Text Symbol');
       },
 
       setConfig: function(config){
@@ -77,58 +85,81 @@ define([
             colorPicker: this.rangeRingColorPicker,
             numberCtrl: this.rangeRingSize,
             color: config.feedback.rangeRingSymbol.outline.color,
-            width: config.feedback.rangeRingSymbol.outline.width            
+            width: config.feedback.rangeRingSymbol.outline.width
+          }, {
+            colorPicker: this.labelColorPicker,
+            numberCtrl: this.labelSize,
+            color: config.feedback.labelSymbol.color,
+            width: config.feedback.labelSymbol.font.size
           }
-        ];        
+        ];
         array.forEach(controls, lang.hitch(this, function (control) {
           this.setColorPickerAttr(control.colorPicker, control.color);
           this.setNumberAttr(control.numberCtrl, control.width);
         }));
+
+
       },
 
       getConfig: function(){
 
         this.config.feedback = {
           lineSymbol: {
-            type: "esriSLS",
-            style: "esriSLSSolid",
-            color: this.lineColorPicker.get("color"), 
-            width: this.lineSize.get("value"),            
+            type: 'esriSLS',
+            style: 'esriSLSSolid',
+            color: this.lineColorPicker.get('color'),
+            width: this.lineSize.get('value')
           },
           circleSymbol: {
-            type: "esriSFS",
-            style: "esriSFSNull",
+            type: 'esriSFS',
+            style: 'esriSFSNull',
             color: [255,0,0,0],
             outline: {
-              color: this.circleColorPicker.get("color"), 
-              width: this.circleSize.get("value"),
-              type: "esriSLS",
-              style: "esriSLSSolid"
+              color: this.circleColorPicker.get('color'),
+              width: this.circleSize.get('value'),
+              type: 'esriSLS',
+              style: 'esriSLSSolid'
             }
           },
           ellipseSymbol: {
-            type: "esriSFS",
-            style: "esriSFSNull",
+            type: 'esriSFS',
+            style: 'esriSFSNull',
             color: [255,0,0,0],
             outline: {
-              color: this.ellipseColorPicker.get("color"), 
-              width: this.ellipseSize.get("value"),
-              type: "esriSLS",
-              style: "esriSLSSolid"
+              color: this.ellipseColorPicker.get('color'),
+              width: this.ellipseSize.get('value'),
+              type: 'esriSLS',
+              style: 'esriSLSSolid'
             }
           },
           rangeRingSymbol: {
-            type: "esriSFS",
-            style: "esriSFSNull",
+            type: 'esriSFS',
+            style: 'esriSFSNull',
             color: [255,0,0,0],
             outline: {
-              color: this.rangeRingColorPicker.get("color"), 
-              width: this.rangeRingSize.get("value"),
-              type: "esriSLS",
-              style: "esriSLSSolid"
+              color: this.rangeRingColorPicker.get('color'),
+              width: this.rangeRingSize.get('value'),
+              type: 'esriSLS',
+              style: 'esriSLSSolid'
+            }
+          },
+          labelSymbol: {
+            'type' : 'esriTS',
+            'color' : this.labelColorPicker.get('color'),
+            'verticalAlignment' : 'middle',
+            'horizontalAlignment' : 'center',
+            'xoffset' : 0,
+            'yoffset' : 0,
+            'kerning' : true,
+            'font' : {
+              'family' : 'arial',
+              'size' : this.labelSize.get('value'),
+              'style' : 'normal',
+              'weight' : 'normal',
+              'decoration' : 'none'
             }
           }
-        };      
+        };
 
         return this.config;
       },
@@ -139,7 +170,7 @@ define([
       },
 
       setNumberAttr: function(ctrl, val) {
-        ctrl.set("value", val);
+        ctrl.set('value', val);
       },
 
       setColorText: function(domNode, color) {
@@ -147,10 +178,18 @@ define([
           color = new Color(color);
         }
         var text = color.toHex();
-        var textColor = (0.2126*color.r + 0.7152*color.g + 0.0722*color.b) > 128 ? new Color([0,0,0]) : new Color([255,255,255]);
-        var height = domGeometry.position(domNode).h === 0 ? "36px" :  domGeometry.position(domNode).h + 'px';
-        var style = 'width:100%;text-align:center;vertical-align:middle;line-height:' + height + ';color:' + textColor + ';';
-        domNode.innerHTML = "<div style='" + style + "'>" + text +"</div>";
-      }     
+
+        var textColor = (0.2126*color.r + 0.7152*color.g + 0.0722*color.b) > 128 ?
+          new Color([0,0,0]) :
+          new Color([255,255,255]);
+
+        var height = domGeometry.position(domNode).h === 0 ?
+          '36px' :
+          domGeometry.position(domNode).h + 'px';
+
+        var style = 'width:100%;text-align:center;vertical-align:middle;line-height:' +
+          height + ';color:' + textColor + ';';
+        domNode.innerHTML = '<div style=' + style + '>' + text +'</div>';
+      }
     });
   });

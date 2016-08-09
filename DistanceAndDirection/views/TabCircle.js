@@ -32,15 +32,18 @@ define([
   'dijit/TitlePane',
   'dijit/TooltipDialog',
   'dijit/popup',
-  'esri/layers/GraphicsLayer',
+  'esri/layers/FeatureLayer',
   'esri/graphicsUtils',
   'esri/geometry/geometryEngine',
   'esri/symbols/SimpleFillSymbol',
   'esri/symbols/SimpleMarkerSymbol',
+  'esri/symbols/TextSymbol',
   'esri/graphic',
   'esri/units',
   'esri/geometry/webMercatorUtils',
   'esri/geometry/Circle',
+  'esri/tasks/FeatureSet',
+  'esri/layers/LabelClass',
   '../models/CircleFeedback',
   '../models/ShapeModel',
   '../views/CoordinateInput',
@@ -64,15 +67,18 @@ define([
   dijitTitlePane,
   DijitTooltipDialog,
   DijitPopup,
-  EsriGraphicsLayer,
+  EsriFeatureLayer,
   esriGraphicsUtils,
   esriGeometryEngine,
   EsriSimpleFillSymbol,
   EsriSimpleMarkerSymbol,
+  EsriTextSymbol,
   EsriGraphic,
   esriUnits,
   esriWMUtils,
   EsriCircle,
+  EsriFeatureSet,
+  EsriLabelClass,
   DrawFeedBack,
   ShapeModel,
   CoordInput,
@@ -103,15 +109,13 @@ define([
 
       this.currentLengthUnit = this.lengthUnitDD.get('value');
 
-      this._lengthLayer = new EsriGraphicsLayer();
-
-      this._gl = new EsriGraphicsLayer();
-
       this._circleSym = new EsriSimpleFillSymbol(this.circleSymbol);
 
       this._ptSym = new EsriSimpleMarkerSymbol(this.pointSymbol);
 
-      this.map.addLayers([this._gl, this._lengthLayer]);
+      this._labelSym = new EsriTextSymbol(this.labelSymbol);
+
+      this.map.addLayer(this.getLayer());
 
       // add extended toolbar
       this.dt = new DrawFeedBack(this.map);
@@ -126,6 +130,39 @@ define([
       });
 
       this.syncEvents();
+    },
+
+    /*
+     * upgrade graphicslayer so we can use the label params
+     */
+    getLayer: function () {
+      if (!this._gl) {
+        var layerDefinition = {
+          'geometryType': 'esriGeometryPolygon',
+          'fields': [{
+              'name': 'RADIUS',
+              'type': 'esriFieldTypeDouble',
+              'alias': 'Radius'
+            }]
+          };
+
+          var lblexp = {'labelExpressionInfo': {'value': 'Radius: {RADIUS}'}};
+          var lblClass = new EsriLabelClass(lblexp);
+          lblClass.symbol = this._labelSym;
+
+          var featureCollection = {
+            layerDefinition: layerDefinition,
+            featureSet: new EsriFeatureSet()
+          };
+
+          this._gl = new EsriFeatureLayer(featureCollection, {
+            showLabels: true
+          });
+
+          this._gl.setLabelingInfo([lblClass]);
+
+          return this._gl;
+      }
     },
 
     /*
@@ -269,6 +306,7 @@ define([
       //this.coordTool.set('validateOnInput', true);
       this.coordTool.inputCoordinate.getInputType().then(dojoLang.hitch(this, function (r){
        this.setCoordLabel(r.inputType);
+       this.dt.addStartGraphic(r.coordinateEsriGeometry, this._ptSym);
      }));
     },
 
@@ -319,29 +357,28 @@ define([
      * Rate Input key up event handler
      */
     distanceInputKeyWasPressed: function (evt) {
-      if (evt.keyCode === dojoKeys.ENTER) {          
+      if (evt.keyCode === dojoKeys.ENTER) {
           this.removeManualGraphic();
-          
-          dojoTopic.publish('MANUAL_CIRCLE_RADIUS_INPUT_COMPLETE', this.lengthInput.value);
+          this.setGraphic(true);
+          //dojoTopic.publish('MANUAL_CIRCLE_RADIUS_INPUT_COMPLETE', this.lengthInput.value);
       }
       else {
-          if (this.lengthInput.value != '') {
-
+          if (this.lengthInput.value !== '') {
               dojoTopic.publish('MANUAL_CIRCLE_RADIUS_INPUT', this);
               this.createManualGraphic();
           }
-          
+
       }
     },
 
      /*
-     * 
+     *
      */
       startInputKeyPressed: function (evt) {
             if (evt.keyCode === dojoKeys.ENTER) {
                 this.dt.addStartGraphic(this.coordTool.inputCoordinate, this._ptSym);
             }
-            
+
         },
 
     /*
@@ -466,24 +503,30 @@ define([
         if (this.tempGraphic != null) {
             this._gl.remove(this.tempGraphic);
         }
-        
 
         var stPt = this.coordTool.inputCoordinate.coordinateEsriGeometry;
-        
+
+        var distInMeters = this.utils.convertToMeters(
+          this.lengthInput.value,
+          this.lengthUnitDD.get('value')
+        );
+
         var tempCircle = new EsriCircle(stPt, {
-            radius: this.lengthInput.value,
+            radius: distInMeters,
             geodesic: true
         });
 
         this.tempGraphic = new EsriGraphic(
           tempCircle,
-          this._circleSym
+          this._circleSym,
+          {
+            'RADIUS': this.lengthInput.value
+          }
         );
 
         this._gl.add(this.tempGraphic);
 
-        //this.map.setExtent(newLine.getExtent().expand(3));
-
+        this._gl.refresh();
     },
 
     /*
@@ -493,7 +536,7 @@ define([
         if (this.tempGraphic != null) {
             this._gl.remove(this.tempGraphic);
         }
-        
+
         this.dt.removeStartGraphic();
     },
 
@@ -525,9 +568,17 @@ define([
       if (!this.lengthInput.value || this.lengthInput.value <= 0) {return;}
 
       if (this.coordTool.inputCoordinate.isManual && this.creationType.get('value') === 'Diameter') {
-        results.calculatedDistance = dojoNumber.parse(this.lengthInput.value*2, {places:2});
+        results.calculatedDistance = dojoNumber.parse(
+          this.lengthInput.value*2, {
+            places:2
+          }
+        );
       } else {
-          results.calculatedDistance = dojoNumber.parse(this.lengthInput.value, { places: "0,99" });
+          results.calculatedDistance = dojoNumber.parse(
+            this.lengthInput.value, {
+              places: '0,99'
+            }
+          );
       }
 
       results.calculatedDistance = this.utils.convertToMeters(
@@ -540,20 +591,18 @@ define([
 
       this.currentCircle.graphic = new EsriGraphic(
         this.currentCircle.wmGeometry,
-        this._circleSym
+        this._circleSym,
+        {
+          'RADIUS': results.calculatedDistance
+        }
       );
 
       this._gl.add(this.currentCircle.graphic);
 
-      if (this._lengthLayer.graphics.length > 0) {
-        var tg = dojoLang.clone(this._lengthLayer.graphics[0].geometry);
-        var ts = dojoLang.clone(this._lengthLayer.graphics[0].symbol);
-        this._gl.add(new EsriGraphic(tg, ts));
-        this._lengthLayer.clear();
-      }
-
       if (this.coordTool.inputCoordinate.isManual) {
         this.map.setExtent(this.currentCircle.wmGeometry.getExtent().expand(3));
+      } else {
+        this._gl.refresh();
       }
 
       this.emit('graphic_created', this.currentCircle);
@@ -567,7 +616,7 @@ define([
       if (this._gl) {
         // graphic layers
         this._gl.clear();
-        this._lengthLayer.clear();
+        this._gl.refresh();
 
         // ui controls
         this.clearUI(false);
@@ -578,7 +627,6 @@ define([
      * reset ui controls
      */
     clearUI: function (keepCoords) {
-      
       if (!keepCoords){
         this.coordTool.clear();
       }

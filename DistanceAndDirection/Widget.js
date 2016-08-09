@@ -92,6 +92,34 @@ define([
                         type: 'esriSLS',
                         style: 'esriSLSSolid'
                     }
+                },
+                pointSymbol: this.config.feedback.pointSymbol || {
+                    'color': [255, 255, 255, 64],
+                    'size': 12,
+                    'type': 'esriSMS',
+                    'style': 'esriSMSCircle',
+                    'outline': {
+                        'color': [0, 0, 0, 255],
+                        'width': 1,
+                        'type': 'esriSLS',
+                        'style': 'esriSLSSolid'
+                    }
+                },
+                labelSymbol : this.config.feedback.labelSymbol || {
+                    'type' : 'esriTS',
+                    'color' : [0, 0, 0, 255],
+                    'verticalAlignment' : 'middle',
+                    'horizontalAlignment' : 'center',
+                    'xoffset' : 0,
+                    'yoffset' : 0,
+                    'kerning' : true,
+                    'font' : {
+                      'family' : 'arial',
+                      'size' : 12,
+                      'style' : 'normal',
+                      'weight' : 'normal',
+                      'decoration' : 'none'
+                    }
                 }
             },
               this.circleTabNode
