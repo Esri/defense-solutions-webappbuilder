@@ -38,6 +38,10 @@ define([
     'esri/geometry/geometryEngine',
     'esri/graphic',
     'esri/layers/GraphicsLayer',
+    'esri/layers/FeatureLayer',
+    'esri/layers/LabelClass',
+    'esri/tasks/FeatureSet',
+    'esri/symbols/TextSymbol',
     'esri/symbols/SimpleFillSymbol',
     'esri/symbols/SimpleLineSymbol',
     'esri/geometry/webMercatorUtils',
@@ -69,6 +73,10 @@ define([
     EsriGeometryEngine,
     EsriGraphic,
     EsriGraphicsLayer,
+    EsriFeatureLayer,
+    EsriLabelClass,
+    EsriFeatureSet,
+    EsriTextSymbol,
     EsriSimpleFillSymbol,
     EsriSimpleLineSymbol,
     EsriWMUtils,
@@ -105,12 +113,12 @@ define([
 
             this._util = new Util();
 
-            this._gl = new EsriGraphicsLayer();
-
             this._circleSym = new EsriSimpleFillSymbol(this.circleSymbol);
             this._lineSym = new EsriSimpleLineSymbol(this.lineSymbol);
+            this._labelSym = new EsriTextSymbol(this.labelSymbol);
 
-            this.map.addLayer(this._gl);
+            this._radialGL = new EsriGraphicsLayer();
+            this.map.addLayers([this._radialGL, this.getLayer()]);
 
             this.coordTool = new CoordInput({
                 appConfig: this.appConfig
@@ -143,68 +151,49 @@ define([
                 this.coordTool.set('value', nv);
             }));
 
-            this.own(this.coordTool.on(
-              'blur',
-              dojoLang.hitch(this, this.coordToolDidLoseFocus)
-            ));
-
-            this.own(dojoOn(
-              this.numRadialsInput,
-              'keyup',
-              dojoLang.hitch(this, this.numRadialsInputKeyWasPressed)
-            ));
-
             this.own(
-                dojoOn(
-                  this.ringIntervalUnitsDD,
-                  'change',
-                  dojoLang.hitch(this, this.ringIntervalUnitsDidChange)
-            ));
-
-            this.own(
-                this.dt.on('draw-complete',
-                  dojoLang.hitch(this, this.feedbackDidComplete)
-                )
-            );
-
-            this.own(
-                dojoOn(this.coordinateFormatButton, 'click',
-                  dojoLang.hitch(this, this.coordinateFormatButtonWasClicked)
-                )
-            );
-
-            this.own(
-                dojoOn(
-                  this.addPointBtn,
-                  'click',
-                  dojoLang.hitch(this, this.pointButtonWasClicked)
-                )
-            );
-            this.own(
-                dojoOn(this.coordinateFormat.content.applyButton, 'click',
-                    dojoLang.hitch(this, function () {
-                        var fs = this.coordinateFormat.content.formats[this.coordinateFormat.content.ct];
-                        var cfs = fs.defaultFormat;
-                        var fv = this.coordinateFormat.content.frmtSelect.get('value');
-                        if (fs.useCustom) {
-                            cfs = fs.customFormat;
-                        }
-                        this.coordTool.inputCoordinate.set('formatPrefix', this.coordinateFormat.content.addSignChkBox.checked);
-                        this.coordTool.inputCoordinate.set('formatString', cfs);
-                        this.coordTool.inputCoordinate.set('formatType', fv);
-                        this.setCoordLabel(fv);
-
-                        DijitPopup.close(this.coordinateFormat);
-                    }
-                ))
-            );
-
-            this.own(
-                dojoOn(this.coordinateFormat.content.cancelButton, 'click',
+              this.coordTool.on('blur',
+                dojoLang.hitch(this, this.coordToolDidLoseFocus)
+              ),
+              this.dt.on('draw-complete',
+                dojoLang.hitch(this, this.feedbackDidComplete)
+              ),
+              dojoOn(this.numRadialsInput, 'keyup',
+                dojoLang.hitch(this, this.numRadialsInputKeyWasPressed)
+              ),
+              dojoOn(this.ringIntervalUnitsDD, 'change',
+                dojoLang.hitch(this, this.ringIntervalUnitsDidChange)
+              ),
+              dojoOn(this.coordinateFormatButton, 'click',
+                dojoLang.hitch(this, this.coordinateFormatButtonWasClicked)
+              ),
+              dojoOn(this.addPointBtn, 'click',
+                dojoLang.hitch(this, this.pointButtonWasClicked)
+              ),
+              dojoOn(this.coordinateFormat.content.applyButton, 'click',
                   dojoLang.hitch(this, function () {
+                      var fs = this.coordinateFormat.content.formats[this.coordinateFormat.content.ct];
+                      var cfs = fs.defaultFormat;
+                      var fv = this.coordinateFormat.content.frmtSelect.get('value');
+                      if (fs.useCustom) {
+                          cfs = fs.customFormat;
+                      }
+                      this.coordTool.inputCoordinate.set(
+                        'formatPrefix',
+                        this.coordinateFormat.content.addSignChkBox.checked
+                      );
+                      this.coordTool.inputCoordinate.set('formatString', cfs);
+                      this.coordTool.inputCoordinate.set('formatType', fv);
+                      this.setCoordLabel(fv);
+
                       DijitPopup.close(this.coordinateFormat);
                   }
-                ))
+              )),
+              dojoOn(this.coordinateFormat.content.cancelButton, 'click',
+                dojoLang.hitch(this, function () {
+                    DijitPopup.close(this.coordinateFormat);
+                })
+              )
             );
 
             dojoTopic.subscribe(
@@ -270,6 +259,7 @@ define([
         ringIntervalUnitsDidChange: function () {
             this.ringIntervalUnit = this.ringIntervalUnitsDD.get('value');
         },
+
         /*
          *
          */
@@ -296,12 +286,61 @@ define([
             }
         },
 
+        /*
+         * upgrade graphicslayer so we can use the label params
+         */
+        getLayer: function () {
+          if (!this._gl) {
+            var layerDefinition = {
+              'geometryType': 'esriGeometryPolyline',
+              'extent': {
+                'xmin': 0,
+                'ymin': 0,
+                'xmax': 0,
+                'ymax': 0,
+                'spatialReference': {
+                    'wkid': 102100,
+                    'latestWkid': 102100
+                }
+            },
+              'fields': [{
+                  'name': 'Interval',
+                  'type': 'esriFieldTypeDouble',
+                  'alias': 'Interval'
+                }]
+              };
+
+              var lblexp = {'labelExpressionInfo': {'value': '{Interval}'}};
+              var lblClass = new EsriLabelClass(lblexp);
+              lblClass.labelPlacement = 'center-end';
+              lblClass.symbol = this._labelSym;
+
+              var fs = new EsriFeatureSet();
+
+              var featureCollection = {
+                layerDefinition: layerDefinition,
+                featureSet: fs
+              };
+
+              this._gl = new EsriFeatureLayer(featureCollection, {
+                showLabels: true
+              });
+
+              this._gl.setLabelingInfo([lblClass]);
+
+              return this._gl;
+          }
+        },
+        /*
+         *
+         */
         getInputsValid: function () {
             return this.coordTool.isValid() &&
               this.numRingsInput.isValid() &&
               this.ringIntervalInput.isValid() &&
               this.numRadialsInput.isValid();
         },
+
         /*
          *
          */
@@ -332,7 +371,20 @@ define([
             }
 
             for (params.c = 0; params.c < params.circles.length; params.c++) {
-                this._gl.add(new EsriGraphic(params.circles[params.c], params.circleSym));
+
+              var p = {
+                'paths': [params.circles[params.c].rings[0]],
+                'spatialReference': this.map.spatialReference
+              };
+              var circlePath = new EsriPolyline(p);
+
+                this._gl.add(
+                  new EsriGraphic(
+                    circlePath,
+                    this._lineSym,
+                    {'Interval': params.circles[params.c].radius}
+                  )
+                );
             }
 
             // create radials
@@ -368,10 +420,11 @@ define([
                   params.lineCopy, params.azimuth, params.centerPoint);
                 //Cut the radial to the last range ring
                 params.cutRadial = EsriGeometryEngine.cut(params.rotatedRadial, params.cutGeom);
-                this._gl.add(new EsriGraphic(params.cutRadial.length === 1 ?
+                this._radialGL.add(new EsriGraphic(params.cutRadial.length === 1 ?
                     params.cutRadial[0] : params.cutRadial[1], this._lineSym));
                 params.azimuth += params.interval;
             }
+
             this.map.setExtent(params.lastCircle.getExtent().expand(3));
         },
 
@@ -421,6 +474,7 @@ define([
             if (this._gl) {
                 // graphic layers
                 this._gl.clear();
+                this._radialGL.clear();
                 this.coordTool.clear();
             }
         }

@@ -61,7 +61,7 @@
         "kerning" : true,
         "font" : {
           "family" : "arial",
-          "size" : 23,
+          "size" : 12,
           "style" : "normal",
           "weight" : "normal",
           "decoration" : "none"

@@ -31,6 +31,7 @@ define([
     'dijit/TitlePane',
     'dijit/TooltipDialog',
     'dijit/_WidgetsInTemplateMixin',
+    'dijit/popup',
     'esri/layers/GraphicsLayer',
     'esri/geometry/geometryEngine',
     'esri/symbols/SimpleMarkerSymbol',
@@ -60,6 +61,7 @@ define([
     dijitTitlePane,
     DijitTooltipDialog,
     dijitWidgetsInTemplate,
+    DijitPopup,
     EsriGraphicsLayer,
     esriGeometryEngine,
     EsriSimpleMarkerSymbol,
@@ -120,9 +122,9 @@ define([
             this.syncEvents();
         },
 
-        /**
-         *
-         **/
+        /*
+          *
+          */
         syncEvents: function () {
 
             this.dt.watch('startPoint', dojoLang.hitch(this, function (r, ov, nv) {
@@ -130,7 +132,9 @@ define([
                 this.createCenterPointGraphic();
             }));
 
-            this.coordTool.inputCoordinate.watch('outputString', dojoLang.hitch(this, function (r, ov, nv) {
+            this.coordTool.inputCoordinate.watch(
+              'outputString', dojoLang.hitch(
+                this, function (r, ov, nv) {
                 this.coordTool.set('value', nv);
             }));
 
@@ -167,76 +171,73 @@ define([
               this.dt.on(
                 'draw-complete',
                 dojoLang.hitch(this, this.feedbackDidComplete)
-            ));
+              ),
+              this.ellipseType.on(
+                'change',
+                dojoLang.hitch(this, this.ellipseTypeChangeHandler)
+              ),
+              this.angleUnitDD.on(
+                'change',
+                dojoLang.hitch(this, this.angleUnitDDDidChange)
+              ),
+              this.lengthUnitDD.on(
+                'change',
+                dojoLang.hitch(this, this.lengthUnitDDDidChange)
+              ),
+              dojoOn(this.coordinateFormat.content.applyButton, 'click',
+                  dojoLang.hitch(this, function () {
+                      var fs = this.coordinateFormat.content.formats[this.coordinateFormat.content.ct];
+                      var cfs = fs.defaultFormat;
+                      var fv = this.coordinateFormat.content.frmtSelect.get('value');
+                      if (fs.useCustom) {
+                          cfs = fs.customFormat;
+                      }
+                      this.coordTool.inputCoordinate.set(
+                        'formatPrefix',
+                        this.coordinateFormat.content.addSignChkBox.checked
+                      );
+                      this.coordTool.inputCoordinate.set('formatString', cfs);
+                      this.coordTool.inputCoordinate.set('formatType', fv);
+                      this.setCoordLabel(fv);
 
-            this.own(dojoOn(
-              this.addPointBtn,
-              'click',
-              dojoLang.hitch(this, this.pointButtonWasClicked)
-            ));
-
-            this.own(this.ellipseType.on(
-              'change',
-              dojoLang.hitch(this, this.ellipseTypeChangeHandler)
-            ));
-
-            this.own(this.angleUnitDD.on(
-              'change',
-              dojoLang.hitch(this, this.angleUnitDDDidChange)
-            ));
-
-            this.own(this.lengthUnitDD.on(
-              'change',
-              dojoLang.hitch(this, this.lengthUnitDDDidChange)
-            ));
-
-            this.own(
-                dojoOn(this.coordinateFormat.content.applyButton, 'click',
-                    dojoLang.hitch(this, function () {
-                        var fs = this.coordinateFormat.content.formats[this.coordinateFormat.content.ct];
-                        var cfs = fs.defaultFormat;
-                        var fv = this.coordinateFormat.content.frmtSelect.get('value');
-                        if (fs.useCustom) {
-                            cfs = fs.customFormat;
-                        }
-                        this.coordTool.inputCoordinate.set('formatPrefix', this.coordinateFormat.content.addSignChkBox.checked);
-                        this.coordTool.inputCoordinate.set('formatString', cfs);
-                        this.coordTool.inputCoordinate.set('formatType', fv);
-                        this.setCoordLabel(fv);
-
-                        DijitPopup.close(this.coordinateFormat);
-                    }
-                ))
+                      DijitPopup.close(this.coordinateFormat);
+                  }
+              )),
+              dojoOn(this.addPointBtn, 'click',
+                dojoLang.hitch(this, this.pointButtonWasClicked)
+              ),
+              dojoOn(this.coordTool, 'keyup',
+                dojoLang.hitch(this, this.coordToolKeyWasPressed)
+              ),
+              dojoOn(this.majorAxisInput, 'keyup',
+                dojoLang.hitch(this, this.onMajorAxisInputKeyupHandler)
+              ),
+              dojoOn(this.minorAxisInput, 'keyup',
+                dojoLang.hitch(this, this.onMinorAxisInputKeyupHandler)
+              ),
+              dojoOn(this.angleInput, 'keyup',
+                dojoLang.hitch(this, this.onOrientationAngleKeyupHandler)
+              )
             );
-
-
-            dojoOn(
-              this.coordTool,
-              'keyup',
-              dojoLang.hitch(this, this.coordToolKeyWasPressed)
-            )
-
-            dojoOn(this.majorAxisInput, 'keyup',
-              dojoLang.hitch(this, this.onMajorAxisInputKeyupHandler)
-            )
-
-            dojoOn(this.minorAxisInput, 'keyup',
-              dojoLang.hitch(this, this.onMinorAxisInputKeyupHandler)
-            )
-
-            dojoOn(this.angleInput, 'keyup',
-              dojoLang.hitch(this, this.onOrientationAngleKeyupHandler)
-            )
         },
 
+        /*
+         *
+         */
         onMajorAxisInputKeyupHandler: function (evt) {
             dojoTopic.publish('manual-ellipse-major-axis-input', this.majorAxisInput.value);
         },
 
+        /*
+         *
+         */
         onMinorAxisInputKeyupHandler: function (evt) {
             dojoTopic.publish('manual-ellipse-minor-axis-input', this.minorAxisInput.value);
         },
 
+        /*
+         *
+         */
         onOrientationAngleKeyupHandler: function (evt) {
             if (evt.keyCode === dojoKeys.ENTER) {
                 dojoTopic.publish('manual-ellipse-orientation-angle-input', this.angleInput.value);
@@ -274,7 +275,10 @@ define([
 
             if (evt.keyCode === dojoKeys.ENTER) {
                 this.coordTool.inputCoordinate.getInputType().then(dojoLang.hitch(this, function (r) {
-                    dojoTopic.publish('manual-ellipse-center-point-input', this.coordTool.inputCoordinate.coordinateEsriGeometry);
+                    dojoTopic.publish(
+                      'manual-ellipse-center-point-input',
+                      this.coordTool.inputCoordinate.coordinateEsriGeometry
+                    );
                     this.createCenterPointGraphic();
                 }));
             }
@@ -289,9 +293,9 @@ define([
             dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
         },
 
-        /**
-         *
-         **/
+        /*
+          *
+          */
         lengthUnitDDDidChange: function () {
             this.currentLengthUnit = this.lengthUnitDD.get('value');
             this.dt.set('lengthUnit', this.currentLengthUnit);
@@ -305,9 +309,9 @@ define([
             }
         },
 
-        /**
-         *
-         **/
+        /*
+          *
+          */
         ellipseTypeChangeHandler: function () {
             var majorAxisLength = this.ellipseType.get('value') === 'full' ?
               this.currentEllipse.geometry.majorAxisLength * 2 :
@@ -319,9 +323,9 @@ define([
             );
         },
 
-        /**
-         *
-         **/
+        /*
+          *
+          */
         angleUnitDDDidChange: function () {
             this.currentAngleUnit = this.angleUnitDD.get('value');
 
@@ -333,9 +337,9 @@ define([
             }
         },
 
-        /**
-         *
-         **/
+        /*
+          *
+          */
         feedbackDidComplete: function (results) {
             this.currentEllipse = new ShapeModel(results);
             this.currentEllipse.graphic = new EsriGraphic(
@@ -369,9 +373,9 @@ define([
             dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
         },
 
-        /**
-         *
-         **/
+        /*
+          *
+          */
         clearGraphics: function () {
             if (this._gl) {
                 this._gl.clear();
@@ -384,18 +388,18 @@ define([
             }
         },
 
-        /**
-         *
-         **/
+        /*
+          *
+          */
         setGraphicsHidden: function () {
             if (this._gl) {
                 this._gl.hide();
             }
         },
 
-        /**
-         *
-         **/
+        /*
+          *
+          */
         setGraphicsShown: function () {
             if (this._gl) {
                 this._gl.show();
@@ -419,8 +423,8 @@ define([
         },
 
         /*
-        Removes the center point graphic
-        */
+         * Removes the center point graphic
+         */
         removeCenterPointGraphic: function () {
             if (this.centerPointGraphic) {
                 this._gl.remove(this.centerPointGraphic);
@@ -457,7 +461,7 @@ define([
             }
             return dojoNumber.format(convertedLength, {
                 places: 4
-            });;
+            });
 
         }
     });

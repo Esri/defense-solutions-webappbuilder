@@ -162,6 +162,22 @@ define([
                     style: 'esriSLSSolid',
                     color: [255, 50, 50, 255],
                     width: 1.25
+                },
+                labelSymbol : this.config.feedback.labelSymbol || {
+                    'type' : 'esriTS',
+                    'color' : [0, 0, 0, 255],
+                    'verticalAlignment' : 'middle',
+                    'horizontalAlignment' : 'center',
+                    'xoffset' : 0,
+                    'yoffset' : 0,
+                    'kerning' : true,
+                    'font' : {
+                      'family' : 'arial',
+                      'size' : 6,
+                      'style' : 'normal',
+                      'weight' : 'normal',
+                      'decoration' : 'none'
+                    }
                 }
             }, this.RangeTabContainer);
 

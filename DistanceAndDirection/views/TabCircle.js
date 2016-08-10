@@ -205,12 +205,12 @@ define([
         this.coordTool,
         'keyup',
         dojoLang.hitch(this, this.startInputKeyPressed)
-        ),
-
-      dojoTopic.subscribe('DD_CLEAR_GRAPHICS',
-        dojoLang.hitch(this, this.clearGraphics)
       );
 
+      dojoTopic.subscribe(
+        'DD_CLEAR_GRAPHICS',
+        dojoLang.hitch(this, this.clearGraphics)
+      );
 
       this.own(
         this.dt.on('draw-complete',
@@ -367,19 +367,17 @@ define([
               dojoTopic.publish('MANUAL_CIRCLE_RADIUS_INPUT', this);
               this.createManualGraphic();
           }
-
       }
     },
 
-     /*
+    /*
      *
      */
-      startInputKeyPressed: function (evt) {
-            if (evt.keyCode === dojoKeys.ENTER) {
-                this.dt.addStartGraphic(this.coordTool.inputCoordinate, this._ptSym);
-            }
-
-        },
+    startInputKeyPressed: function (evt) {
+          if (evt.keyCode === dojoKeys.ENTER) {
+              this.dt.addStartGraphic(this.coordTool.inputCoordinate, this._ptSym);
+          }
+      },
 
     /*
      *
@@ -497,8 +495,8 @@ define([
     },
 
     /*
-    *
-    */
+     *
+     */
     createManualGraphic: function () {
         if (this.tempGraphic != null) {
             this._gl.remove(this.tempGraphic);
@@ -530,8 +528,8 @@ define([
     },
 
     /*
-    *
-    */
+     *
+     */
     removeManualGraphic: function () {
         if (this.tempGraphic != null) {
             this._gl.remove(this.tempGraphic);
@@ -539,7 +537,6 @@ define([
 
         this.dt.removeStartGraphic();
     },
-
 
     /*
      *
