@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2016 Esri. All Rights Reserved.
 //
 // Licensed under the Apache License Version 2.0 (the "License");
@@ -44,6 +44,7 @@ define([
     'esri/symbols/TextSymbol',
     'esri/symbols/SimpleFillSymbol',
     'esri/symbols/SimpleLineSymbol',
+    'esri/symbols/SimpleMarkerSymbol',
     'esri/geometry/webMercatorUtils',
     '../views/CoordinateInput',
     '../views/EditOutputCoordinate',
@@ -79,6 +80,7 @@ define([
     EsriTextSymbol,
     EsriSimpleFillSymbol,
     EsriSimpleLineSymbol,
+    EsriSimpleMarkerSymbol,
     EsriWMUtils,
     CoordInput,
     EditOutputCoordinate,
@@ -113,12 +115,12 @@ define([
 
             this._util = new Util();
 
+            this._ptSym = new EsriSimpleMarkerSymbol(this.pointSymbol);
             this._circleSym = new EsriSimpleFillSymbol(this.circleSymbol);
             this._lineSym = new EsriSimpleLineSymbol(this.lineSymbol);
             this._labelSym = new EsriTextSymbol(this.labelSymbol);
 
-            this._radialGL = new EsriGraphicsLayer();
-            this.map.addLayers([this._radialGL, this.getLayer()]);
+            this.map.addLayers([this.getLayer()]);
 
             this.coordTool = new CoordInput({
                 appConfig: this.appConfig
@@ -145,6 +147,7 @@ define([
 
             this.dt.watch('startPoint', dojoLang.hitch(this, function (r, ov, nv) {
                 this.coordTool.inputCoordinate.set('coordinateEsriGeometry', nv);
+                this.dt.addStartGraphic(nv, this._ptSym);
             }));
 
             this.coordTool.inputCoordinate.watch('outputString', dojoLang.hitch(this, function (r, ov, nv) {
@@ -224,8 +227,8 @@ define([
             this.coordTool.inputCoordinate.getInputType().then(
               dojoLang.hitch(this, function (r) {
                   this.setCoordLabel(r.inputType);
-                  this._set('startPoint',
-                    this.coordTool.inputCoordinate.coordinateEsriGeometry);
+                  this.dt.addStartGraphic(r.coordinateEsriGeometry, this._ptSym);
+
               }));
         },
 
@@ -267,7 +270,7 @@ define([
             // validate input
             if (evt.keyCode === dojoKeys.ENTER && this.getInputsValid()) {
                 var params = {
-                    centerPoint: this.dt.get('startPoint'),
+                    centerPoint: this.dt.get('startPoint') || this.coordTool.inputCoordinate.coordinateEsriGeometry,
                     numRings: this.numRingsInput.get('value'),
                     numRadials: this.numRadialsInput.get('value'),
                     radius: 0,
@@ -307,6 +310,11 @@ define([
                   'name': 'Interval',
                   'type': 'esriFieldTypeDouble',
                   'alias': 'Interval'
+                }, {
+                  'name': 'linetype',
+                  'type': 'esriFieldTypeString',
+                  'alias': 'linetype',
+                  'lenght': 25
                 }]
               };
 
@@ -314,6 +322,7 @@ define([
               var lblClass = new EsriLabelClass(lblexp);
               lblClass.labelPlacement = 'center-end';
               lblClass.symbol = this._labelSym;
+              lblClass.where = 'Interval > 0';
 
               var fs = new EsriFeatureSet();
 
@@ -357,6 +366,7 @@ define([
                     params.ringInterval, params.ringIntervalUnitsDD);
             }
 
+            this.dt.removeStartGraphic();
             // create rings
             if (params.circles.length === 0) {
                 for (params.r = 0; params.r < params.numRings; params.r++) {
@@ -382,7 +392,8 @@ define([
                   new EsriGraphic(
                     circlePath,
                     this._lineSym,
-                    {'Interval': params.circles[params.c].radius}
+                    {'Interval': params.circles[params.c].radius,
+                    'linetype': 'rangering'}
                   )
                 );
             }
@@ -420,8 +431,8 @@ define([
                   params.lineCopy, params.azimuth, params.centerPoint);
                 //Cut the radial to the last range ring
                 params.cutRadial = EsriGeometryEngine.cut(params.rotatedRadial, params.cutGeom);
-                this._radialGL.add(new EsriGraphic(params.cutRadial.length === 1 ?
-                    params.cutRadial[0] : params.cutRadial[1], this._lineSym));
+                this._gl.add(new EsriGraphic(params.cutRadial.length === 1 ?
+                    params.cutRadial[0] : params.cutRadial[1], this._lineSym, {'Interval': 0, 'linetype': 'radial'}));
                 params.azimuth += params.interval;
             }
 
@@ -474,7 +485,8 @@ define([
             if (this._gl) {
                 // graphic layers
                 this._gl.clear();
-                this._radialGL.clear();
+                this._gl.refresh();
+                this.dt.removeStartGraphic();
                 this.coordTool.clear();
             }
         }
