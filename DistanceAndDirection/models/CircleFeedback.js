@@ -93,7 +93,7 @@ define([
     * Draw graphic
     */
     manualRadiusUpdateComplete: function (radius) {
-        
+
         var stPt = this.get('startPoint');
         var circleGeometry = new EsriCircle(stPt, {
             radius: radius,
@@ -129,6 +129,7 @@ define([
 
       switch (this._geometryType) {
         case esriDraw.POINT:
+          this.set('startPoint', start.offset(0,0));
           this._drawEnd(start.offset(0,0));
           this._setTooltipMessage(0);
           break;
