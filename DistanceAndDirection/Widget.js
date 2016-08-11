@@ -146,6 +146,18 @@ define([
             this.rangeTab = new TabRange({
                 map: this.map,
                 appConfig: this.appConfig,
+                pointSymbol: this.config.feedback.pointSymbol || {
+                    'color': [255, 255, 255, 64],
+                    'size': 12,
+                    'type': 'esriSMS',
+                    'style': 'esriSMSCircle',
+                    'outline': {
+                        'color': [0, 0, 0, 255],
+                        'width': 1,
+                        'type': 'esriSLS',
+                        'style': 'esriSLSSolid'
+                    }
+                },
                 circleSymbol: this.config.feedback.circleSymbol || {
                     type: 'esriSFS',
                     style: 'esriSFSNull',

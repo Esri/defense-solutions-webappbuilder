@@ -548,6 +548,7 @@ define([
       this.map.enableMapNavigation();
 
       this.dt.deactivate();
+
       this.dt.removeStartGraphic();
 
       dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
