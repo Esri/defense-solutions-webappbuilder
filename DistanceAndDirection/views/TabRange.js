@@ -120,7 +120,7 @@ define([
             this._lineSym = new EsriSimpleLineSymbol(this.lineSymbol);
             this._labelSym = new EsriTextSymbol(this.labelSymbol);
 
-            this.map.addLayers([this.getLayer()]);
+            this.map.addLayer(this.getLayer());
 
             this.coordTool = new CoordInput({
                 appConfig: this.appConfig
@@ -308,36 +308,32 @@ define([
             },
               'fields': [{
                   'name': 'Interval',
-                  'type': 'esriFieldTypeDouble',
-                  'alias': 'Interval'
-                }, {
-                  'name': 'linetype',
                   'type': 'esriFieldTypeString',
-                  'alias': 'linetype',
-                  'lenght': 25
-                }]
-              };
+                  'alias': 'Interval'
+                }
+              ]
+            };
 
-              var lblexp = {'labelExpressionInfo': {'value': '{Interval}'}};
-              var lblClass = new EsriLabelClass(lblexp);
-              lblClass.labelPlacement = 'center-end';
-              lblClass.symbol = this._labelSym;
-              lblClass.where = 'Interval > 0';
+            var lblexp = {'labelExpressionInfo': {'value': '{Interval}'}};
+            var lblClass = new EsriLabelClass(lblexp);
+            lblClass.labelPlacement = 'center-end';
+            lblClass.symbol = this._labelSym;
+            //lblClass.where = 'Interval > 0';
 
-              var fs = new EsriFeatureSet();
+            var fs = new EsriFeatureSet();
 
-              var featureCollection = {
-                layerDefinition: layerDefinition,
-                featureSet: fs
-              };
+            var featureCollection = {
+              layerDefinition: layerDefinition,
+              featureSet: fs
+            };
 
-              this._gl = new EsriFeatureLayer(featureCollection, {
-                showLabels: true
-              });
+            this._gl = new EsriFeatureLayer(featureCollection, {
+              showLabels: true
+            });
 
-              this._gl.setLabelingInfo([lblClass]);
+            this._gl.setLabelingInfo([lblClass]);
 
-              return this._gl;
+            return this._gl;
           }
         },
         /*
@@ -387,15 +383,13 @@ define([
                 'spatialReference': this.map.spatialReference
               };
               var circlePath = new EsriPolyline(p);
-
-                this._gl.add(
-                  new EsriGraphic(
-                    circlePath,
-                    this._lineSym,
-                    {'Interval': params.circles[params.c].radius,
-                    'linetype': 'rangering'}
-                  )
-                );
+              var cGraphic = new EsriGraphic(circlePath,
+                this._lineSym,
+                {
+                  'Interval': params.circles[params.c].radius.toString()
+                }
+              );
+              this._gl.add(cGraphic);
             }
 
             // create radials
@@ -432,10 +426,11 @@ define([
                 //Cut the radial to the last range ring
                 params.cutRadial = EsriGeometryEngine.cut(params.rotatedRadial, params.cutGeom);
                 this._gl.add(new EsriGraphic(params.cutRadial.length === 1 ?
-                    params.cutRadial[0] : params.cutRadial[1], this._lineSym, {'Interval': 0, 'linetype': 'radial'}));
+                    params.cutRadial[0] : params.cutRadial[1], this._lineSym, {'Interval': ''}));
                 params.azimuth += params.interval;
             }
 
+            this._gl.redraw();
             this.map.setExtent(params.lastCircle.getExtent().expand(3));
         },
 
