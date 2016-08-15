@@ -138,6 +138,7 @@ define([
     getLayer: function () {
       if (!this._gl) {
         var layerDefinition = {
+          'id': 'circleLayer',
           'geometryType': 'esriGeometryPolygon',
           'fields': [{
               'name': 'RADIUS',

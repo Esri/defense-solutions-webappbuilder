@@ -131,12 +131,40 @@ define([
                 ellipseSymbol: this.config.feedback.ellipseSymbol || {
                     type: 'esriSFS',
                     style: 'esriSFSNull',
-                    color: [255, 0, 0, 0],
+                    color: [255, 0, 0, 125],
                     outline: {
                         color: [255, 50, 50, 255],
                         width: 1.25,
                         type: 'esriSLS',
                         style: 'esriSLSSolid'
+                    }
+                },
+                pointSymbol: this.config.feedback.pointSymbol || {
+                    'color': [255, 255, 255, 64],
+                    'size': 12,
+                    'type': 'esriSMS',
+                    'style': 'esriSMSCircle',
+                    'outline': {
+                        'color': [0, 0, 0, 255],
+                        'width': 1,
+                        'type': 'esriSLS',
+                        'style': 'esriSLSSolid'
+                    }
+                },
+                labelSymbol : this.config.feedback.labelSymbol || {
+                    'type' : 'esriTS',
+                    'color' : [0, 0, 0, 255],
+                    'verticalAlignment' : 'middle',
+                    'horizontalAlignment' : 'center',
+                    'xoffset' : 0,
+                    'yoffset' : 0,
+                    'kerning' : true,
+                    'font' : {
+                      'family' : 'arial',
+                      'size' : 12,
+                      'style' : 'normal',
+                      'weight' : 'normal',
+                      'decoration' : 'none'
                     }
                 }
             },
@@ -177,7 +205,7 @@ define([
                 },
                 labelSymbol : this.config.feedback.labelSymbol || {
                     'type' : 'esriTS',
-                    'color' : [0, 0, 0, 255],
+                    'color' : [0, 0, 255, 255],
                     'verticalAlignment' : 'middle',
                     'horizontalAlignment' : 'center',
                     'xoffset' : 0,

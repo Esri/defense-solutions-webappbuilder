@@ -33,13 +33,17 @@ define([
     'dijit/_WidgetsInTemplateMixin',
     'dijit/popup',
     'esri/layers/GraphicsLayer',
+    'esri/layers/FeatureLayer',
+    'esri/layers/LabelClass',
     'esri/geometry/geometryEngine',
     'esri/symbols/SimpleMarkerSymbol',
     'esri/symbols/SimpleLineSymbol',
     'esri/symbols/SimpleFillSymbol',
+    'esri/symbols/TextSymbol',
     'esri/graphic',
     'esri/units',
     'esri/geometry/webMercatorUtils',
+    'esri/tasks/FeatureSet',
     '../models/EllipseFeedback',
     '../models/ShapeModel',
     '../views/CoordinateInput',
@@ -63,13 +67,17 @@ define([
     dijitWidgetsInTemplate,
     DijitPopup,
     EsriGraphicsLayer,
+    EsriFeatureLayer,
+    EsriLabelClass,
     esriGeometryEngine,
     EsriSimpleMarkerSymbol,
     EsriSimpleLineSymbol,
     EsriSimpleFillSymbol,
+    EsriTextSymbol,
     EsriGraphic,
     esriUnits,
     esriWMUtils,
+    EsriFeatureSet,
     DrawFeedBack,
     ShapeModel,
     CoordInput,
@@ -83,13 +91,64 @@ define([
 
         centerPointGraphic: null,
 
-        /**
+        /*
          * class constructor
-         **/
+         */
         constructor: function (args) {
             dojoDeclare.safeMixin(this, args);
         },
 
+        /*
+         * upgrade graphicslayer so we can use the label params
+         */
+        getLayer: function () {
+          if (!this._gl) {
+            var layerDefinition = {
+              'extent': {
+                'xmin': 0,
+                'ymin': 0,
+                'xmax': 0,
+                'ymax': 0,
+                'spatialReference': {
+                    'wkid': 102100,
+                    'latestWkid': 102100
+                }},
+              'geometryType': 'esriGeometryPolygon',
+              'fields': [{
+                  'name': 'MAJOR',
+                  'type': 'esriFieldTypeDouble',
+                  'alias': 'Major'
+                }, {
+                    'name': 'MINOR',
+                    'type': 'esriFieldTypeDouble',
+                    'alias': 'Minor'
+                }, {
+                    'name': 'ORIENTATION_ANGLE',
+                    'type': 'esriFieldTypeDouble',
+                    'alias': 'Orientation Angle'
+                }
+              ]
+            };
+
+            var lblexp = {'labelExpressionInfo': {'value': 'Major: {MAJOR} Minor: {MINOR} Angle: {ORIENTATION_ANGLE}'}};
+            var lblClass = new EsriLabelClass(lblexp);
+            lblClass.symbol = this._labelSym;
+
+            var fs = new EsriFeatureSet();
+            var featureCollection = {
+              layerDefinition: layerDefinition,
+              featureSet: fs
+            };
+
+            this._gl = new EsriFeatureLayer(featureCollection, {
+              showLabels: true
+            });
+
+            this._gl.setLabelingInfo([lblClass]);
+
+            return this._gl;
+          }
+        },
         /*
          * widget is alive, initilize our stuff
          */
@@ -97,12 +156,11 @@ define([
             this.currentAngleUnit = this.angleUnitDD.get('value');
             this.currentLengthUnit = this.lengthUnitDD.get('value');
 
-            this._lengthLayer = new EsriGraphicsLayer();
-            this._gl = new EsriGraphicsLayer();
-            this.map.addLayers([this._gl, this._lengthLayer]);
-
+            this._labelSym = new EsriTextSymbol(this.labelSymbol);
+            this._ptSym = new EsriSimpleMarkerSymbol(this.pointSymbol);
             this._ellipseSym = new EsriSimpleFillSymbol(this.ellipseSymbol);
 
+            this.map.addLayer(this.getLayer());
             this.coordTool = new CoordInput({
                 appConfig: this.appConfig
             }, this.startPointCoords);
@@ -116,7 +174,6 @@ define([
             // add extended toolbar
             this.dt = new DrawFeedBack(this.map);
             this.dt.setLineSymbol(this._ellipseSym);
-            this.dt.set('lengthLayer', this._lengthLayer);
             this.dt.set('lengthUnit', 'feet');
 
             this.syncEvents();
@@ -129,7 +186,7 @@ define([
 
             this.dt.watch('startPoint', dojoLang.hitch(this, function (r, ov, nv) {
                 this.coordTool.inputCoordinate.set('coordinateEsriGeometry', nv);
-                this.createCenterPointGraphic();
+                this.dt.addStartGraphic(nv, this._ptSym);
             }));
 
             this.coordTool.inputCoordinate.watch(
@@ -279,7 +336,11 @@ define([
                       'manual-ellipse-center-point-input',
                       this.coordTool.inputCoordinate.coordinateEsriGeometry
                     );
-                    this.createCenterPointGraphic();
+                    this.dt.addStartGraphic(
+                      this.coordTool.inputCoordinate.coordTool,
+                      this._ptSym
+                    );
+                    //this.createCenterPointGraphic();
                 }));
             }
         },
@@ -338,131 +399,121 @@ define([
         },
 
         /*
-          *
-          */
+         *
+         */
         feedbackDidComplete: function (results) {
-            this.currentEllipse = new ShapeModel(results);
-            this.currentEllipse.graphic = new EsriGraphic(
-              this.currentEllipse.wmGeometry,
-              this._ellipseSym
-            );
-
-            //dojoDomAttr.set(
-            //  this.startPointCoords,
-            //  'value',
-            //  this.currentEllipse.formattedStartPoint
-            //);
-
-            this.lengthUnitDDDidChange();
-            this.angleUnitDDDidChange();
-
-            this._gl.add(this.currentEllipse.graphic);
-            ///this.map.setExtent(this.currentEllipse.graphic.geometry.getExtent());
-            if (this._lengthLayer.graphics.length > 0) {
-                var tg = dojoLang.clone(this._lengthLayer.graphics[0].geometry);
-                var ts = dojoLang.clone(this._lengthLayer.graphics[0].symbol);
-                this._gl.add(new EsriGraphic(tg, ts));
-                this._lengthLayer.clear();
+          this.currentEllipse = new ShapeModel(results);
+          this.currentEllipse.graphic = new EsriGraphic(
+            this.currentEllipse.wmGeometry,
+            this._ellipseSym,
+            {
+              'MINOR': parseFloat(dojoDomAttr.get(this.minorAxisInput, 'value').replace(',',''),2),
+              'MAJOR': parseFloat(dojoDomAttr.get(this.majorAxisInput, 'value').replace(',',''),2),
+              'ORIENTATION_ANGLE': parseFloat(this.currentEllipse.angle.replace(',',''),2)
             }
+          );
 
-            this.emit('graphic_created', this.currentEllipse);
+          this.lengthUnitDDDidChange();
+          this.angleUnitDDDidChange();
 
-            this.map.enableMapNavigation();
-            this.dt.deactivate();
-            this.removeCenterPointGraphic();
-            dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
+          this._gl.add(this.currentEllipse.graphic);
+          this._gl.refresh();
+          this.emit('graphic_created', this.currentEllipse);
+
+          this.map.enableMapNavigation();
+          this.dt.deactivate();
+          this.dt.removeStartGraphic();
+          dojoDomClass.toggle(this.addPointBtn, 'jimu-state-active');
         },
 
         /*
-          *
-          */
+         *
+         */
         clearGraphics: function () {
-            if (this._gl) {
-                this._gl.clear();
-                this._lengthLayer.clear();
-                this.coordTool.clear();
-                dojoDomAttr.set(this.startPointCoords, 'value', '');
-                dojoDomAttr.set(this.majorAxisInput, 'value', '');
-                dojoDomAttr.set(this.minorAxisInput, 'value', '');
-                dojoDomAttr.set(this.angleInput, 'value', '');
-            }
+          if (this._gl) {
+            this._gl.clear();
+            this.coordTool.clear();
+            dojoDomAttr.set(this.startPointCoords, 'value', '');
+            dojoDomAttr.set(this.majorAxisInput, 'value', '');
+            dojoDomAttr.set(this.minorAxisInput, 'value', '');
+            dojoDomAttr.set(this.angleInput, 'value', '');
+          }
         },
 
         /*
-          *
-          */
+         *
+         */
         setGraphicsHidden: function () {
-            if (this._gl) {
-                this._gl.hide();
-            }
+          if (this._gl) {
+            this._gl.hide();
+          }
         },
 
         /*
-          *
-          */
+         *
+         */
         setGraphicsShown: function () {
-            if (this._gl) {
-                this._gl.show();
-            }
+          if (this._gl) {
+            this._gl.show();
+          }
         },
 
         /*
          * Creates a temporary center point on the map
          */
         createCenterPointGraphic: function () {
-            if (this.centerPointGraphic !== null) {
-                this._gl.remove(this.centerPointGraphic);
-            }
-            var centerPoint = this.coordTool.inputCoordinate.coordinateEsriGeometry;
-            if (centerPoint) {
-                this.centerPointGraphic = new EsriGraphic(
-                  centerPoint, new EsriSimpleMarkerSymbol()
-                );
-                this._gl.add(this.centerPointGraphic);
-            }
+          if (this.centerPointGraphic !== null) {
+            this._gl.remove(this.centerPointGraphic);
+          }
+          var centerPoint = this.coordTool.inputCoordinate.coordinateEsriGeometry;
+          if (centerPoint) {
+            this.centerPointGraphic = new EsriGraphic(
+              centerPoint, new EsriSimpleMarkerSymbol()
+            );
+            this._gl.add(this.centerPointGraphic);
+          }
         },
 
         /*
          * Removes the center point graphic
          */
         removeCenterPointGraphic: function () {
-            if (this.centerPointGraphic) {
-                this._gl.remove(this.centerPointGraphic);
-            }
+          if (this.centerPointGraphic) {
+            this._gl.remove(this.centerPointGraphic);
+          }
         },
 
         /*
          *
          */
         _getFormattedLength: function (length) {
-            var convertedLength = length;
-            switch (this.currentLengthUnit) {
-                case 'meters':
-                    convertedLength = length;
-                    break;
-                case 'feet':
-                    convertedLength = length * 3.28084;
-                    break;
-                case 'kilometers':
-                    convertedLength = length * 1000;
-                    break;
-                case 'miles':
-                    convertedLength = length * 0.00062137121212121;
-                    break;
-                case 'nautical-miles':
-                    convertedLength = length * 0.00053995682073433939625;
-                    break;
-                case 'yards':
-                    convertedLength = length * 1.0936133333333297735;
-                    break;
-                case 'ussurveyfoot':
-                    convertedLength = length * 3.2808333333465;
-                    break;
-            }
-            return dojoNumber.format(convertedLength, {
-                places: 4
-            });
-
+          var convertedLength = length;
+          switch (this.currentLengthUnit) {
+            case 'meters':
+              convertedLength = length;
+              break;
+            case 'feet':
+              convertedLength = length * 3.28084;
+              break;
+            case 'kilometers':
+              convertedLength = length * 1000;
+              break;
+            case 'miles':
+              convertedLength = length * 0.00062137121212121;
+              break;
+            case 'nautical-miles':
+              convertedLength = length * 0.00053995682073433939625;
+              break;
+            case 'yards':
+              convertedLength = length * 1.0936133333333297735;
+              break;
+            case 'ussurveyfoot':
+              convertedLength = length * 3.2808333333465;
+              break;
+          }
+          return dojoNumber.format(convertedLength, {
+            places: 4
+          });
         }
     });
 });
