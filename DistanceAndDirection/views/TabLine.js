@@ -34,12 +34,16 @@ define([
     'dijit/TooltipDialog',
     'dijit/popup',
     'esri/layers/GraphicsLayer',
+    'esri/layers/FeatureLayer',
+    'esri/layers/LabelClass',
+    'esri/tasks/FeatureSet',
     'esri/geometry/geometryEngine',
     'esri/geometry/Polyline',
     'esri/geometry/Circle',
     'esri/geometry/Point',
     'esri/symbols/SimpleLineSymbol',
     'esri/symbols/SimpleMarkerSymbol',
+    'esri/symbols/TextSymbol',
     'esri/graphic',
     'esri/units',
     'esri/geometry/webMercatorUtils',
@@ -69,12 +73,16 @@ define([
     DijitTooltipDialog,
     DijitPopup,
     EsriGraphicsLayer,
+    EsriFeatureLayer,
+    EsriLabelClass,
+    EsriFeatureSet,
     esriGeometryEngine,
     EsriPolyline,
     EsriCircle,
     EsriPoint,
     EsriSimpleLineSymbol,
     EsriSimpleMarkerSymbol,
+    EsriTextSymbol,
     EsriGraphic,
     esriUnits,
     esriWMUtils,
@@ -106,13 +114,13 @@ define([
 
           this.currentAngleUnit = this.angleUnitDD.get('value');
 
-          this._gl = new EsriGraphicsLayer();
-
           this._lineSym = new EsriSimpleLineSymbol(this.lineSymbol);
 
           this._ptSym = new EsriSimpleMarkerSymbol(this.pointSymbol);
 
-          this.map.addLayer(this._gl);
+          this._labelSym = new EsriTextSymbol(this.labelSymbol);
+
+          this.map.addLayer(this.getLayer());
 
           // add extended toolbar
           this.dt = new DrawFeedBack(this.map);
@@ -133,6 +141,54 @@ define([
 
           this.lineTypeDDDidChange();
           this.syncEvents();
+        },
+
+        /*
+         * upgrade graphicslayer so we can use the label params
+         */
+        getLayer: function () {
+              if (!this._gl) {
+                var layerDefinition = {
+                  'geometryType': 'esriGeometryPolyline',
+                  'extent': {
+                    'xmin': 0,
+                    'ymin': 0,
+                    'xmax': 0,
+                    'ymax': 0,
+                    'spatialReference': {
+                        'wkid': 102100,
+                        'latestWkid': 102100
+                    }
+                  },
+                  'fields': [{
+                    'name': 'GeoLength',
+                    'type': 'esriFieldTypeDouble',
+                    'alias': 'GeoLength'
+                  }, {
+                    'name': 'LineAngle',
+                    'type': 'esriFieldTypeDouble',
+                    'alias': 'LineAngle'
+                  }]
+                };
+
+                  var lblexp = {'labelExpressionInfo': {'value': 'Length: {GeoLength}, Angle: {LineAngle}'}};
+                  var lblClass = new EsriLabelClass(lblexp);
+                  lblClass.labelPlacement = 'center-along';
+                  lblClass.symbol = this._labelSym;
+
+                  var featureCollection = {
+                    layerDefinition: layerDefinition,
+                    featureSet: new EsriFeatureSet()
+                  };
+
+                  this._gl = new EsriFeatureLayer(featureCollection, {
+                    showLabels: true
+                  });
+
+                  this._gl.setLabelingInfo([lblClass]);
+
+                  return this._gl;
+              }
         },
 
         /*
@@ -435,14 +491,17 @@ define([
           this.currentLine = new ShapeModel(results);
           this.currentLine.graphic = new EsriGraphic(
             this.currentLine.wmGeometry,
-            this._lineSym
+            this._lineSym, {
+              'GeoLength': this.lengthInput.get('value'),
+              'LineAngle': this.angleInput.get('value')
+            }
           );
 
           //this.lengthUnitDDDidChange();
           //this.angleUnitDDDidChange();
 
           this._gl.add(this.currentLine.graphic);
-
+          this._gl.refresh();
           this.emit('graphic_created', this.currentLine);
 
           this.map.enableMapNavigation();

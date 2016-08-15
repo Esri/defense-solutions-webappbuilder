@@ -74,6 +74,22 @@ define([
                         'type': 'esriSLS',
                         'style': 'esriSLSSolid'
                     }
+                },
+                labelSymbol : this.config.feedback.labelSymbol || {
+                    'type' : 'esriTS',
+                    'color' : [0, 0, 0, 255],
+                    'verticalAlignment' : 'middle',
+                    'horizontalAlignment' : 'center',
+                    'xoffset' : 0,
+                    'yoffset' : 0,
+                    'kerning' : true,
+                    'font' : {
+                      'family' : 'arial',
+                      'size' : 12,
+                      'style' : 'normal',
+                      'weight' : 'normal',
+                      'decoration' : 'none'
+                    }  
                 }
             },
               this.lineTabNode
