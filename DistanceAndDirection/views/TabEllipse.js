@@ -405,16 +405,17 @@ define([
           this.currentEllipse = new ShapeModel(results);
           this.currentEllipse.graphic = new EsriGraphic(
             this.currentEllipse.wmGeometry,
-            this._ellipseSym,
-            {
-              'MINOR': parseFloat(dojoDomAttr.get(this.minorAxisInput, 'value').replace(',',''),2),
-              'MAJOR': parseFloat(dojoDomAttr.get(this.majorAxisInput, 'value').replace(',',''),2),
-              'ORIENTATION_ANGLE': parseFloat(this.currentEllipse.angle.replace(',',''),2)
-            }
+            this._ellipseSym
           );
 
           this.lengthUnitDDDidChange();
           this.angleUnitDDDidChange();
+
+          this.currentEllipse.graphic.setAttributes({
+            'MINOR': parseFloat(dojoDomAttr.get(this.minorAxisInput, 'value').replace(',',''),2),
+            'MAJOR': parseFloat(dojoDomAttr.get(this.majorAxisInput, 'value').replace(',',''),2),
+            'ORIENTATION_ANGLE': parseFloat(this.currentEllipse.angle.replace(',',''),2)
+          });
 
           this._gl.add(this.currentEllipse.graphic);
           this._gl.refresh();
