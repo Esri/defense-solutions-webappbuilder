@@ -542,7 +542,7 @@ define([
             var stPt = this.coordToolStart.inputCoordinate.coordinateEsriGeometry;
 
             var l = this.lengthInput.get('value');
-            var ang = this.angleInput.get('value');
+            var ang = -Math.abs(this.angleInput.get('value'));
 
             var tempcircle = new EsriCircle(stPt, {
               geodesic:true,
