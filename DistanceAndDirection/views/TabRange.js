@@ -25,6 +25,7 @@ define([
     'dojo/topic',
     'dojo/string',
     'dojo/keys',
+    'dojo/number',
     'dijit/_WidgetBase',
     'dijit/_TemplatedMixin',
     'dijit/TitlePane',
@@ -61,6 +62,7 @@ define([
     dojoTopic,
     dojoString,
     dojoKeys,
+    dojoNumber,
     dijitWidgetBase,
     dijitTemplatedMixin,
     dijitTitlePane,
@@ -376,6 +378,7 @@ define([
                 }
             }
 
+            var u = this.ringIntervalUnitsDD.get('value');
             for (params.c = 0; params.c < params.circles.length; params.c++) {
 
               var p = {
@@ -386,7 +389,7 @@ define([
               var cGraphic = new EsriGraphic(circlePath,
                 this._lineSym,
                 {
-                  'Interval': params.circles[params.c].radius.toString()
+                  'Interval': dojoNumber.round(this._util.convertMetersToUnits(params.circles[params.c].radius, u))
                 }
               );
               this._gl.add(cGraphic);
