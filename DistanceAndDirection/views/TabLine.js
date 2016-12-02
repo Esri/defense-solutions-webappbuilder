@@ -43,12 +43,14 @@ define([
     'esri/geometry/Point',
     'esri/symbols/SimpleLineSymbol',
     'esri/symbols/SimpleMarkerSymbol',
+    'esri/symbols/PictureMarkerSymbol',
     'esri/symbols/TextSymbol',
     'esri/graphic',
     'esri/units',
     'esri/geometry/webMercatorUtils',
     '../models/LineFeedback',
     '../models/ShapeModel',
+    '../models/DirectionalLineSymbol',
     '../views/CoordinateInput',
     '../views/EditOutputCoordinate',
     '../util',
@@ -82,12 +84,14 @@ define([
     EsriPoint,
     EsriSimpleLineSymbol,
     EsriSimpleMarkerSymbol,
+    EsriPictureMarkerSymbol,
     EsriTextSymbol,
     EsriGraphic,
     esriUnits,
     esriWMUtils,
     DrawFeedBack,
     ShapeModel,
+    DirectionalLineSymbol,
     CoordInput,
     EditOutputCoordinate,
     Utils,
@@ -114,7 +118,14 @@ define([
 
           this.currentAngleUnit = this.angleUnitDD.get('value');
 
-          this._lineSym = new EsriSimpleLineSymbol(this.lineSymbol);
+          //Create the directional line symbol with basic polyline params
+          var basicOptions = {
+              directionSymbol: DirectionalLineSymbol.arrow1,
+              directionPixelBuffer: 40,
+              showArrowsAlongLine: false
+          };            
+          basicOptions = dojoLang.mixin(basicOptions, this.lineSymbol);
+          this._lineSym = new DirectionalLineSymbol(basicOptions);
 
           this._ptSym = new EsriSimpleMarkerSymbol(this.pointSymbol);
 
@@ -173,7 +184,8 @@ define([
 
                   var lblexp = {'labelExpressionInfo': {'value': 'Length: {GeoLength}, Angle: {LineAngle}'}};
                   var lblClass = new EsriLabelClass(lblexp);
-                  lblClass.labelPlacement = 'center-along';
+                  lblClass.labelPlacement = 'above-along';
+                  lblClass.where = "GeoLength > 0";
                   lblClass.symbol = this._labelSym;
 
                   var featureCollection = {
@@ -488,27 +500,28 @@ define([
          */
         feedbackDidComplete: function (results) {
 
-          this.currentLine = new ShapeModel(results);
-          this.currentLine.graphic = new EsriGraphic(
-            this.currentLine.wmGeometry,
-            this._lineSym, {
-              'GeoLength': this.lengthInput.get('value'),
-              'LineAngle': this.angleInput.get('value')
-            }
-          );
+          if (this.lengthInput.get('value') !== undefined || this.angleInput.get('value') !== undefined) {
+            this.currentLine = new ShapeModel(results);
+            this.currentLine.graphic = new EsriGraphic(
+              this.currentLine.wmGeometry,
+              this._lineSym, {
+                'GeoLength': this.lengthInput.get('value'),
+                'LineAngle': this.angleInput.get('value')
+              }
+            );
 
-          //this.lengthUnitDDDidChange();
-          //this.angleUnitDDDidChange();
+            //this.lengthUnitDDDidChange();
+            //this.angleUnitDDDidChange();
 
-          this._gl.add(this.currentLine.graphic);
-          this._gl.refresh();
-          this.emit('graphic_created', this.currentLine);
+            this._gl.add(this.currentLine.graphic);
+            this._gl.refresh();
+            this.emit('graphic_created', this.currentLine);
 
-          this.map.enableMapNavigation();
+            this.map.enableMapNavigation();
 
-          this.dt.deactivate();
-          this.dt.removeStartGraphic();
-
+            this.dt.deactivate();
+            this.dt.removeStartGraphic();
+          }
           dojoDomClass.toggle(this.addPointBtnLine, 'jimu-state-active');
 
         },
