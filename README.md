@@ -1,4 +1,13 @@
 # military-tools-webappbuilder
+This **military-tools-webappbuilder** repository is no longer maintained. For the latest code:
+
+**Coordinate Conversion** is now part of Web AppBuilder for ArcGIS and Web AppBuilder for ArcGIS (Developer Edition).
+
+**Distance and Direction** is in the [Distance and Direction repository](https://github.com/Esri/distance-direction-addin-dotnet)
+
+**Visibility** is in the [Visibility repository](https://github.com/Esri/visibility-addin-dotnet)
+
+
 The Web AppBuilder Widgets for Military Tools for ArcGIS is a set of widgets for use with the Web AppBuilder for ArcGIS. These widgets address specialized workflows for defense users. Additionally, these widgets are created and managed by the Esri Solutions teams. 
 
 ## Sections
